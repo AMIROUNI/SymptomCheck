@@ -1,4 +1,4 @@
-package com.SymptomCheck.userservice;
+ package com.SymptomCheck.userservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
