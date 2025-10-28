@@ -1,10 +1,13 @@
 package com.symptomcheck.doctorservice.models;
 
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.util.List;
 
 @Entity
 @Table(name = "doctor_profiles")
+@Data
 public class DoctorProfile {
     @Id
     private Long doctorId; // même id que dans User Service
