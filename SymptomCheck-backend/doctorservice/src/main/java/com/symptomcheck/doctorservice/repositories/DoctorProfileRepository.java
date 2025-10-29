@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DoctorProfileRepository extends JpaRepository<DoctorProfile, Integer> {
+    DoctorProfile findBySpeciality(String speciality);
+
 }
