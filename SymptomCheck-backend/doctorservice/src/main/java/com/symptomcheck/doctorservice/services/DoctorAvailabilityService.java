@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class DoctorAvailabilityService {
     private final DoctorAvailabilityRepository doctorAvailabilityRepository;
+
     public boolean isDoctorAvailable(Long doctorId, LocalDateTime dateTime) {
         DayOfWeek day = dateTime.getDayOfWeek();
         var time = dateTime.toLocalTime();

@@ -1,0 +1,19 @@
+{
+  "realm": "symptomcheck-realm",
+  "enabled": true,
+  "roles": {
+    "realm": [
+      { "name": "PATIENT" },
+      { "name": "DOCTOR" },
+      { "name": "ADMIN" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "userservice-client",
+      "publicClient": true,
+      "redirectUris": ["*"],
+      "webOrigins": ["*"]
+    }
+  ]
+}

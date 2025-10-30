@@ -1,0 +1,7 @@
+to run a service
+cd nameservice
+mvnw.cmd spring-boot:run -DskipTests
+
+
+to build a image
+docker-compose up --build
