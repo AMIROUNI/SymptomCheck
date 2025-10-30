@@ -1,0 +1,29 @@
+server:
+  port: 8081
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/symptomcheck-realm
+
+# Configuration Keycloak Admin
+keycloak:
+  admin:
+    server-url: http://localhost:8080
+    realm: master
+    username: admin
+    password: admin
+    client-id: admin-cli
+  app:
+    realm: symptomcheck-realm
+    client-id: userservice
+    roles: USER,ADMIN,DOCTOR,PATIENT
+    client-secret: userservice-secret
+
+logging:
+  level:
+    com.SymptomCheck.userservice: DEBUG
+    org.keycloak: INFO
+    org.springframework.security: DEBUG

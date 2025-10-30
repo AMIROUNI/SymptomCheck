@@ -1,9 +1,9 @@
 package com.SymptomCheck.userservice.models;
 
-
 import com.SymptomCheck.userservice.enums.UserRole;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,25 +11,21 @@ import lombok.Setter;
 
 import java.time.Instant;
 
-@Entity
-@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long id; // ✅ Supprimé @Id @GeneratedValue
 
-    @NotBlank @Column(unique = true)
-    private String username;
+    @NotBlank
+    private String username; // ✅ Supprimé @Column(unique = true)
 
     @NotBlank
     private String passwordHash;
 
     @NotNull
-    @Enumerated(EnumType.STRING)
-    private UserRole role = UserRole.PATIENT;
+    private UserRole role = UserRole.PATIENT; // ✅ Supprimé @Enumerated
 
     private String firstName;
     private String lastName;
@@ -41,16 +37,8 @@ public class User {
     private String profilePhotoUrl;
     private boolean isProfileComplete = false;
 
-    private Long clinicId; // référence à Clinic (autre service) par id
+    private Long clinicId;
 
     private Instant createdAt = Instant.now();
     private Instant updatedAt;
-
-
-
-
 }
-
-
-
-
