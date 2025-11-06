@@ -61,7 +61,7 @@ public class KeycloakService {
     }
 
     /**
-     * Crée un utilisateur COMPLET dans Keycloak avec tous les attributs
+     * Crée un utilisateur COMPLET dans Keycloak avec tous les attributs personnalisés
      */
     public String registerUser(com.SymptomCheck.userservice.models.User user) {
         try {
@@ -78,56 +78,17 @@ public class KeycloakService {
             keycloakUser.setLastName(user.getLastName());
             keycloakUser.setEnabled(true);
             keycloakUser.setEmailVerified(true);
+
+            // Assigner le rôle
             keycloakUser.setRealmRoles(Collections.singletonList(user.getRole().name()));
 
-            // ✅ AJOUT DE TOUS LES ATTRIBUTS PERSONNALISÉS
-            Map<String, List<String>> attributes = new HashMap<>();
-
-            // Attributs de base
-            if (user.getPhoneNumber() != null) {
-                attributes.put("phoneNumber", Collections.singletonList(user.getPhoneNumber()));
-            }
-            if (user.getProfilePhotoUrl() != null) {
-                attributes.put("profilePhotoUrl", Collections.singletonList(user.getProfilePhotoUrl()));
-            }
-
-            // Attributs booléens
-            attributes.put("isProfileComplete", Collections.singletonList(String.valueOf(user.isProfileComplete())));
-
-            // Attributs numériques
-            if (user.getClinicId() != null) {
-                attributes.put("clinicId", Collections.singletonList(user.getClinicId().toString()));
-            }
-
-            // Timestamps
-            if (user.getCreatedAt() != null) {
-                attributes.put("createdAt", Collections.singletonList(
-                        DateTimeFormatter.ISO_INSTANT.format(user.getCreatedAt())
-                ));
-            }
-            if (user.getUpdatedAt() != null) {
-                attributes.put("updatedAt", Collections.singletonList(
-                        DateTimeFormatter.ISO_INSTANT.format(user.getUpdatedAt())
-                ));
-            } else {
-                // Set updatedAt to current time if null
-                attributes.put("updatedAt", Collections.singletonList(
-                        DateTimeFormatter.ISO_INSTANT.format(Instant.now())
-                ));
-            }
-
             // ID de la base locale (si vous l'utilisez encore pour référence)
-            if (user.getId() != null) {
-                attributes.put("localUserId", Collections.singletonList(user.getId().toString()));
-            }
-
-            keycloakUser.setAttributes(attributes);
 
             // Création du mot de passe
             CredentialRepresentation credential = new CredentialRepresentation();
             credential.setTemporary(false);
             credential.setType(CredentialRepresentation.PASSWORD);
-            credential.setValue(user.getPasswordHash()); // Utilise le passwordHash
+            credential.setValue(user.getPasswordHash());
             keycloakUser.setCredentials(Collections.singletonList(credential));
 
             // Envoi vers Keycloak
@@ -136,6 +97,9 @@ public class KeycloakService {
             if (response.getStatus() == 201) {
                 String userId = CreatedResponseUtil.getCreatedId(response);
                 log.info("✅ User created successfully in Keycloak with ALL attributes: {}", user.getUsername());
+
+                // Assigner explicitement le rôle
+                assignRoleToUser(userId, user.getRole().name());
 
                 // Log des détails pour vérification
                 logUserCreationDetails(user);
@@ -153,6 +117,23 @@ public class KeycloakService {
     }
 
     /**
+     * Assigner un rôle à un utilisateur
+     */
+    private void assignRoleToUser(String userId, String roleName) {
+        try {
+            // Récupérer le rôle du realm
+            var role = keycloak.realm(appRealm).roles().get(roleName).toRepresentation();
+
+            // Assigner le rôle à l'utilisateur
+            keycloak.realm(appRealm).users().get(userId).roles().realmLevel().add(Collections.singletonList(role));
+
+            log.info("✅ Role {} assigned to user {}", roleName, userId);
+        } catch (Exception e) {
+            log.error("❌ Error assigning role {} to user {}: {}", roleName, userId, e.getMessage());
+        }
+    }
+
+    /**
      * Log les détails de la création utilisateur
      */
     private void logUserCreationDetails(com.SymptomCheck.userservice.models.User user) {
@@ -162,12 +143,7 @@ public class KeycloakService {
         log.info("   - First Name: {}", user.getFirstName());
         log.info("   - Last Name: {}", user.getLastName());
         log.info("   - Role: {}", user.getRole());
-        log.info("   - Phone: {}", user.getPhoneNumber());
-        log.info("   - Profile Photo: {}", user.getProfilePhotoUrl());
-        log.info("   - Profile Complete: {}", user.isProfileComplete());
-        log.info("   - Clinic ID: {}", user.getClinicId());
-        log.info("   - Created At: {}", user.getCreatedAt());
-        log.info("   - Updated At: {}", user.getUpdatedAt());
+
     }
 
     /**

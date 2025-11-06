@@ -26,6 +26,8 @@ public class UserRegistrationRequest {
     private String firstName;
     private String lastName;
     private String phoneNumber;
+    private String profilePhotoUrl;
+
 
     @NotBlank
     private String role; // "PATIENT", "DOCTOR", "ADMIN"

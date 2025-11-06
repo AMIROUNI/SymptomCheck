@@ -1,14 +1,34 @@
 server:
-  port: 8081
+  port: 8082
 
 spring:
+  application:
+    name: user-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/user_service_db
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/realms/symptomcheck-realm
 
-# Configuration Keycloak Admin
+# ===============================
+# 🔐 Keycloak Admin Configuration
+# ===============================
 keycloak:
   admin:
     server-url: http://localhost:8080
@@ -19,9 +39,24 @@ keycloak:
   app:
     realm: symptomcheck-realm
     client-id: userservice
-    roles: USER,ADMIN,DOCTOR,PATIENT
     client-secret: userservice-secret
+    roles: USER,ADMIN,DOCTOR,PATIENT
 
+# ===============================
+# 🩺 Monitoring (Optional)
+# ===============================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+# ===============================
+#  Logging Levels
+# ===============================
 logging:
   level:
     com.SymptomCheck.userservice: DEBUG

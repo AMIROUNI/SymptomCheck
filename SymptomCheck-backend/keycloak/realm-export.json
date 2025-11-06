@@ -3,17 +3,184 @@
   "enabled": true,
   "roles": {
     "realm": [
-      { "name": "PATIENT" },
-      { "name": "DOCTOR" },
-      { "name": "ADMIN" }
+      {
+        "name": "PATIENT",
+        "description": "Patient role"
+      },
+      {
+        "name": "DOCTOR",
+        "description": "Doctor role"
+      },
+      {
+        "name": "ADMIN",
+        "description": "Administrator role"
+      }
     ]
   },
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "User",
+      "email": "admin@symptomcheck.local",
+      "attributes": {
+        "phoneNumber": ["+1234567890"],
+        "isProfileComplete": ["true"],
+        "localUserId": ["admin-001"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ADMIN"],
+      "clientRoles": {
+        "account": ["manage-account", "view-profile"]
+      }
+    },
+    {
+      "username": "doctor1",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "doctor@symptomcheck.local",
+      "attributes": {
+        "phoneNumber": ["+1987654321"],
+        "isProfileComplete": ["true"],
+        "clinicId": ["clinic-001"],
+        "localUserId": ["doctor-001"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "doctor123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["DOCTOR"],
+      "clientRoles": {
+        "account": ["manage-account", "view-profile"]
+      }
+    },
+    {
+      "username": "patient1",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "email": "patient@symptomcheck.local",
+      "attributes": {
+        "phoneNumber": ["+1555555555"],
+        "isProfileComplete": ["true"],
+        "localUserId": ["patient-001"]
+      },
+      "credentials": [
+        {
+          "type": "password",
+          "value": "patient123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["PATIENT"],
+      "clientRoles": {
+        "account": ["manage-account", "view-profile"]
+      }
+    }
+  ],
   "clients": [
     {
       "clientId": "userservice-client",
+      "name": "User Service Client",
+      "description": "Client for user service authentication",
+      "enabled": true,
       "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
       "redirectUris": ["*"],
-      "webOrigins": ["*"]
+      "webOrigins": ["*"],
+      "protocol": "openid-connect",
+      "attributes": {
+        "pkce.code.challenge.method": "S256"
+      },
+      "protocolMappers": [
+        {
+          "name": "phoneNumber",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "phoneNumber",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "phoneNumber",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "profilePhotoUrl",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "profilePhotoUrl",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "profilePhotoUrl",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "isProfileComplete",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "isProfileComplete",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "isProfileComplete",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "clinicId",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "clinicId",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "clinicId",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "localUserId",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "userinfo.token.claim": "true",
+            "user.attribute": "localUserId",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "localUserId",
+            "jsonType.label": "String"
+          }
+        }
+      ]
     }
   ]
 }

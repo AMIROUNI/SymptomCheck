@@ -1,5 +1,6 @@
 package com.SymptomCheck.userservice.controllers;
 
+import com.SymptomCheck.userservice.dtos.UserRegistrationRequest;
 import com.SymptomCheck.userservice.models.User;
 import com.SymptomCheck.userservice.services.UserService;
 import jakarta.validation.Valid;
@@ -20,15 +21,12 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody User user) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationRequest user) {
         try {
             // S'assurer que les timestamps sont définis
-            if (user.getCreatedAt() == null) {
-                user.setCreatedAt(Instant.now());
-            }
-            user.setUpdatedAt(Instant.now());
 
-            String userId = userService.registerUser(user);
+
+            String userId = userService.registerMyUser(user);
             return ResponseEntity.ok(Map.of(
                     "message", "User registered successfully in Keycloak with ALL attributes",
                     "keycloakUserId", userId,
@@ -59,14 +57,23 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.ok(Map.of(
-                "username", jwt.getClaim("preferred_username"),
-                "email", jwt.getClaim("email"),
-                "firstName", jwt.getClaim("given_name"),
-                "lastName", jwt.getClaim("family_name"),
-                "roles", jwt.getClaim("realm_access"),
-                "userId", jwt.getSubject(),
-                "allClaims", jwt.getClaims() // Pour voir tous les attributs
-        ));
+        Map<String, Object> userMap = Map.ofEntries(
+                Map.entry("username", jwt.getClaim("preferred_username")),
+                Map.entry("email", jwt.getClaim("email")),
+                Map.entry("firstName", jwt.getClaim("given_name")),
+                Map.entry("lastName", jwt.getClaim("family_name")),
+                Map.entry("roles", jwt.getClaim("realm_access")),
+                Map.entry("userId", jwt.getSubject()),
+                Map.entry("phoneNumber", jwt.getClaim("phoneNumber")),
+                Map.entry("profilePhotoUrl", jwt.getClaim("profilePhotoUrl")),
+                Map.entry("isProfileComplete", jwt.getClaim("isProfileComplete")),
+                Map.entry("clinicId", jwt.getClaim("clinicId")),
+                Map.entry("localUserId", jwt.getClaim("localUserId")),
+                Map.entry("createdAt", jwt.getClaim("createdAt")),
+                Map.entry("updatedAt", jwt.getClaim("updatedAt")),
+                Map.entry("allClaims", jwt.getClaims())
+        );
+        return ResponseEntity.ok(userMap);
     }
+
 }

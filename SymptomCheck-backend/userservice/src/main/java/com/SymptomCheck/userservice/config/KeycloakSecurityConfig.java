@@ -23,12 +23,14 @@ public class KeycloakSecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(
+
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/webjars/**",
                                 "/api/v1/users/register",
+                                "/api/v1/users/all",
                                 "/api/v1/users/public/**",
                                 "/api/v1/auth/**").permitAll()
                         .anyRequest().authenticated()

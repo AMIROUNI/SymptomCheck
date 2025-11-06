@@ -33,12 +33,5 @@ public class User {
     @Email
     private String email;
 
-    private String phoneNumber;
-    private String profilePhotoUrl;
-    private boolean isProfileComplete = false;
 
-    private Long clinicId;
-
-    private Instant createdAt = Instant.now();
-    private Instant updatedAt;
 }
