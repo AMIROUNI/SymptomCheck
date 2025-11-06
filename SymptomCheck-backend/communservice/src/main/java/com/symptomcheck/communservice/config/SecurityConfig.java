@@ -1,6 +1,5 @@
-package com.SymptomCheck.userservice.config;
+package com.symptomcheck.communservice.config;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -23,8 +22,20 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
-@RequiredArgsConstructor
-public class KeycloakSecurityConfig {
+public class SecurityConfig {
+
+    // Common public endpoints for all services
+    protected String[] getPublicEndpoints() {
+        return new String[]{
+                "/swagger-ui.html",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/swagger-resources/**",
+                "/webjars/**",
+                "/actuator/health",
+                "/actuator/info"
+        };
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -33,24 +44,7 @@ public class KeycloakSecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
-                        // Public endpoints
-                        .requestMatchers(
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-resources/**",
-                                "/webjars/**",
-                                "/api/v1/users/register",
-                                "/api/v1/users/public/**",
-                                "/api/v1/auth/**",
-                                "/actuator/health").permitAll()
-
-                        // Role-based access control
-                        .requestMatchers("/api/v1/users/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/users/doctor/**").hasAnyRole("DOCTOR", "ADMIN")
-                        .requestMatchers("/api/v1/users/patient/**").hasAnyRole("PATIENT", "ADMIN")
-
-                        // All other endpoints require authentication
+                        .requestMatchers(getPublicEndpoints()).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -67,7 +61,6 @@ public class KeycloakSecurityConfig {
         return converter;
     }
 
-    // Custom converter to extract realm roles from Keycloak JWT
     public static class KeycloakRealmRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 
         @Override

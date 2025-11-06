@@ -11,6 +11,7 @@
         <module>medicalrecordservice</module>
         <module>doctorservice</module>
         <module>aiservice</module>
+        <module>communservice</module>
     </modules>
 
     <parent>
