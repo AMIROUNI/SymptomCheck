@@ -5,10 +5,12 @@ import com.symptomcheck.appointmentservice.repositories.AppointmentRepository;
 import com.symptomcheck.appointmentservice.services.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/appointments")
@@ -27,5 +29,25 @@ public class AppointmentController {
         } catch (Exception ex) {
             return ResponseEntity.status(500).body("Internal server error: " + ex.getMessage());
         }
+    }
+
+    // version locale
+    @GetMapping("/doctor/{doctorId}")
+    @PreAuthorize("hasRole('Doctor')")
+    public ResponseEntity<List<Appointment>> getByDoctor(@PathVariable String doctorId) {
+        List<Appointment> appointments = appointmentService.getByDoctor(doctorId);
+        return ResponseEntity.ok(appointments);
+    }
+
+    // version WebClient (appelle un autre microservice)
+    @GetMapping("/doctor/{doctorId}/remote")
+    @PreAuthorize("hasRole('Doctor')")
+    public ResponseEntity<List<Appointment>> getByDoctorRemote(
+            @PathVariable int doctorId,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        String token = jwt.getTokenValue();
+        List<Appointment> appointments = appointmentService.getByDoctorFromDoctorService(doctorId, token);
+        return ResponseEntity.ok(appointments);
     }
 }

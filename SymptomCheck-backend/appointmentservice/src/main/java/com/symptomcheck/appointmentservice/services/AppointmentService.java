@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 
 @Service
@@ -40,5 +41,24 @@ public class AppointmentService {
         } else {
             throw new IllegalArgumentException(" The doctor is not available at the selected date.");
         }
+    }
+
+
+    // méthode locale (si tu veux récupérer directement depuis ta base)
+    public List<Appointment> getByDoctor(String doctorId) {
+        return appointmentRepository.findByDoctorId(doctorId);
+    }
+
+    // méthode distante (si tu veux appeler un autre microservice)
+    public List<Appointment> getByDoctorFromDoctorService(int doctorId, String token) {
+        String doctorServiceUrl = "http://doctorservice:8082/api/doctors/" + doctorId + "/appointments";
+
+        return webClient.get()
+                .uri(doctorServiceUrl)
+                .header("Authorization", "Bearer " + token)
+                .retrieve()
+                .bodyToFlux(Appointment.class)
+                .collectList()
+                .block(); // pour simplifier en synchrone
     }
 }

@@ -14,7 +14,7 @@ public class DoctorAvailability {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long doctorId;
+    private String doctorId;
     @NotNull
     private DayOfWeek dayOfWeek;
     @NotNull

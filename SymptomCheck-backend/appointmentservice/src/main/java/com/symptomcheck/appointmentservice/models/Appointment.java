@@ -20,10 +20,10 @@ public class Appointment {
     private LocalDateTime dateTime; // moment du rendez-vous
 
     @NotNull
-    private Long patientId;   // référence User Service
+    private String patientId;   // référence User Service
 
     @NotNull
-    private Long doctorId;    // référence Doctor Service / User Service
+    private String doctorId;    // référence Doctor Service / User Service
 
     @NotNull
     @Enumerated(EnumType.STRING)
