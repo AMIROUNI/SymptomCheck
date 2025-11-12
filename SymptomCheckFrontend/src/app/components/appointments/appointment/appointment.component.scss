@@ -1,0 +1,70 @@
+.appointment-container {
+  padding: 60px 0;
+  background-color: #f5f8fb;
+  min-height: calc(100vh - 160px);
+  
+  .section-header {
+    margin-bottom: 40px;
+    
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    p {
+      font-size: 1.1rem;
+      color: #666;
+    }
+  }
+  
+  .appointment-card {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+    
+    .form-label {
+      font-weight: 500;
+      color: #333;
+    }
+    
+    .form-control, .form-select {
+      padding: 12px;
+      border-color: #ddd;
+      
+      &:focus {
+        border-color: #3f8efc;
+        box-shadow: 0 0 0 0.25rem rgba(63, 142, 252, 0.25);
+      }
+    }
+    
+    .btn-primary {
+      background-color: #3f8efc;
+      border-color: #3f8efc;
+      padding: 12px;
+      
+      &:hover {
+        background-color: darken(#3f8efc, 10%);
+        border-color: darken(#3f8efc, 10%);
+      }
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .appointment-container {
+    padding: 40px 0;
+    
+    .section-header {
+      h1 {
+        font-size: 2rem;
+      }
+    }
+    
+    .appointment-card {
+      padding: 20px;
+    }
+  }
+}

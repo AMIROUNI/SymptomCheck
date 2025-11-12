@@ -1,0 +1,56 @@
+<div class="doctor-list-container">
+  <div class="container">
+    <div class="section-header text-center">
+      <h1>Find a Doctor</h1>
+      <p>Connect with our qualified healthcare professionals</p>
+    </div>
+    
+    <div class="search-filters">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input 
+              type="text" 
+              class="form-control" 
+              placeholder="Search by name or specialty..." 
+              [(ngModel)]="searchTerm"
+              (input)="onSearchChange()"
+            >
+          </div>
+        </div>
+        <div class="col-md-4">
+          <select 
+            class="form-select" 
+            [(ngModel)]="selectedSpecialty"
+            (change)="onSpecialtyChange(selectedSpecialty)"
+          >
+            <option value="">All Specialties</option>
+            <option *ngFor="let specialty of specialties" [value]="specialty">{{ specialty }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    
+    <div *ngIf="!isLoading" class="doctors-grid">
+      <div class="row">
+        <div *ngFor="let doctor of filteredDoctors" class="col-md-6 col-lg-4">
+          <app-doctor-card [doctor]="doctor"></app-doctor-card>
+        </div>
+      </div>
+      
+      <div *ngIf="filteredDoctors.length === 0" class="no-results">
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i>
+          No doctors found matching your criteria. Please try different search terms or filters.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

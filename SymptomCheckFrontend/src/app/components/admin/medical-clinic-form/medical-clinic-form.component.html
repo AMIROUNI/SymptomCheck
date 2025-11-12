@@ -1,0 +1,125 @@
+<div class="service-form-container">
+  <h2 class="form-title">Add New Medical Clinic</h2>
+  
+  <form [formGroup]="clinicForm" (ngSubmit)="onSubmit()" class="service-form">
+    <!-- Name -->
+    <div class="form-group">
+      <label for="name" class="required-field">Clinic Name</label>
+      <input 
+        type="text" 
+        id="name" 
+        formControlName="name" 
+        placeholder="Enter clinic name"
+        [ngClass]="{'ng-invalid': f['name'].invalid && (f['name'].dirty || f['name'].touched)}"
+      >
+      <div *ngIf="f['name'].invalid && (f['name'].dirty || f['name'].touched)" class="error-message">
+        <span *ngIf="f['name'].errors?.['required']">Clinic name is required</span>
+        <span *ngIf="f['name'].errors?.['maxlength']">Name must be less than 100 characters</span>
+      </div>
+    </div>
+
+    <!-- Address -->
+    <div class="form-group">
+      <label for="address" class="required-field">Address</label>
+      <input 
+        type="text" 
+        id="address" 
+        formControlName="address" 
+        placeholder="Enter clinic address"
+        [ngClass]="{'ng-invalid': f['address'].invalid && (f['address'].dirty || f['address'].touched)}"
+      >
+      <div *ngIf="f['address'].invalid && (f['address'].dirty || f['address'].touched)" class="error-message">
+        <span *ngIf="f['address'].errors?.['required']">Address is required</span>
+        <span *ngIf="f['address'].errors?.['maxlength']">Address must be less than 200 characters</span>
+      </div>
+    </div>
+
+    <!-- City and Country Row -->
+    <div class="form-row">
+      <!-- City -->
+      <div class="form-group">
+        <label for="city" class="required-field">City</label>
+        <input 
+          type="text" 
+          id="city" 
+          formControlName="city" 
+          placeholder="Enter city"
+          [ngClass]="{'ng-invalid': f['city'].invalid && (f['city'].dirty || f['city'].touched)}"
+        >
+        <div *ngIf="f['city'].invalid && (f['city'].dirty || f['city'].touched)" class="error-message">
+          <span *ngIf="f['city'].errors?.['required']">City is required</span>
+          <span *ngIf="f['city'].errors?.['maxlength']">City must be less than 50 characters</span>
+        </div>
+      </div>
+
+      <!-- Country -->
+      <div class="form-group">
+        <label for="country" class="required-field">Country</label>
+        <input 
+          type="text" 
+          id="country" 
+          formControlName="country" 
+          placeholder="Enter country"
+          [ngClass]="{'ng-invalid': f['country'].invalid && (f['country'].dirty || f['country'].touched)}"
+        >
+        <div *ngIf="f['country'].invalid && (f['country'].dirty || f['country'].touched)" class="error-message">
+          <span *ngIf="f['country'].errors?.['required']">Country is required</span>
+          <span *ngIf="f['country'].errors?.['maxlength']">Country must be less than 50 characters</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phone and Website Row -->
+    <div class="form-row">
+      <!-- Phone -->
+      <div class="form-group">
+        <label for="phone" class="required-field">Phone Number</label>
+        <input 
+          type="tel" 
+          id="phone" 
+          formControlName="phone" 
+          placeholder="Enter phone number"
+          [ngClass]="{'ng-invalid': f['phone'].invalid && (f['phone'].dirty || f['phone'].touched)}"
+        >
+        <div *ngIf="f['phone'].invalid && (f['phone'].dirty || f['phone'].touched)" class="error-message">
+          <span *ngIf="f['phone'].errors?.['required']">Phone number is required</span>
+          <span *ngIf="f['phone'].errors?.['pattern']">Please enter a valid phone number</span>
+        </div>
+      </div>
+
+      <!-- Website -->
+      <div class="form-group">
+        <label for="websiteUrl">Website URL</label>
+        <input 
+          type="url" 
+          id="websiteUrl" 
+          formControlName="websiteUrl" 
+          placeholder="Enter website URL (optional)"
+          [ngClass]="{'ng-invalid': f['websiteUrl'].invalid && (f['websiteUrl'].dirty || f['websiteUrl'].touched)}"
+        >
+        <div *ngIf="f['websiteUrl'].invalid && (f['websiteUrl'].dirty || f['websiteUrl'].touched)" class="error-message">
+          <span *ngIf="f['websiteUrl'].errors?.['pattern']">Please enter a valid URL</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button type="button" class="cancel-btn" (click)="resetForm()">Reset</button>
+      <button type="submit" class="submit-btn" [disabled]="isSubmitting || clinicForm.invalid">
+        <span *ngIf="!isSubmitting">Submit</span>
+        <span *ngIf="isSubmitting" class="spinner"></span>
+      </button>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="fileError" class="error-message">
+      {{ fileError }}
+    </div>
+  </form>
+
+  <!-- Success Message -->
+  <div *ngIf="submitSuccess" class="submit-success">
+    Clinic added successfully!
+  </div>
+</div>

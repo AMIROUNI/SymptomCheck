@@ -1,0 +1,183 @@
+/* Reuse existing header styles from doctor management */
+.header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(224, 230, 237, 0.5);
+}
+
+.header h2 {
+  color: #2c3e50;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.header h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 24px;
+  width: 6px;
+  background: linear-gradient(to bottom, #3498db, #2ecc71);
+  border-radius: 3px;
+}
+
+/* Card styles */
+mat-card {
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(224, 230, 237, 0.5);
+  overflow: hidden;
+}
+
+mat-card-content {
+  padding: 0 !important;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+}
+
+mat-spinner {
+  margin: 0 auto;
+}
+
+/* Table styles */
+.mat-elevation-z8 {
+  box-shadow: none !important;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.mat-table {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.mat-header-cell {
+  background-color: #f8fafc;
+  color: #34495e;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(224, 230, 237, 0.5);
+}
+
+.mat-cell {
+  padding: 1rem 1.5rem;
+  color: #2c3e50;
+  border-bottom: 1px solid rgba(224, 230, 237, 0.3);
+}
+
+.mat-row {
+  transition: background-color 0.2s ease;
+}
+
+.mat-row:hover {
+  background-color: #f1f7fe;
+}
+
+.mat-row:last-child .mat-cell {
+  border-bottom: none;
+}
+
+/* Role chip styles */
+mat-chip {
+  font-weight: 500;
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  font-size: 0.8rem !important;
+}
+
+.mat-chip.mat-primary {
+  background: linear-gradient(135deg, #3498db, #2980b9) !important;
+  color: white !important;
+}
+
+.mat-chip.mat-accent {
+  background: linear-gradient(135deg, #2ecc71, #27ae60) !important;
+  color: white !important;
+}
+
+.mat-chip.mat-warn {
+  background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+  color: white !important;
+}
+
+/* Action buttons */
+button[mat-icon-button] {
+  transition: all 0.2s ease;
+  transform: scale(0.9);
+  margin: 0 4px;
+}
+
+button[mat-icon-button]:hover {
+  transform: scale(1);
+}
+
+button[mat-icon-button][color="primary"] {
+  background-color: rgba(52, 152, 219, 0.1) !important;
+}
+
+button[mat-icon-button][color="warn"] {
+  background-color: rgba(231, 76, 60, 0.1) !important;
+}
+
+button[mat-icon-button][color="primary"]:hover {
+  background-color: rgba(52, 152, 219, 0.2) !important;
+}
+
+button[mat-icon-button][color="warn"]:hover {
+  background-color: rgba(231, 76, 60, 0.2) !important;
+}
+
+mat-icon {
+  color: currentColor;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .mat-header-cell, .mat-cell {
+    padding: 0.75rem 1rem;
+  }
+
+  .header h2 {
+    font-size: 1.5rem;
+  }
+
+  /* Hide less important columns on smaller screens */
+  .mat-column-id {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .mat-table {
+    min-width: 100%;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .header h2 {
+    font-size: 1.3rem;
+    padding-left: 1rem;
+  }
+
+  .header h2::before {
+    height: 20px;
+    width: 4px;
+  }
+
+  /* Hide additional columns on very small screens */
+  .mat-column-firstName,
+  .mat-column-lastName {
+    display: none;
+  }
+}

@@ -1,0 +1,205 @@
+/* Header Styles */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(224, 230, 237, 0.5);
+}
+
+.header h2 {
+  color: #2c3e50;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.header h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 24px;
+  width: 6px;
+  background: linear-gradient(to bottom, #3498db, #2ecc71);
+  border-radius: 3px;
+}
+
+/* Add Clinic Button */
+button[mat-raised-button] {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px rgba(52, 152, 219, 0.15) !important;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+button[mat-raised-button]:hover {
+  background: linear-gradient(135deg, #2980b9, #3498db);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(52, 152, 219, 0.2) !important;
+}
+
+button[mat-raised-button]:active {
+  transform: translateY(0);
+}
+
+button[mat-raised-button] mat-icon {
+  color: white;
+  font-size: 1.2rem;
+  height: 1.2rem;
+  width: 1.2rem;
+}
+
+/* Card Styles */
+mat-card {
+  border-radius: 16px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(224, 230, 237, 0.5);
+  overflow: hidden;
+}
+
+mat-card-content {
+  padding: 0 !important;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+}
+
+mat-spinner {
+  margin: 0 auto;
+}
+
+/* Table Styles */
+.mat-elevation-z8 {
+  box-shadow: none !important;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.mat-table {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.mat-header-cell {
+  background-color: #f8fafc;
+  color: #34495e;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(224, 230, 237, 0.5);
+}
+
+.mat-cell {
+  padding: 1rem 1.5rem;
+  color: #2c3e50;
+  border-bottom: 1px solid rgba(224, 230, 237, 0.3);
+}
+
+.mat-row {
+  transition: background-color 0.2s ease;
+}
+
+.mat-row:hover {
+  background-color: #f1f7fe;
+}
+
+.mat-row:last-child .mat-cell {
+  border-bottom: none;
+}
+
+/* Action Buttons */
+button[mat-icon-button] {
+  transition: all 0.2s ease;
+  transform: scale(0.9);
+  margin: 0 4px;
+}
+
+button[mat-icon-button]:hover {
+  transform: scale(1);
+}
+
+button[mat-icon-button][color="primary"] {
+  background-color: rgba(52, 152, 219, 0.1) !important;
+}
+
+button[mat-icon-button][color="warn"] {
+  background-color: rgba(231, 76, 60, 0.1) !important;
+}
+
+button[mat-icon-button][color="primary"]:hover {
+  background-color: rgba(52, 152, 219, 0.2) !important;
+}
+
+button[mat-icon-button][color="warn"]:hover {
+  background-color: rgba(231, 76, 60, 0.2) !important;
+}
+
+mat-icon {
+  color: currentColor;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .mat-header-cell, .mat-cell {
+    padding: 0.75rem 1rem;
+  }
+
+  .header h2 {
+    font-size: 1.5rem;
+  }
+
+  /* Hide less important columns on smaller screens */
+  .mat-column-id {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .mat-table {
+    min-width: 100%;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .header h2 {
+    font-size: 1.3rem;
+    padding-left: 1rem;
+  }
+
+  .header h2::before {
+    height: 20px;
+    width: 4px;
+  }
+
+  /* Hide additional columns on very small screens */
+  .mat-column-city,
+  .mat-column-country {
+    display: none;
+  }
+
+  button[mat-raised-button] {
+    width: 100%;
+    justify-content: center;
+  }
+}

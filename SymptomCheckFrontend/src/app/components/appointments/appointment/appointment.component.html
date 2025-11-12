@@ -1,0 +1,136 @@
+<div class="appointment-container">
+  <div class="container">
+    <div class="section-header text-center">
+      <h1>Book an Appointment</h1>
+      <p>Schedule your visit with our healthcare professionals</p>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-md-10 col-lg-8">
+        <div class="appointment-card">
+          <div *ngIf="isLoading" class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+
+          <div *ngIf="!isLoading">
+            <div *ngIf="errorMessage" class="alert alert-danger">
+              <i class="fas fa-exclamation-circle me-2"></i>
+              {{ errorMessage }}
+            </div>
+
+            <div *ngIf="successMessage" class="alert alert-success">
+              <i class="fas fa-check-circle me-2"></i>
+              {{ successMessage }}
+            </div>
+
+            <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
+              <div class="mb-4">
+                <label for="doctorId" class="form-label">Select Doctor</label>
+                <select
+                  id="doctorId"
+                  formControlName="doctorId"
+                  class="form-select"
+                  [ngClass]="{'is-invalid': appointmentForm.get('doctorId')?.invalid && appointmentForm.get('doctorId')?.touched}"
+                  (change)="onDoctorChange()"
+                >
+                  <option value="">-- Select a Doctor --</option>
+                  <option *ngFor="let doctor of doctors" [value]="doctor.id">
+                    Dr. {{ doctor.firstName }} {{ doctor.lastName }} ({{ doctor.speciality }})
+                  </option>
+                </select>
+                <div class="invalid-feedback">
+                  Please select a doctor
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label for="serviceId" class="form-label">Select Service</label>
+                <select
+                  id="serviceId"
+                  formControlName="serviceId"
+                  class="form-select"
+                  [ngClass]="{'is-invalid': appointmentForm.get('serviceId')?.invalid && appointmentForm.get('serviceId')?.touched}"
+                >
+                  <option value="">-- Select a Service --</option>
+                  <option *ngFor="let service of filteredServices" [value]="service.id">
+                    {{ service.name }} (${{ service.price }} - {{ service.durationMinutes }} min)
+                  </option>
+                </select>
+                <div class="invalid-feedback">
+                  Please select a service
+                </div>
+                <div *ngIf="filteredServices.length === 0 && appointmentForm.get('doctorId')?.value" class="form-text text-warning">
+                  <i class="fas fa-info-circle me-1"></i>
+                  No services available for this doctor
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label for="date" class="form-label">Select Date</label>
+                <input
+                  type="date"
+                  id="date"
+                  formControlName="date"
+                  class="form-control"
+                  [ngClass]="{'is-invalid': appointmentForm.get('date')?.invalid && appointmentForm.get('date')?.touched}"
+                  [min]="minDate.toISOString().split('T')[0]"
+                  (change)="onDateChange()"
+                >
+                <div class="invalid-feedback">
+                  Please select a date
+                </div>
+              </div>
+
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-clock"></i></span>
+                <input
+                  type="time"
+                  id="time"
+                  formControlName="time"
+                  class="form-control form-control-lg"
+                  [ngClass]="{'is-invalid': appointmentForm.get('time')?.invalid && appointmentForm.get('time')?.touched}"
+                  min="09:00"
+                  max="17:00"
+                  step="900"
+                >
+              </div>
+
+              <div class="mb-4">
+                <label for="description" class="form-label">Reason for Visit</label>
+                <textarea
+                  id="description"
+                  formControlName="description"
+                  class="form-control"
+                  rows="4"
+                  [ngClass]="{'is-invalid': appointmentForm.get('description')?.invalid && appointmentForm.get('description')?.touched}"
+                  placeholder="Please describe your symptoms or reason for the appointment"
+                ></textarea>
+                <div class="invalid-feedback">
+                  Please provide a reason for your visit
+                </div>
+                <div class="form-text">
+                  <span [ngClass]="{'text-danger': appointmentForm.get('description')?.value?.length > 1000}">
+                    {{ appointmentForm.get('description')?.value?.length || 0 }}/1000
+                  </span>
+                </div>
+              </div>
+
+              <div class="d-grid gap-2">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-lg"
+                  [disabled]="appointmentForm.invalid || isSubmitting"
+                >
+                  <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Book Appointment
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

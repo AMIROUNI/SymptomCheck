@@ -1,0 +1,107 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f7fa;
+}
+
+mat-toolbar {
+  background: linear-gradient(135deg, #3498db, #2980b9) !important;
+  color: white !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 0 2rem;
+  height: 64px;
+}
+
+mat-toolbar span {
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: 0.5px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+mat-icon {
+  color: white;
+}
+
+.sidenav-container {
+  flex: 1;
+  background-color: #f5f7fa;
+}
+
+.sidenav {
+  width: 240px;
+  background: #ffffff;
+  border-right: 1px solid rgba(224, 230, 237, 0.5);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.mat-nav-list {
+  padding-top: 1rem;
+}
+
+.mat-list-item {
+  color: #2c3e50;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  margin: 0.25rem 0.5rem;
+  border-radius: 8px;
+  width: calc(100% - 1rem);
+}
+
+.mat-list-item:hover {
+  background-color: #f1f7fe !important;
+  color: #3498db;
+}
+
+.mat-list-item .mat-icon {
+  color: #7f8c8d;
+  margin-right: 1rem;
+}
+
+.mat-list-item:hover .mat-icon {
+  color: #3498db;
+}
+
+.mat-list-item.active {
+  background: linear-gradient(90deg, rgba(52, 152, 219, 0.1), transparent) !important;
+  color: #3498db;
+  font-weight: 600;
+}
+
+.mat-list-item.active .mat-icon {
+  color: #3498db;
+}
+
+.main-content {
+  padding: 2rem;
+  background-color: #f5f7fa;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1.5rem;
+  }
+
+  mat-toolbar {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidenav {
+    width: 200px;
+  }
+
+  .main-content {
+    padding: 1rem;
+  }
+
+  mat-toolbar span {
+    font-size: 1rem;
+  }
+}

@@ -1,0 +1,29 @@
+.login-container {
+  padding: 60px 0;
+  background-color: #f5f8fb;
+  min-height: calc(100vh - 160px);
+}
+
+.card {
+  border-radius: 10px;
+  border: none;
+}
+
+.btn-primary {
+  background-color: #3f8efc;
+  border-color: #3f8efc;
+  
+  &:hover {
+    background-color: darken(#3f8efc, 10%);
+    border-color: darken(#3f8efc, 10%);
+  }
+}
+
+a {
+  color: #3f8efc;
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}

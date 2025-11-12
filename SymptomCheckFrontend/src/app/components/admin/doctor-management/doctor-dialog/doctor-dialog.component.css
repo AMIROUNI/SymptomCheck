@@ -1,0 +1,203 @@
+.mat-dialog-container {
+  border-radius: 16px !important;
+  padding: 2.5rem !important;
+  background-color: #ffffff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(224, 230, 237, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.mat-dialog-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+}
+
+h2.mat-dialog-title {
+  color: #2c3e50;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 1rem;
+  position: relative;
+  text-align: center;
+}
+
+h2.mat-dialog-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+  border-radius: 4px;
+  opacity: 0.8;
+}
+
+.mat-dialog-content {
+  padding: 0.5rem 0 !important;
+  max-height: 65vh !important;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+mat-form-field {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline {
+  color: #e0e6ed;
+  background-color: #f8fafc;
+  border-radius: 8px;
+}
+
+.mat-form-field-appearance-outline .mat-form-field-outline-thick {
+  color: #3498db;
+}
+
+.mat-form-field-appearance-outline.mat-focused .mat-form-field-outline-thick {
+  color: #3498db;
+}
+
+.mat-input-element {
+  color: #2c3e50;
+  caret-color: #3498db;
+  padding: 0.5em 0 !important;
+}
+
+.mat-form-field-label {
+  color: #95a5a6 !important;
+}
+
+.mat-form-field.mat-focused .mat-form-field-label {
+  color: #3498db !important;
+}
+
+.mat-error {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.mat-error::before {
+  content: '⚠';
+  font-size: 1rem;
+}
+
+textarea.mat-input-element {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.mat-select-value {
+  color: #2c3e50 !important;
+}
+
+.mat-select-arrow {
+  color: #95a5a6 !important;
+}
+
+.mat-dialog-actions {
+  padding: 1.5rem 0 0 0 !important;
+  margin: 0 !important;
+  border-top: 1px solid #e0e6ed;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+button[mat-button] {
+  color: #7f8c8d;
+  padding: 0.5rem 1.5rem;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #e0e6ed;
+  font-weight: 600;
+}
+
+button[mat-button]:hover {
+  background-color: #f1f3f5;
+  color: #5d6d7e;
+  border-color: #d5dbdb;
+}
+
+button[mat-raised-button] {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  padding: 0.5rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 100px;
+  box-shadow: 0 4px 6px rgba(52, 152, 219, 0.15) !important;
+}
+
+button[mat-raised-button]:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2980b9, #3498db);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(52, 152, 219, 0.2) !important;
+}
+
+button[mat-raised-button]:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+button[mat-raised-button]:disabled {
+  background: #bdc3c7 !important;
+  cursor: not-allowed;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.mat-spinner {
+  margin-right: 0.5rem;
+}
+
+.mat-spinner circle {
+  stroke: white !important;
+}
+
+@media (max-width: 768px) {
+  .mat-dialog-container {
+    padding: 1.75rem !important;
+  }
+
+  h2.mat-dialog-title {
+    font-size: 1.5rem;
+  }
+
+  .full-width {
+    margin-bottom: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mat-dialog-container {
+    padding: 1.5rem !important;
+  }
+
+  h2.mat-dialog-title {
+    font-size: 1.3rem;
+  }
+
+  .mat-dialog-actions {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+  }
+
+  button[mat-button], button[mat-raised-button] {
+    width: 100%;
+  }
+}

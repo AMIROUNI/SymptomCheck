@@ -1,0 +1,135 @@
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="hero-title">Your Health, Our Priority</h1>
+        <p class="hero-subtitle">Connect with trusted healthcare professionals and book appointments with ease.</p>
+        <div class="hero-buttons">
+          <button class="btn btn-primary btn-lg me-3" (click)="navigateToDoctors()">Find a Doctor</button>
+          <button class="btn btn-outline-primary btn-lg" (click)="navigateToAppointment()">Book Appointment</button>
+        </div>
+      </div>
+      <div class="col-lg-6 d-none d-lg-block">
+        <img src="background.jpg" alt="Healthcare professionals" class="img-fluid hero-image">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-user-md"></i>
+          </div>
+          <h3>Book Trusted Doctors</h3>
+          <p>Connect with verified healthcare professionals with years of experience in their fields.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-dollar-sign"></i>
+          </div>
+          <h3>Affordable Services</h3>
+          <p>Access quality healthcare services at competitive and transparent prices.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-headset"></i>
+          </div>
+          <h3>24/7 Support</h3>
+          <p>Our dedicated team is always available to assist you with any questions or concerns.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Doctors Section -->
+<section class="doctors-section">
+  <div class="container">
+    <div class="section-header text-center">
+      <h2>Meet Our Specialists</h2>
+      <p>Experienced doctors across various specialties</p>
+    </div>
+
+    <div class="row" *ngIf="!isLoading">
+      <div class="col-md-4" *ngFor="let doctor of featuredDoctors">
+        <div class="doctor-card">
+          <div class="doctor-image">
+            <img [src]="doctor.profilePhotoUrl || 'assets/images/doctor-placeholder.jpg'" [alt]="doctor.firstName + ' ' + doctor.lastName">
+          </div>
+          <div class="doctor-info">
+            <h3>Dr. {{ doctor.firstName }} {{ doctor.lastName }}</h3>
+            <p class="doctor-specialty">{{ doctor.speciality }}</p>
+            <app-star-rating [rating]="4.5" [readOnly]="true"></app-star-rating>
+            <button class="btn btn-outline-primary mt-3" [routerLink]="['/doctors', doctor.id]">View Profile</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div class="text-center mt-4">
+      <button class="btn btn-primary" (click)="navigateToDoctors()">View All Doctors</button>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<app-testimonials></app-testimonials>
+
+<!-- Stats Section -->
+<section class="stats-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3 col-6">
+        <div class="stat-item">
+          <h3>5,000+</h3>
+          <p>Happy Patients</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="stat-item">
+          <h3>100+</h3>
+          <p>Expert Doctors</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="stat-item">
+          <h3>50+</h3>
+          <p>Medical Services</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="stat-item">
+          <h3>10+</h3>
+          <p>Years Experience</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content text-center">
+      <h2>Ready to prioritize your health?</h2>
+      <p>Book an appointment with one of our healthcare professionals today.</p>
+      <button class="btn btn-light btn-lg mt-3" (click)="navigateToAppointment()">Book Now</button>
+    </div>
+  </div>
+</section>

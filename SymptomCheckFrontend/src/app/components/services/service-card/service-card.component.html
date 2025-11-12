@@ -1,0 +1,24 @@
+<div class="service-card">
+  <div class="service-image">
+    <img [src]="service.imageUrl || 'assets/images/services/default.jpg'" [alt]="service.name">
+    <div class="service-category">{{ service.category }}</div>
+  </div>
+  <div class="service-info">
+    <h3>{{ service.name }}</h3>
+    <p class="service-description">{{ service.description }}</p>
+    <div class="service-details">
+      <div class="detail-item">
+        <i class="fas fa-clock"></i>
+        <span>{{ service.durationMinutes }} minutes</span>
+      </div>
+      <div class="detail-item">
+        <i class="fas fa-dollar-sign"></i>
+        <span>${{ service.price }}</span>
+      </div>
+    </div>
+    <div class="service-actions">
+      <button class="btn btn-outline-primary" (click)="viewDoctor()">View Doctor</button>
+      <button class="btn btn-primary" (click)="bookAppointment()">Book Now</button>
+    </div>
+  </div>
+</div>

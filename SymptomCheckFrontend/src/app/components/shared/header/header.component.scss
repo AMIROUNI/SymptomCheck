@@ -1,0 +1,216 @@
+.site-header {
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0;
+  }
+  
+  .logo {
+    a {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: #333;
+      
+      .logo-icon {
+        font-size: 1.8rem;
+        color: #3f8efc;
+        margin-right: 10px;
+      }
+      
+      .logo-text {
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+    }
+  }
+  
+  .main-nav {
+    .nav-list {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      
+      li {
+        margin: 0 15px;
+        
+        a {
+          color: #555;
+          text-decoration: none;
+          font-weight: 500;
+          padding: 5px 0;
+          position: relative;
+          transition: color 0.3s ease;
+          
+          &:hover, &.active {
+            color: #3f8efc;
+          }
+          
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #3f8efc;
+            transition: width 0.3s ease;
+          }
+          
+          &:hover::after, &.active::after {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+  
+  .header-actions {
+    display: flex;
+    align-items: center;
+    
+    .btn {
+      padding: 8px 16px;
+      font-weight: 500;
+    }
+    
+    .user-dropdown {
+      position: relative;
+      
+      .dropdown-toggle {
+        display: flex;
+        align-items: center;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 5px;
+        
+        &:hover {
+          background-color: #f5f5f5;
+        }
+        
+        .user-avatar {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          object-fit: cover;
+          margin-right: 8px;
+        }
+        
+        .user-name {
+          margin-right: 5px;
+          font-weight: 500;
+        }
+      }
+      
+      .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        min-width: 200px;
+        padding: 10px 0;
+        margin-top: 10px;
+        display: none;
+        z-index: 1000;
+        
+        .dropdown-item {
+          display: flex;
+          align-items: center;
+          padding: 10px 15px;
+          color: #555;
+          text-decoration: none;
+          transition: background-color 0.3s ease;
+          
+          i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+          }
+          
+          &:hover {
+            background-color: #f5f8fb;
+            color: #3f8efc;
+          }
+        }
+        
+        .dropdown-divider {
+          height: 1px;
+          background-color: #eee;
+          margin: 5px 0;
+        }
+      }
+      
+      &:hover .dropdown-menu {
+        display: block;
+      }
+    }
+    
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #555;
+      cursor: pointer;
+    }
+  }
+}
+
+@media (max-width: 991px) {
+  .site-header {
+    .main-nav {
+      position: fixed;
+      top: 70px;
+      left: 0;
+      width: 100%;
+      background-color: #fff;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      transform: translateY(-100%);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      
+      &.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+      
+      .nav-list {
+        flex-direction: column;
+        
+        li {
+          margin: 10px 0;
+          
+          a {
+            display: block;
+            padding: 10px 0;
+          }
+        }
+      }
+    }
+    
+    .header-actions {
+      .btn {
+        display: none;
+      }
+      
+      .mobile-menu-toggle {
+        display: block;
+      }
+    }
+  }
+}

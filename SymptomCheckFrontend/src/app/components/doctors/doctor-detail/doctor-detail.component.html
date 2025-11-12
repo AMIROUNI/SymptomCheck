@@ -1,0 +1,75 @@
+<div *ngIf="isLoading">Loading...</div>
+<div *ngIf="error">{{ error }}</div>
+
+<div *ngIf="doctor && !isLoading" class="doctor-detail-container">
+  <div class="doctor-profile">
+    <div class="left-section">
+      <img
+        *ngIf="doctor?.profilePhotoUrl"
+        [src]="doctor.profilePhotoUrl"
+        alt="Doctor's photo"
+        class="profile-photo"
+      />
+    </div>
+    <div class="right-section">
+      <h2 class="doctor-name">
+        {{ doctor.firstName }} {{ doctor.lastName }}
+      </h2>
+      <div class="rating-section">
+        <app-star-rating [rating]="averageRating" [readOnly]="true"></app-star-rating>
+        <span class="rating-text">{{ averageRating | number:'1.1-1' }} ({{ reviews.length }} reviews)</span>
+      </div>
+      <div class="doctor-info">
+        <p><i class="fas fa-user-md"></i> <strong>Speciality:</strong> {{ doctor.speciality }}</p>
+        <p><i class="fas fa-envelope"></i> <strong>Email:</strong> {{ doctor.email }}</p>
+        <p><i class="fas fa-phone"></i> <strong>Phone:</strong> {{ doctor.phoneNumber }}</p>
+        <p *ngIf="doctor.description"><i class="fas fa-file-alt"></i> <strong>Description:</strong> {{ doctor.description }}</p>
+        <p *ngIf="doctor.diploma"><i class="fas fa-certificate"></i> <strong>Diploma:</strong> {{ doctor.diploma }}</p>
+        <p *ngIf="doctor.clinicId"><i class="fas fa-clinic-medical"></i> <strong>Clinic ID:</strong> {{ doctor.clinicId }}</p>
+      </div>
+
+      <button class="btn btn-primary" (click)="toggleReviewForm()">
+        {{ showReviewForm ? 'Cancel' : 'Leave a Review' }}
+      </button>
+
+      <div *ngIf="showReviewForm" class="review-form">
+        <h3>Write a Review</h3>
+        <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
+          <div class="form-group">
+            <label>Rating:</label>
+            <app-star-rating
+              formControlName="stars"
+              [readOnly]="false">
+            </app-star-rating>
+          </div>
+          <div class="form-group">
+            <label for="comment">Comment:</label>
+            <textarea
+              id="comment"
+              formControlName="comment"
+              class="form-control"
+              rows="4"
+              placeholder="Share your experience with this doctor..."></textarea>
+          </div>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!reviewForm.valid">
+            Submit Review
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="reviews-section" *ngIf="reviews.length">
+    <h3>Patient Reviews</h3>
+    <div class="review-card" *ngFor="let review of reviews">
+      <div class="review-header">
+        <app-star-rating [rating]="review.stars" [readOnly]="true"></app-star-rating>
+        <span class="review-date">{{ review.datePosted | date:'mediumDate' }}</span>
+      </div>
+      <p class="review-comment">{{ review.comment }}</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,81 @@
+<div class="service-form-container">
+  <h2 class="form-title">Add New Healthcare Service</h2>
+  <form [formGroup]="serviceForm" (ngSubmit)="onSubmit()" class="service-form">
+    <div class="form-group">
+      <label for="name" class="required-field">Service Name</label>
+      <input type="text" id="name" formControlName="name" placeholder="e.g. Dental Checkup">
+      <div *ngIf="serviceForm.get('name')?.invalid && (serviceForm.get('name')?.dirty || serviceForm.get('name')?.touched)"
+           class="error-message">
+        Service name is required (3-100 characters)
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="description" class="required-field">Description</label>
+      <textarea id="description" formControlName="description" rows="4"
+                placeholder="Detailed description of the service"></textarea>
+      <div *ngIf="serviceForm.get('description')?.invalid && (serviceForm.get('description')?.dirty || serviceForm.get('description')?.touched)"
+           class="error-message">
+        Description is required (10-500 characters)
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="category" class="required-field">Category</label>
+        <select id="category" formControlName="category">
+          <option value="">Select a category</option>
+          <option value="Dental">Dental</option>
+          <option value="Cardiology">Cardiology</option>
+          <option value="Dermatology">Dermatology</option>
+          <option value="Neurology">Neurology</option>
+          <option value="Pediatrics">Pediatrics</option>
+          <option value="Other">Other</option>
+        </select>
+        <div *ngIf="serviceForm.get('category')?.invalid && (serviceForm.get('category')?.dirty || serviceForm.get('category')?.touched)"
+             class="error-message">
+          Please select a category
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="price">Price ($)</label>
+        <div class="price-input-container">
+          <input type="number" id="price" formControlName="price" min="0" step="0.01" placeholder="0.00" class="price-input">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="duration" class="required-field">Duration (minutes)</label>
+        <div class="duration-input-container">
+          <input type="number" id="duration" formControlName="durationMinutes" min="5" max="240" placeholder="30" class="duration-input">
+        </div>
+        <div *ngIf="serviceForm.get('durationMinutes')?.invalid && (serviceForm.get('durationMinutes')?.dirty || serviceForm.get('durationMinutes')?.touched)"
+             class="error-message">
+          Duration must be between 5-240 minutes
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="imageFile">Service Image</label>
+        <input type="file" id="imageFile" accept="image/*" (change)="onFileSelected($event)" class="upload-input">
+        <div *ngIf="imagePreview" class="image-preview visible">
+          <img [src]="imagePreview" alt="Image Preview">
+        </div>
+        <div *ngIf="fileError" class="error-message">
+          {{ fileError }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" [disabled]="serviceForm.invalid || isSubmitting" class="submit-btn">
+        <span *ngIf="!isSubmitting">Add Service</span>
+        <span *ngIf="isSubmitting" class="spinner"></span>
+      </button>
+      <button type="button" (click)="resetForm()" class="cancel-btn">Cancel</button>
+    </div>
+  </form>
+</div> 

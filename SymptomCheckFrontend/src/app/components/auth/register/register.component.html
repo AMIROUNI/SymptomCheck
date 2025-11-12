@@ -1,0 +1,184 @@
+<div class="register-container">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+          <div class="card-body p-4 p-md-5">
+            <h2 class="text-center mb-4">Create Your Account</h2>
+
+            <div *ngIf="errorMessage" class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
+
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+              <!-- Role Selection -->
+              <div class="mb-4">
+                <label class="form-label">Registering as:</label>
+                <div class="btn-group w-100" role="group">
+                  <button type="button" class="btn" [class.btn-primary]="isPatient"
+                    [class.btn-outline-primary]="!isPatient" (click)="setRole('patient')">
+                    Patient
+                  </button>
+                  <button type="button" class="btn" [class.btn-primary]="!isPatient"
+                    [class.btn-outline-primary]="isPatient" (click)="setRole('doctor')">
+                    Doctor
+                  </button>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="firstName" class="form-label">First Name</label>
+                  <input type="text" id="firstName" formControlName="firstName" class="form-control"
+                    [ngClass]="{'is-invalid': registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched}">
+                  <div class="invalid-feedback">
+                    First name is required
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="lastName" class="form-label">Last Name</label>
+                  <input type="text" id="lastName" formControlName="lastName" class="form-control"
+                    [ngClass]="{'is-invalid': registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched}">
+                  <div class="invalid-feedback">
+                    Last name is required
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" id="email" formControlName="email" class="form-control"
+                  [ngClass]="{'is-invalid': registerForm.get('email')?.invalid && registerForm.get('email')?.touched}">
+                <div class="invalid-feedback">
+                  Please enter a valid email address
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" id="username" formControlName="username" class="form-control"
+                  [ngClass]="{'is-invalid': registerForm.get('username')?.invalid && registerForm.get('username')?.touched}">
+                <div class="invalid-feedback">
+                  Username must be at least 4 characters
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="password" class="form-label">Password</label>
+                  <input type="password" id="password" formControlName="password" class="form-control"
+                    [ngClass]="{'is-invalid': registerForm.get('password')?.invalid && registerForm.get('password')?.touched}">
+                  <div class="invalid-feedback">
+                    Password must be at least 6 characters
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="confirmPassword" class="form-label">Confirm Password</label>
+                  <input type="password" id="confirmPassword" formControlName="confirmPassword" class="form-control"
+                    [ngClass]="{'is-invalid': (registerForm.get('confirmPassword')?.invalid || registerForm.hasError('passwordMismatch')) && registerForm.get('confirmPassword')?.touched}">
+                  <div class="invalid-feedback">
+                    Passwords do not match
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="phoneNumber" class="form-label">Phone Number</label>
+                <input type="tel" id="phoneNumber" formControlName="phoneNumber" class="form-control"
+                  placeholder="123-456-7890"
+                  [ngClass]="{'is-invalid': registerForm.get('phoneNumber')?.invalid && registerForm.get('phoneNumber')?.touched}">
+                <div class="invalid-feedback">
+                  Please enter a valid phone number
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="profilePhoto" class="form-label">Profile Photo</label>
+                <input
+                  type="file"
+                  id="profilePhoto"
+                  class="form-control"
+                  (change)="onFileSelected($event)"
+                  accept="image/*"
+                  [disabled]="isSubmitting"
+                >
+                <small class="text-muted">Upload a profile picture (optional)</small>
+                <div *ngIf="profilePhotoPreview" class="mt-2">
+                  <img [src]="profilePhotoPreview" alt="Preview" class="img-thumbnail" style="max-height: 100px;">
+                </div>
+                <div *ngIf="isSubmitting && selectedFile" class="mt-2">
+                  <div class="spinner-border spinner-border-sm" role="status">
+                    <span class="visually-hidden">Uploading...</span>
+                  </div>
+                  <small class="ms-2">Uploading profile photo...</small>
+                </div>
+              </div>
+
+
+              <!-- Doctor Specific Fields -->
+              <div *ngIf="!isPatient" class="doctor-fields">
+                <div class="mb-3">
+                  <label for="speciality" class="form-label">Speciality</label>
+                  <input type="text" id="speciality" formControlName="speciality" class="form-control"
+                    [ngClass]="{'is-invalid': registerForm.get('speciality')?.invalid && registerForm.get('speciality')?.touched}">
+                  <div class="invalid-feedback">
+                    Speciality is required
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="description" class="form-label">Professional Description</label>
+                  <textarea id="description" formControlName="description" class="form-control" rows="3"
+                    [ngClass]="{'is-invalid': registerForm.get('description')?.invalid && registerForm.get('description')?.touched}"></textarea>
+                  <div class="invalid-feedback">
+                    Description is required
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="diploma" class="form-label">Diploma/Certification</label>
+                  <input type="text" id="diploma" formControlName="diploma" class="form-control"
+                    [ngClass]="{'is-invalid': registerForm.get('diploma')?.invalid && registerForm.get('diploma')?.touched}">
+                  <div class="invalid-feedback">
+                    Diploma information is required
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="clinicId" class="form-label">Clinic/Hospital</label>
+                  <select id="clinicId" formControlName="clinicId" class="form-select"
+                    [ngClass]="{'is-invalid': registerForm.get('clinicId')?.invalid && registerForm.get('clinicId')?.touched}">
+                    <option value="" disabled selected>Select a clinic</option>
+                    <option *ngFor="let clinic of clinics" [value]="clinic.id">
+                      {{ clinic.name }} - {{ clinic.address }}
+                    </option>
+                  </select>
+                  <div class="invalid-feedback">
+                    Please select a clinic
+                  </div>
+                  <div *ngIf="isLoadingClinics" class="mt-2">
+                    <small class="text-muted">Loading clinics...</small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-primary btn-lg" [disabled]="registerForm.invalid || isSubmitting">
+                  <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2" role="status"
+                    aria-hidden="true"></span>
+                  {{ isPatient ? 'Register as Patient' : 'Register as Doctor' }}
+                </button>
+              </div>
+
+              <div class="text-center mt-3">
+                <p>Already have an account? <a routerLink="/login">Login</a></p>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

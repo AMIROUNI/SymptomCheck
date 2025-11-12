@@ -1,0 +1,44 @@
+<div class="clinic-list-container">
+  <h2 class="table-title">Medical Clinics</h2>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <table class="clinic-table" *ngIf="clinics.length > 0; else noClinics">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Address</th>
+        <th>City</th>
+        <th>Country</th>
+        <th>Phone</th>
+        <th>Website</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let clinic of clinics">
+        <td>{{ clinic.name }}</td>
+        <td>{{ clinic.address }}</td>
+        <td>{{ clinic.city }}</td>
+        <td>{{ clinic.country }}</td>
+        <td>{{ clinic.phone }}</td>
+        <td>
+          <a *ngIf="clinic.websiteUrl" [href]="clinic.websiteUrl" target="_blank" class="website-link">
+            Visit Website
+          </a>
+          <span *ngIf="!clinic.websiteUrl">N/A</span>
+        </td>
+        <td>
+          <button class="action-btn update-btn" (click)="onUpdate(clinic.id!)">Update</button>
+          <button class="action-btn delete-btn" (click)="onDelete(clinic.id!)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <ng-template #noClinics>
+    <div class="no-data">No clinics found.</div>
+  </ng-template>
+</div>

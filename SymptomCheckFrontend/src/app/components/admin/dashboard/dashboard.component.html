@@ -1,0 +1,30 @@
+<mat-toolbar color="primary">
+  <span>DocLink Admin Dashboard</span>
+  <span class="spacer"></span>
+  <button mat-icon-button (click)="logout()">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>
+
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav mode="side" opened class="sidenav">
+    <mat-nav-list>
+      <a mat-list-item routerLink="/admoun/users" routerLinkActive="active">
+        <mat-icon>people</mat-icon>
+        <span>Users</span>
+      </a>
+      <a mat-list-item routerLink="/admoun/doctors" routerLinkActive="active">
+        <mat-icon>local_hospital</mat-icon>
+        <span>Doctors</span>
+      </a>
+      <a mat-list-item routerLink="/admoun/clinics" routerLinkActive="active">
+        <mat-icon>business</mat-icon>
+        <span>Clinics</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="main-content">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

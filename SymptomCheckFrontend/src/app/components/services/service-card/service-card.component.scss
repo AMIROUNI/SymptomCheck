@@ -1,0 +1,85 @@
+.service-card {
+  background-color: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-10px);
+  }
+  
+  .service-image {
+    height: 200px;
+    overflow: hidden;
+    position: relative;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .service-category {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background-color: rgba(63, 142, 252, 0.9);
+      color: #fff;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+  }
+  
+  .service-info {
+    padding: 20px;
+    
+    h3 {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    
+    .service-description {
+      color: #666;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    
+    .service-details {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 15px;
+      
+      .detail-item {
+        display: flex;
+        align-items: center;
+        
+        i {
+          color: #3f8efc;
+          margin-right: 5px;
+        }
+        
+        span {
+          color: #666;
+          font-weight: 500;
+        }
+      }
+    }
+    
+    .service-actions {
+      display: flex;
+      gap: 10px;
+      
+      .btn {
+        flex: 1;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

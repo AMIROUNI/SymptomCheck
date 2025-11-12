@@ -1,0 +1,206 @@
+:host {
+  display: block;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #2c3e50;
+  line-height: 1.6;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+  padding: 2rem 0;
+}
+
+.clinic-list-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(224, 230, 237, 0.5);
+}
+
+.clinic-list-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+}
+
+.table-title {
+  color: #2c3e50;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: 700;
+  position: relative;
+  padding-bottom: 1rem;
+  letter-spacing: -0.5px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.table-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 4px;
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+  border-radius: 4px;
+  opacity: 0.8;
+}
+
+.clinic-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #f8fafc;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.clinic-table th,
+.clinic-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e6ed;
+}
+
+.clinic-table th {
+  background: #f1f5f9;
+  font-weight: 600;
+  color: #34495e;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+}
+
+.clinic-table td {
+  color: #2c3e50;
+  font-size: 0.9rem;
+}
+
+.clinic-table tr:hover {
+  background: #f1f7fe;
+}
+
+.website-link {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.website-link:hover {
+  text-decoration: underline;
+}
+
+.action-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.85rem;
+  margin-right: 0.5rem;
+}
+
+.update-btn {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+}
+
+.update-btn:hover {
+  background: linear-gradient(135deg, #2980b9, #3498db);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.2);
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+}
+
+.delete-btn:hover {
+  background: linear-gradient(135deg, #c0392b, #e74c3c);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(231, 76, 60, 0.2);
+}
+
+.error-message {
+  color: #e74c3c;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #fff9f9;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.error-message::before {
+  content: '⚠';
+  font-size: 1rem;
+}
+
+.no-data {
+  text-align: center;
+  color: #7f8c8d;
+  font-size: 1rem;
+  padding: 2rem;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e0e6ed;
+}
+
+@media (max-width: 768px) {
+  .clinic-list-container {
+    padding: 1.75rem;
+    margin: 1.25rem;
+    border-radius: 12px;
+  }
+
+  .table-title {
+    font-size: 1.75rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .clinic-table th,
+  .clinic-table td {
+    padding: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .action-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .clinic-list-container {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .table-title {
+    font-size: 1.5rem;
+  }
+
+  .clinic-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .clinic-table th,
+  .clinic-table td {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+}

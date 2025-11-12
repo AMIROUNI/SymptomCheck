@@ -1,0 +1,56 @@
+<div class="service-list-container">
+  <div class="container">
+    <div class="section-header text-center">
+      <h1>Our Services</h1>
+      <p>Explore our range of healthcare services</p>
+    </div>
+    
+    <div class="search-filters">
+      <div class="row">
+        <div class="col-md-8">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input 
+              type="text" 
+              class="form-control" 
+              placeholder="Search services..." 
+              [(ngModel)]="searchTerm"
+              (input)="onSearchChange()"
+            >
+          </div>
+        </div>
+        <div class="col-md-4">
+          <select 
+            class="form-select" 
+            [(ngModel)]="selectedCategory"
+            (change)="onCategoryChange(selectedCategory)"
+          >
+            <option value="">All Categories</option>
+            <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="isLoading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    
+    <div *ngIf="!isLoading" class="services-grid">
+      <div class="row">
+        <div *ngFor="let service of filteredServices" class="col-md-6 col-lg-4">
+          <app-service-card [service]="service"></app-service-card>
+        </div>
+      </div>
+      
+      <div *ngIf="filteredServices.length === 0" class="no-results">
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle me-2"></i>
+          No services found matching your criteria. Please try different search terms or filters.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
