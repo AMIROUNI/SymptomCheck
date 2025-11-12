@@ -30,7 +30,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
 
             try {
-                userService.registerMyUser(patient);
+                userService.registerMyUser(patient,null);
                 System.out.println("✅ Patient user created in Keycloak with ALL attributes");
             } catch (Exception e) {
                 System.out.println("❌ Failed to create patient: " + e.getMessage());
@@ -49,7 +49,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
 
             try {
-                userService.registerMyUser(doctor);
+                userService.registerMyUser(doctor,null);
                 System.out.println("✅ Doctor user created in Keycloak with ALL attributes");
             } catch (Exception e) {
                 System.out.println("❌ Failed to create doctor: " + e.getMessage());

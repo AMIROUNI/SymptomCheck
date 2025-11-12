@@ -1,19 +1,27 @@
 server:
   port: 8082
 
+app:
+  upload-dir: uploads
+
 spring:
   application:
     name: user-service
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
 
   datasource:
     url: jdbc:postgresql://localhost:5432/user_service_db
     username: postgres
-    password: 1234
+    password: amir    #badrix bellahi chouf louta
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update   #badrix taw takhrali fih
     show-sql: true
     properties:
       hibernate:
@@ -62,3 +70,9 @@ logging:
     com.SymptomCheck.userservice: DEBUG
     org.keycloak: INFO
     org.springframework.security: DEBUG
+
+
+
+
+
+

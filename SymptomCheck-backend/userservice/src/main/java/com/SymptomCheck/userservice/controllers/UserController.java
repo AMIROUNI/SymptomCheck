@@ -2,31 +2,39 @@ package com.SymptomCheck.userservice.controllers;
 
 import com.SymptomCheck.userservice.dtos.UserRegistrationRequest;
 import com.SymptomCheck.userservice.models.User;
+import com.SymptomCheck.userservice.models.UserData;
+import com.SymptomCheck.userservice.services.UserDataService;
 import com.SymptomCheck.userservice.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
+@Slf4j  // ✅ Add this annotation for logging
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+    private  final UserDataService userDataService;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationRequest user) {
+
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> registerUser(@Valid @RequestPart("user") UserRegistrationRequest user,
+                                          @RequestPart(value = "file", required = false) MultipartFile file) {
         try {
-            // S'assurer que les timestamps sont définis
-
-
-            String userId = userService.registerMyUser(user);
+            String userId = userService.registerMyUser(user, file);
             return ResponseEntity.ok(Map.of(
                     "message", "User registered successfully in Keycloak with ALL attributes",
                     "keycloakUserId", userId,
@@ -54,25 +62,72 @@ public class UserController {
             ));
         }
     }
-
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
-        Map<String, Object> userMap = Map.ofEntries(
-                Map.entry("username", jwt.getClaim("preferred_username")),
-                Map.entry("email", jwt.getClaim("email")),
-                Map.entry("firstName", jwt.getClaim("given_name")),
-                Map.entry("lastName", jwt.getClaim("family_name")),
-                Map.entry("roles", jwt.getClaim("realm_access")),
-                Map.entry("userId", jwt.getSubject()),
-                Map.entry("phoneNumber", jwt.getClaim("phoneNumber")),
-                Map.entry("profilePhotoUrl", jwt.getClaim("profilePhotoUrl")),
-                Map.entry("isProfileComplete", jwt.getClaim("isProfileComplete")),
-                Map.entry("clinicId", jwt.getClaim("clinicId")),
-                Map.entry("localUserId", jwt.getClaim("localUserId")),
-                Map.entry("createdAt", jwt.getClaim("createdAt")),
-                Map.entry("updatedAt", jwt.getClaim("updatedAt")),
-                Map.entry("allClaims", jwt.getClaims())
-        );
+        log.info("=== /me endpoint called ===");
+        log.info("JWT Subject (Keycloak ID): {}", jwt.getSubject());
+        log.info("JWT Claims: {}", jwt.getClaims());
+
+        String keycloakUserId = jwt.getSubject();
+        log.info("🔍 Looking up user data for Keycloak ID: '{}'", keycloakUserId);
+
+        // Get UserData from database
+        Optional<UserData> optionalData = userDataService.getUserDataById(keycloakUserId);
+
+        if (optionalData.isEmpty()) {
+            log.warn("⚠️ UserData not found for Keycloak ID: '{}'", keycloakUserId);
+        } else {
+            log.info("✅ UserData found: {}", optionalData.get());
+        }
+
+        UserData userData = optionalData.orElse(null);
+
+        // Build response map
+        Map<String, Object> userMap = new HashMap<>();
+
+        // Basic Keycloak info (always available)
+        userMap.put("id", keycloakUserId);
+        userMap.put("username", jwt.getClaim("preferred_username"));
+        userMap.put("email", jwt.getClaim("email"));
+        userMap.put("firstName", jwt.getClaim("given_name"));
+        userMap.put("lastName", jwt.getClaim("family_name"));
+        userMap.put("emailVerified", jwt.getClaim("email_verified"));
+
+        // Extract roles from JWT
+        Map<String, Object> realmAccess = jwt.getClaim("realm_access");
+        if (realmAccess != null && realmAccess.get("roles") != null) {
+            userMap.put("roles", realmAccess.get("roles"));
+        }
+
+        // Extended user data (from database)
+        if (userData != null) {
+            userMap.put("phoneNumber", userData.getPhoneNumber());
+            userMap.put("profilePhotoUrl", userData.getProfilePhotoUrl());
+            userMap.put("isProfileComplete", userData.isProfileComplete());
+            userMap.put("clinicId", userData.getClinicId());
+            userMap.put("speciality", userData.getSpeciality());
+            userMap.put("description", userData.getDescription());
+            userMap.put("diploma", userData.getDiploma());
+            userMap.put("createdAt", userData.getCreatedAt());
+            userMap.put("updatedAt", userData.getUpdatedAt());
+        } else {
+            // Add null values for missing fields
+            userMap.put("phoneNumber", null);
+            userMap.put("profilePhotoUrl", null);
+            userMap.put("isProfileComplete", false);
+            userMap.put("clinicId", null);
+            userMap.put("speciality", null);
+            userMap.put("description", null);
+            userMap.put("diploma", null);
+            userMap.put("createdAt", null);
+            userMap.put("updatedAt", null);
+
+            log.warn("⚠️ Returning user without extended profile data");
+        }
+
+        log.info("✅ Returning user data: {}", userMap);
+        log.info("=== End /me endpoint ===");
+
         return ResponseEntity.ok(userMap);
     }
 

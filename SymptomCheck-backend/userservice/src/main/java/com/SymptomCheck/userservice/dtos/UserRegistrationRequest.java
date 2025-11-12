@@ -31,4 +31,8 @@ public class UserRegistrationRequest {
 
     @NotBlank
     private String role; // "PATIENT", "DOCTOR", "ADMIN"
+    private String speciality;
+    private  String description;
+    private  String diploma;
+   private Long clinicId;
 }

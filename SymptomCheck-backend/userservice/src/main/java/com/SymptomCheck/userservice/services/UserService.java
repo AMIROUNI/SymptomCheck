@@ -9,6 +9,8 @@ import com.SymptomCheck.userservice.repositories.UserDataRepository;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Var;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.Map;
@@ -22,13 +24,18 @@ public class UserService {
 
     private final KeycloakService keycloakService;
     private  final UserDataRepository userDataRepository;
+    private final LocalFileStorageService localFileStorageService;
 
 
     /**
      * Enregistre un utilisateur COMPLET dans Keycloak
      */
-    public String registerMyUser(UserRegistrationRequest userRegistrationRequest) {
+    public String registerMyUser(UserRegistrationRequest userRegistrationRequest,
+                                 MultipartFile file) {
         try {
+
+
+
             User user = new User();
             user.setRole(UserRole.valueOf(userRegistrationRequest.getRole().toUpperCase()));
             user.setUsername(userRegistrationRequest.getUsername());
@@ -45,6 +52,11 @@ public class UserService {
             userData.setPhoneNumber(userRegistrationRequest.getPhoneNumber());
             userData.setProfileComplete(false);
             userData.setProfilePhotoUrl(userRegistrationRequest.getProfilePhotoUrl());
+            userData.setDescription(userRegistrationRequest.getDescription());
+            userData.setDiploma(userRegistrationRequest.getDiploma());
+            userData.setClinicId(userRegistrationRequest.getClinicId());
+            userData.setSpeciality(userRegistrationRequest.getSpeciality());
+            userData.setProfilePhotoUrl(localFileStorageService.store(file));
             userDataRepository.save(userData);
 
             return userId;
