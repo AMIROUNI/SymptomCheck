@@ -34,6 +34,8 @@ const routes: Routes = [
    {path: "medical-clinic-form",component: MedicalClinicFormComponent},
    {path: "clinic-list", component: ClinicListComponent},
    {path: "update-clinic/:id", component: UpdateMedicalClinicComponent},
+   {path: "test", component: ClinicListComponent},
+   {path:"addclinic",component:MedicalClinicFormComponent},
   //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   {
     path: "appointment",
@@ -43,13 +45,12 @@ const routes: Routes = [
   {
     path: "admin",
     component: AdminDashboardComponent,
-    canActivate: [AuthGuard ],
     children: [
       { path: "", redirectTo: "dashboard", pathMatch: "full" },
   //    { path: "dashboard", component: AdminOverviewComponent },
   //    { path: "users", component: UserManagementComponent },
   //    { path: "doctors", component: DoctorManagementComponent },
- //     { path: "clinics", component: ClinicManagementComponent },
+      { path: "clinics", component: ClinicManagementComponent },
   //    { path: "appointments", component: AppointmentManagementComponent },
   //    { path: "services", component: ServiceManagementComponent },
   //    { path: "reports", component: ReportsComponent },

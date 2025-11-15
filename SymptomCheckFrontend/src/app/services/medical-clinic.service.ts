@@ -1,44 +1,52 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { MedicalClinic } from '../models/medical-clinic.model';
-import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MedicalClinicService {
-  private apiUrl = 'http://localhost:5190/api/MedicalClinic';
+  private apiUrl = 'http://localhost:8085/api/v1/medical/clinic';
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient) {}
 
-
-
-  getClinics(): Observable<MedicalClinic[]> {
-    return this.http.get<MedicalClinic[]>(this.apiUrl, );
+  // ➤ Create clinic
+  createMedicalClinic(clinic: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}`, clinic);
   }
 
-  getClinicById(id: number): Observable<MedicalClinic> {
-    return this.http.get<MedicalClinic>(`${this.apiUrl}/${id}`);
+  // ➤ Get all clinics
+  getMedicalClinics(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}`);
   }
 
-   getMedicalClinics(): Observable<MedicalClinic[]> {
-    return this.http.get<MedicalClinic[]>(`${this.apiUrl}`);
-  }
-  updateClinic(id: number, clinic: MedicalClinic): Observable<MedicalClinic> {
-    return this.http.put<MedicalClinic>(`${this.apiUrl}/${id}`, clinic);
+  // Alias
+  getClinics(): Observable<any[]> {
+    return this.getMedicalClinics();
   }
 
-  deleteClinic(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  // ➤ Get clinic by id
+  getMedicalClinicById(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${id}`);
   }
 
-  createMedicalClinic(clinic: MedicalClinic): Observable<MedicalClinic> {
-    return this.http.post<MedicalClinic>(this.apiUrl, clinic);
+  // Alias
+  getClinicById(id: number): Observable<any> {
+    return this.getMedicalClinicById(id);
   }
 
-
-  update(clinic: MedicalClinic): Observable<any> {
+  // ➤ Update clinic
+  update(clinic: any): Observable<any> {
     return this.http.put(`${this.apiUrl}/${clinic.id}`, clinic);
+  }
+
+  // Alias
+  updateClinic(id: number, clinic: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, clinic);
+  }
+
+  // ➤ Delete clinic
+  deleteClinic(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }

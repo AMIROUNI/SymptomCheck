@@ -19,7 +19,7 @@ export class ClinicListComponent implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit(): void {
+ ngOnInit(): void {
     this.loadClinics();
   }
 
@@ -44,12 +44,10 @@ export class ClinicListComponent implements OnInit {
     if (confirm('Are you sure you want to delete this clinic?')) {
       this.medicalClinicService.deleteClinic(clinicId).subscribe({
         next: () => {
-          this.clinics = this.clinics.filter(clinic => clinic.id !== clinicId);
-          this.errorMessage = null;
+          this.clinics = this.clinics.filter(c => c.id !== clinicId);
         },
         error: (error) => {
           this.errorMessage = 'Failed to delete clinic. Please try again.';
-          console.error('Error deleting clinic:', error);
         }
       });
     }
