@@ -1,12 +1,21 @@
 package com.SymptomCheck.userservice.services;
 
+import com.SymptomCheck.userservice.dtos.UserRegistrationRequest;
+import com.SymptomCheck.userservice.models.User;
+import com.SymptomCheck.userservice.models.UserData;
+import com.SymptomCheck.userservice.repositories.UserDataRepository;
+import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.RoleResource;
+import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +26,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class KeycloakService {
 
     private static final Logger log = LoggerFactory.getLogger(KeycloakService.class);
+
+    private final UserDataRepository userDataRepository ;
+
+
 
     @Value("${keycloak.admin.server-url}")
     private String serverUrl;
@@ -63,7 +77,7 @@ public class KeycloakService {
     /**
      * Crée un utilisateur COMPLET dans Keycloak avec tous les attributs personnalisés
      */
-    public String registerUser(com.SymptomCheck.userservice.models.User user) {
+    public String registerUser(User user) {
         try {
             // Vérifier si l'utilisateur existe déjà
             if (userExists(user.getUsername())) {
@@ -136,7 +150,7 @@ public class KeycloakService {
     /**
      * Log les détails de la création utilisateur
      */
-    private void logUserCreationDetails(com.SymptomCheck.userservice.models.User user) {
+    private void logUserCreationDetails(User user) {
         log.info("📋 User created with ALL attributes:");
         log.info("   - Username: {}", user.getUsername());
         log.info("   - Email: {}", user.getEmail());
@@ -186,5 +200,105 @@ public class KeycloakService {
             log.error("❌ Error getting user details: {}", e.getMessage());
             return null;
         }
+    }
+
+
+
+
+
+
+    public void disableUser(String userId,boolean  isEnabled) {
+        Keycloak keycloak = KeycloakBuilder.builder()
+                .serverUrl(serverUrl)
+                .realm("master") // admin login always happens on master
+                .clientId("admin-cli")
+                .username("admin")
+                .password("admin")
+                .grantType("password")
+                .build();
+
+        UsersResource users = keycloak.realm(appRealm).users();
+        UserRepresentation user = users.get(userId).toRepresentation();
+        user.setEnabled(isEnabled);
+
+        users.get(userId).update(user);
+    }
+
+
+
+    public List<UserRegistrationRequest> getUsersByRole(String roleName) {
+        List<UserRegistrationRequest> result = new ArrayList<>();
+
+        try {
+            // 1️⃣ Get Keycloak users with this role
+
+            log.info(roleName);
+            List<UserRepresentation> keycloakUsers = new ArrayList<>(keycloak.realm(appRealm)
+                    .roles()
+                    .get(roleName)
+                    .getRoleUserMembers());
+            log.info("keycloakUsers size: {}", keycloakUsers.size());
+
+
+
+            // 2️⃣ Map each Keycloak user to your UserRegistrationRequest
+            for (UserRepresentation kcUser : keycloakUsers) {
+                // Assuming you have a repository to fetch UserData by ID
+                Optional<UserData> userDataOpt = userDataRepository.findById(kcUser.getId());
+
+                UserRegistrationRequest ur = new UserRegistrationRequest();
+                ur.setId(kcUser.getId());
+                ur.setUsername(kcUser.getUsername());
+                ur.setEmail(kcUser.getEmail());
+                ur.setFirstName(kcUser.getFirstName());
+                ur.setLastName(kcUser.getLastName());
+                ur.setRole(roleName);
+                ur.setEnabled(kcUser.isEnabled());
+
+                // Fill additional fields if exists
+                userDataOpt.ifPresent(userData -> {
+                    ur.setPhoneNumber(userData.getPhoneNumber());
+                    ur.setProfilePhotoUrl(userData.getProfilePhotoUrl());
+                    ur.setSpeciality(userData.getSpeciality());
+                    ur.setClinicId(userData.getClinicId());
+                    ur.setDescription(userData.getDescription());
+                    ur.setDiploma(userData.getDiploma());
+                });
+                log.info("userData: {}", userDataOpt.orElse(null));
+                result.add(ur);
+            }
+
+        } catch (Exception e) {
+            log.error("❌ Error fetching users by role {}: {}", roleName, e.getMessage());
+        }
+
+        return result;
+    }
+
+    public UserRegistrationRequest getUserById(String userId) {
+        UsersResource users = keycloak.realm(appRealm).users();
+        UserRepresentation user = users.get(userId).toRepresentation();
+
+
+        Optional<UserData> userDataOpt = userDataRepository.findById(userId);
+
+        UserRegistrationRequest ur = new UserRegistrationRequest();
+        ur.setId(user.getId());
+        ur.setUsername(user.getUsername());
+        ur.setEmail(user.getEmail());
+        ur.setFirstName(user.getFirstName());
+        ur.setLastName(user.getLastName());
+        ur.setEnabled(user.isEnabled());
+
+        // Fill additional fields if exists
+        userDataOpt.ifPresent(userData -> {
+            ur.setPhoneNumber(userData.getPhoneNumber());
+            ur.setProfilePhotoUrl(userData.getProfilePhotoUrl());
+            ur.setSpeciality(userData.getSpeciality());
+            ur.setClinicId(userData.getClinicId());
+            ur.setDescription(userData.getDescription());
+            ur.setDiploma(userData.getDiploma());
+        });
+        return ur;
     }
 }

@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -17,10 +18,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Slf4j  // ✅ Add this annotation for logging
+@Slf4j  //  Add this annotation for logging
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -129,6 +131,43 @@ public class UserController {
         log.info("=== End /me endpoint ===");
 
         return ResponseEntity.ok(userMap);
+    }
+
+
+
+    @PatchMapping("disable/{userId}")
+    public ResponseEntity<Boolean> disableUser(@PathVariable("userId") String userId,
+                                               @RequestParam boolean isEnable) {
+        try {
+            userService.disableUser(userId, isEnable);
+            return ResponseEntity.ok(true);
+        }
+        catch (Exception e) {
+            log.info(e.getMessage());
+            return   ResponseEntity.internalServerError().body(false);
+        }
+    }
+
+
+    @GetMapping("/by-role")
+    public ResponseEntity<List<UserRegistrationRequest>> getUsersByRole(@RequestParam String role) {
+        try {
+            List<UserRegistrationRequest> users = userService.getUsersByRole(role.toUpperCase());
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("{userId}")
+    public ResponseEntity<?> getUserById(@PathVariable("userId") String userId) {
+        try {
+            return ResponseEntity.ok( userService.getUserById(userId));
+        }
+        catch (Exception e) {
+            log.info(e.getMessage());
+            return ResponseEntity.internalServerError().body(false);
+        }
     }
 
 }

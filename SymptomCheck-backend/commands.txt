@@ -5,3 +5,11 @@ mvnw.cmd spring-boot:run -DskipTests
 
 to build a image
 docker-compose up --build
+
+
+
+when you update the client in keycload you should  delete the volume of the container by:
+docker-compose down -v
+and :
+
+docker-compose up --build
