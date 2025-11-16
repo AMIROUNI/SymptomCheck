@@ -1,6 +1,8 @@
 import { Component,  OnInit } from "@angular/core"
 import  { DoctorService } from "../../../services/doctor.service"
 import  { User } from "../../../models/user.model"
+import { UserService } from "@/app/services/user.service"
+import { environment } from "@/environments/environment"
 
 @Component({
   selector: "app-doctor-list",
@@ -17,7 +19,7 @@ export class DoctorListComponent implements OnInit {
 
   specialties: string[] = []
 
-  constructor(private doctorService: DoctorService) {}
+  constructor(private doctorService: UserService) {}
 
   ngOnInit(): void {
     this.loadDoctors()
@@ -25,7 +27,7 @@ export class DoctorListComponent implements OnInit {
 
   loadDoctors(): void {
     this.isLoading = true;
-    this.doctorService.getDoctors().subscribe({
+    this.doctorService.getAllUsersByRole("DOCTOR").subscribe({
       next: (doctors) => {
         this.doctors = doctors;
         this.filteredDoctors = doctors;
@@ -69,4 +71,9 @@ export class DoctorListComponent implements OnInit {
     this.selectedSpecialty = specialty
     this.filterDoctors()
   }
+
+
+
+  
+
 }

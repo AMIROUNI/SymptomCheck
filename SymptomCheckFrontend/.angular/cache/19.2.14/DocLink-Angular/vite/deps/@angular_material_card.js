@@ -26,8 +26,8 @@ import {
   ɵɵprojection,
   ɵɵprojectionDef
 } from "./chunk-6SZJNWHU.js";
-import "./chunk-6Q4RANH6.js";
 import "./chunk-FFZIAYYX.js";
+import "./chunk-6Q4RANH6.js";
 import "./chunk-CXCX2JKZ.js";
 
 // node_modules/@angular/material/fesm2022/card.mjs

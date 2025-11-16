@@ -1,6 +1,7 @@
 import { Component, Input } from "@angular/core"
 import  { User } from "../../../models/user.model"
 import  { Router } from "@angular/router"
+import { environment } from "@/environments/environment"
 
 @Component({
   selector: "app-doctor-card",
@@ -22,4 +23,12 @@ export class DoctorCardComponent {
       queryParams: { doctorId: this.doctor.id },
     })
   }
+
+
+  
+     apiUrl = environment.uploadsUrl;
+    
+      getUserImage(filename: string| undefined): string {
+        return `${environment.uploadsUrl}/${filename}`;
+      }
 }
