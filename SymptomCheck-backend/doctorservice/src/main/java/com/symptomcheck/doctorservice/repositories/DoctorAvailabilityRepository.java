@@ -9,9 +9,10 @@ import org.springframework.stereotype.Repository;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface DoctorAvailabilityRepository extends JpaRepository<DoctorAvailability, Integer> {
+public interface DoctorAvailabilityRepository extends JpaRepository<DoctorAvailability, UUID> {
     @Query("""
         SELECT da FROM DoctorAvailability da
         WHERE da.doctorId = :doctorId
@@ -25,5 +26,7 @@ public interface DoctorAvailabilityRepository extends JpaRepository<DoctorAvaila
     );
 
 
-   public boolean existsByDoctorIdAndDayOfWeek(Long  doctorId, DayOfWeek dayOfWeek);
+   public boolean existsByDoctorIdAndDayOfWeek(UUID doctorId, DayOfWeek dayOfWeek);
+    boolean existsByDoctorId(UUID doctorId);
+
 }

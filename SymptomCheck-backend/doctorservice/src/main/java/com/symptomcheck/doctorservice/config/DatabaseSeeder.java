@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -26,28 +27,26 @@ public class DatabaseSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
         // --- CHECK AND CREATE DOCTOR PROFILE ---
-        Optional<DoctorProfile> existingDoctor = doctorProfileRepository.findById(1L);
+        UUID doctorUuid = UUID.fromString("fc6274ff-730a-44f0-9245-17ada9054fe8"); // tu peux générer random avec UUID.randomUUID() si tu veux
+        Optional<DoctorProfile> existingDoctor = doctorProfileRepository.findById(doctorUuid);
         DoctorProfile doctor;
+
         if (existingDoctor.isPresent()) {
             doctor = existingDoctor.get();
             System.out.println("Doctor profile already exists: " + doctor.getDoctorId());
         } else {
             doctor = new DoctorProfile();
-            doctor.setDoctorId(1L);
-            doctor.setSpeciality("General Practitioner");
-            doctor.setDiploma("MD");
-            doctor.setDescription("Experienced doctor");
+            doctor.setDoctorId(doctorUuid);
             doctor.setClinicName("Healthy Clinic");
             doctorProfileRepository.save(doctor);
             System.out.println("Doctor profile created.");
         }
 
         // --- CHECK AND CREATE DOCTOR AVAILABILITY ---
-        boolean availabilityExists = availabilityRepository
-                .existsByDoctorIdAndDayOfWeek(1L, DayOfWeek.MONDAY);
+        boolean availabilityExists = availabilityRepository.existsByDoctorIdAndDayOfWeek(doctorUuid, DayOfWeek.MONDAY);
         if (!availabilityExists) {
             DoctorAvailability availability = new DoctorAvailability();
-            availability.setDoctorId(1L);
+            availability.setDoctorId(doctorUuid);
             availability.setDayOfWeek(DayOfWeek.MONDAY);
             availability.setStartTime(LocalTime.of(9, 0));
             availability.setEndTime(LocalTime.of(17, 0));
@@ -58,17 +57,15 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
 
         // --- CHECK AND CREATE HEALTHCARE SERVICE ---
-        boolean serviceExists = serviceRepository
-                .existsByDoctorIdAndName(1L, "General Checkup");
+        boolean serviceExists = serviceRepository.existsByDoctorIdAndName(doctorUuid, "General Checkup");
         if (!serviceExists) {
             HealthcareService service = new HealthcareService();
-            service.setDoctorId(1L);
+            service.setDoctorId(doctorUuid);
             service.setName("General Checkup");
             service.setDescription("Routine general checkup");
             service.setCategory("Checkup");
             service.setDurationMinutes(30);
             service.setPrice(50.0);
-            service.setDoctorProfile(doctor);
             serviceRepository.save(service);
             System.out.println("Healthcare service created.");
         } else {

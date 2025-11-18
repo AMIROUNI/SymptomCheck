@@ -6,15 +6,17 @@ import lombok.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "doctor_availabilities")
 @Data
 public class DoctorAvailability {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id
+    @GeneratedValue
+    private UUID id;
 
-    private String doctorId;
+    private UUID doctorId;
     @NotNull
     private DayOfWeek dayOfWeek;
     @NotNull

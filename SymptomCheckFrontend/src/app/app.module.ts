@@ -60,6 +60,7 @@ import { AuthGuard } from "./guards/auth.guard";
 // ❌ REMOVED: import { AuthInterceptor } from "./interceptors/auth.interceptor";
 import { initializeKeycloak } from "./keycloak-init";
 import { KeycloakAngularModule, KeycloakService } from "keycloak-angular";
+import { CompleteProfileComponent } from './components/doctors/complete-profile/complete-profile.component';
 
 @NgModule({
   declarations: [
@@ -92,7 +93,8 @@ import { KeycloakAngularModule, KeycloakService } from "keycloak-angular";
     DashboardComponent,
     ClinicDialogComponent,
     DataTableComponent,
-    UserDialogComponent
+    UserDialogComponent,
+    CompleteProfileComponent
   ],
   imports: [
     BrowserModule,

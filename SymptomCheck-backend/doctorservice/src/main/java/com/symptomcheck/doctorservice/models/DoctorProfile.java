@@ -4,23 +4,18 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "doctor_profiles")
 @Data
 public class DoctorProfile {
     @Id
-    private Long doctorId; // même id que dans User Service
-
-    private String speciality;
-    private String diploma;
-    @Column(length = 1000)
-    private String description;
+    private UUID doctorId; // même id que dans User Service
     private String clinicName; // info supplémentaire
 
     // services offerts : stocker en JSON ou table séparée
-    @OneToMany(mappedBy = "doctorProfile", cascade = CascadeType.ALL)
-    private List<HealthcareService> services;
+
 
 }
 

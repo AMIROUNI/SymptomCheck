@@ -5,14 +5,20 @@ import { User } from "../models/user.model"
 import { DoctorReview } from "../models/doctor-review.model"
 import { DoctorAvailability } from "../models/doctor-availability.model"
 import { AuthService } from "./auth.service"
+import { DoctorProfileStatusDTO } from "../models/doctor-profile-status.model"
+import { UserRole } from '../models/user.model';
+import { Router } from "@angular/router"
+
 
 @Injectable({
   providedIn: "root",
 })
 export class DoctorService {
   apiurl = "http://localhost:5190"
+private doctorApiUrl = 'http://localhost:8087/api/v1/doctor/profile'; // backend doctor-service
 
-  constructor(private http: HttpClient,private authService: AuthService) {}
+
+  constructor(private http: HttpClient,private authService: AuthService, private router: Router) {}
 
   getDoctors(): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiurl}/api/doctors`);
@@ -36,5 +42,34 @@ export class DoctorService {
 
   filterDoctorsBySpecialty(specialty: string): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiurl}/api/doctors?specialty=${specialty}`);
+  }
+
+  getDoctorProfileStatus(doctorId: string): Observable<DoctorProfileStatusDTO> {
+    return this.http.get<DoctorProfileStatusDTO>(`${this.doctorApiUrl}/${doctorId}/profile-status`);
+  }
+  async loginAndCheckProfile(username: string, password: string): Promise<void> {
+    try {
+      await this.authService.loginWithCredentials(username, password);
+      const user = this.authService.getCurrentUser();
+
+      if (user && user.role === UserRole.Doctor) {
+        // Vérifie le statut du profil du médecin
+        this.getDoctorProfileStatus(user.id).subscribe(status => {
+          if (status.profileCompleted) {
+            this.router.navigate(['/home']); // profil complet → page d'accueil
+          } else {
+            // profil incomplet → afficher popup ou rediriger vers page complétion
+            this.router.navigate(['/profile/completion']);
+          }
+        });
+      } else {
+        // utilisateur non médecin → redirection normale
+        this.router.navigate(['/home']);
+      }
+
+    } catch (error) {
+      console.error('Login or profile check failed', error);
+      throw error;
+    }
   }
 }

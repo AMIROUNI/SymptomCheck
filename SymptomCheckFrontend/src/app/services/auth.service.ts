@@ -2,12 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, from } from 'rxjs';
 import { tap, switchMap } from 'rxjs/operators';
-import { User } from '../models/user.model';
+import { User, UserRole } from '../models/user.model';
 import { UserRegistrationRequest } from '../models/auth-request.model';
 import { KeycloakService } from 'keycloak-angular';
 import { Router } from '@angular/router';
+import { DoctorProfileStatusDTO } from '../models/doctor-profile-status.model';
 
 const apiUrl = 'http://localhost:8082/api/v1/users';
+
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +17,7 @@ const apiUrl = 'http://localhost:8082/api/v1/users';
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+
 
   constructor(
     private http: HttpClient,
@@ -24,7 +27,7 @@ export class AuthService {
     this.loadCurrentUser();
   }
 
-  private loadCurrentUser() {
+  public loadCurrentUser() {
     // Check if user is authenticated in Keycloak
     if (this.keycloakService.isLoggedIn()) {
       this.keycloakService.getToken().then(token => {
@@ -44,6 +47,7 @@ export class AuthService {
       });
     }
   }
+  
 
   /**
    * Register a new user (this doesn't require Keycloak login)

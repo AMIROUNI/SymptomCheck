@@ -1,0 +1,71 @@
+<div class="complete-profile-container">
+  <h2>Complétez votre profil</h2>
+
+  <form [formGroup]="profileForm" (ngSubmit)="submitForm()">
+
+    <!-- Infos basiques -->
+    <div>
+      <label>Spécialité</label>
+      <input formControlName="speciality" />
+    </div>
+
+    <div>
+      <label>Description</label>
+      <textarea formControlName="description"></textarea>
+    </div>
+
+    <div>
+      <label>Diplôme</label>
+      <input formControlName="diploma" />
+    </div>
+
+    <div>
+      <label>Photo de profil URL</label>
+      <input formControlName="profilePhotoUrl" />
+    </div>
+
+    <div>
+      <label>Clinique ID</label>
+      <input formControlName="clinicId" />
+    </div>
+
+    <!-- Disponibilités -->
+    <div formArrayName="availabilities">
+      <h3>Disponibilités</h3>
+      <button type="button" (click)="addAvailability()">Ajouter disponibilité</button>
+      <div *ngFor="let avail of availabilities.controls; let i=index" [formGroupName]="i">
+        <label>Jour (0-6)</label>
+        <input formControlName="day" type="number" min="0" max="6" />
+        <label>Début</label>
+        <input formControlName="startTime" type="time" />
+        <label>Fin</label>
+        <input formControlName="endTime" type="time" />
+        <button type="button" (click)="removeAvailability(i)">Supprimer</button>
+      </div>
+    </div>
+
+    <!-- Services -->
+    <div formArrayName="services">
+      <h3>Services</h3>
+      <button type="button" (click)="addService()">Ajouter service</button>
+      <div *ngFor="let srv of services.controls; let i=index" [formGroupName]="i">
+        <label>Nom</label>
+        <input formControlName="name" />
+        <label>Description</label>
+        <input formControlName="description" />
+        <label>Catégorie</label>
+        <input formControlName="category" />
+        <label>Image URL</label>
+        <input formControlName="imageUrl" />
+        <label>Prix</label>
+        <input formControlName="price" type="number" />
+        <label>Durée (minutes)</label>
+        <input formControlName="durationMinutes" type="number" />
+        <button type="button" (click)="removeService(i)">Supprimer</button>
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="loading">Enregistrer</button>
+    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+  </form>
+</div>
