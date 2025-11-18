@@ -33,6 +33,9 @@ export interface User {
   doctorAppointments?: Appointment[]
   patientAppointments?: Appointment[]
   paymentTransactions?: PaymentTransaction[]
+
+
+  enabled?: boolean
 }
 
 export interface DoctorDto {

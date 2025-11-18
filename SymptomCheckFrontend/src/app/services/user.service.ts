@@ -1,23 +1,39 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { DoctorProfileDto, User, UserUpdateDto } from '../models/user.model';
+import { environment } from '@/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  private apiUrl = 'http://localhost:5190/api/user';
+  private apiUrl = `${environment.userserviceApiUrl}/users`;
 
 
 
   constructor(private http: HttpClient , private authService: AuthService) {}
 
 
+
+ getAllUsersByRole(role: string):Observable<User[]> {
+      const params = new HttpParams().set('role', role.toString());
+    return this.http.get<User[]>(`${this.apiUrl}/by-role`, { params });
+  }
+
+  desableOrEnableUser(id: string, enable: boolean): Observable<any> {
+  const params = new HttpParams().set('isEnable', enable.toString());
+  return this.http.patch(`${this.apiUrl}/disable/${id}`, null, { params });
+}
+
   getAllUsers():Observable<User[]> {
     return this.http.get<User[]>(this.apiUrl);
+  }
+
+  getUserById(id: string): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/${id}`);
   }
 
 

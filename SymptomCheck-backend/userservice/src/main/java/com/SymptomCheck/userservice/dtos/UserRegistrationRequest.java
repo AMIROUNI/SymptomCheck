@@ -12,6 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRegistrationRequest {
+    private  String id;
+
 
     @NotBlank
     private String username;
@@ -35,4 +37,5 @@ public class UserRegistrationRequest {
     private  String description;
     private  String diploma;
    private Long clinicId;
+   private  boolean enabled ;
 }

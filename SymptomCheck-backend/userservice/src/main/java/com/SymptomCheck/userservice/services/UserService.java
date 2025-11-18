@@ -7,16 +7,21 @@ import com.SymptomCheck.userservice.models.User;
 import com.SymptomCheck.userservice.models.UserData;
 import com.SymptomCheck.userservice.repositories.UserDataRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.weaver.ast.Var;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 
@@ -75,5 +80,21 @@ public class UserService {
 
     public Map<String, Object> getUserDetails(String username) {
         return keycloakService.getUserDetails(username);
+    }
+
+
+    public  void  disableUser(String userId , boolean  isEnabled) {
+        keycloakService.disableUser(userId ,  isEnabled);
+    }
+
+
+    public List<UserRegistrationRequest> getUsersByRole(String roleName) {
+
+              return  keycloakService.getUsersByRole(roleName);
+
+    }
+
+    public UserRegistrationRequest getUserById(String userId) {
+        return keycloakService.getUserById(userId);
     }
 }

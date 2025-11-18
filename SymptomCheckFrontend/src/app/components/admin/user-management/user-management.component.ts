@@ -1,21 +1,20 @@
-import { Component, Inject, OnInit } from "@angular/core"
-import { MatDialog } from "@angular/material/dialog"
-import { MatSnackBar } from "@angular/material/snack-bar"
+import { Component, Inject, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
-import { UserDialogComponent } from "./user-dialog/user-dialog.component"
-import { UserService } from "@/app/services/user.service"
-import { User, UserRole } from "@/app/models/user.model"
+import { UserService } from "@/app/services/user.service";
+import { User, UserRole } from "@/app/models/user.model";
 
 @Component({
   selector: "app-user-management",
   templateUrl: "./user-management.component.html",
   styleUrls: ["./user-management.component.css"],
-  standalone:false
+  standalone: false
 })
 export class UserManagementComponent implements OnInit {
-  users: User[] = []
-  displayedColumns: string[] = ["id", "username", "firstName", "lastName", "email", "role", "actions"]
-  loading = false
+  users: User[] = [];
+  displayedColumns: string[] = ["id", "username", "firstName", "lastName", "email", "role", "actions"];
+  loading = false;
 
   constructor(
     private userService: UserService,
@@ -24,51 +23,67 @@ export class UserManagementComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadUsers()
+    console.log('ng on init');
+    
+    this.loadAllUsers();
+    console.log("UserManagementComponent initialized");
+    console.log("**************************************");
+    
+    console.log(this.users);
+    
   }
 
-  loadUsers(): void {
-    this.loading = true
-    this.userService.getAllUsers().subscribe({
-      next: (users) => {
-        this.users = users
-        this.loading = false
+  private loadAllUsers(): void {
+    this.loading = true;
+
+    // Load patients first
+    this.userService.getAllUsersByRole("PATIENT").subscribe({
+      next: (patients) => {
+        // Load doctors next
+        this.userService.getAllUsersByRole("DOCTOR").subscribe({
+          next: (doctors) => {
+            // Merge both lists
+            this.users = [...doctors, ...patients];
+            this.loading = false;
+          },
+          error: (error) => {
+            this.loading = false;
+            this.snackBar.open("Error loading doctors", "Close", { duration: 3000 });
+          },
+        });
       },
       error: (error) => {
-        this.loading = false
-        this.snackBar.open("Error loading users", "Close", { duration: 3000 })
+        this.loading = false;
+        this.snackBar.open("Error loading patients", "Close", { duration: 3000 });
       },
-    })
+    });
   }
 
-  editUser(user: User): void {
-    const dialogRef = this.dialog.open(UserDialogComponent, {
-      width: "500px",
-      data: { user, isEdit: true },
-    })
+  desactivateUser(user: User): void {
+    if (!confirm(`Are you sure you want to deactivate the account ${user.username}?`)) return;
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.loadUsers()
-      }
-    })
+    this.userService.desableOrEnableUser(user.id, false).subscribe({
+      next: () => {
+        user.enabled = false; // update table immediately
+        this.snackBar.open("User deactivated successfully", "Close", { duration: 3000 });
+      },
+      error: () => this.snackBar.open("Error deactivating user", "Close", { duration: 3000 }),
+    });
   }
 
-  deleteUser(user: User): void {
-    if (confirm(`Are you sure you want to delete user ${user.username}?`)) {
-      this.userService.delete(user.id).subscribe({
-        next: () => {
-          this.snackBar.open("User deleted successfully", "Close", { duration: 3000 })
-          this.loadUsers()
-        },
-        error: (error) => {
-          this.snackBar.open("Error deleting user", "Close", { duration: 3000 })
-        },
-      })
-    }
+  activateUser(user: User): void {
+    if (!confirm(`Are you sure you want to activate the account ${user.username}?`)) return;
+
+    this.userService.desableOrEnableUser(user.id, true).subscribe({
+      next: () => {
+        user.enabled = true; // update table immediately
+        this.snackBar.open("User activated successfully", "Close", { duration: 3000 });
+      },
+      error: () => this.snackBar.open("Error activating user", "Close", { duration: 3000 }),
+    });
   }
 
   getRoleName(role: UserRole): string {
-    return UserRole[role]
+    return UserRole[role];
   }
 }

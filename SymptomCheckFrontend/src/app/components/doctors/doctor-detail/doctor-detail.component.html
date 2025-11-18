@@ -6,7 +6,7 @@
     <div class="left-section">
       <img
         *ngIf="doctor?.profilePhotoUrl"
-        [src]="doctor.profilePhotoUrl"
+         [src]="getUserImage(doctor?.profilePhotoUrl)"
         alt="Doctor's photo"
         class="profile-photo"
       />

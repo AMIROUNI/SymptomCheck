@@ -51,10 +51,22 @@ export class LoginComponent implements OnInit {
       // ✅ Login using Keycloak with custom credentials
       await this.authService.loginWithCredentials(username, password);
 
-      console.log('✅ Login successful!');
+
+       const roles = this.authService.getUserRoles();
+
+  console.log("🎭 Roles after login:", roles);
+  console.log(roles.includes('ADMIN'))
+const normalizedRoles = roles.map(r => r.trim().toUpperCase());
+console.log(normalizedRoles.includes("ADMIN"));
+
+if (normalizedRoles.includes("ADMIN")) {
+  this.router.navigate(['/admoun']);
+} else {
+  this.router.navigate(['/']);
+}   console.log('✅ Login successful!');
 
       // Navigate to return URL or dashboard
-      this.router.navigateByUrl(this.returnUrl);
+      // this.router.navigateByUrl(this.returnUrl);
 
     } catch (error: any) {
       console.error('❌ Login error:', error);

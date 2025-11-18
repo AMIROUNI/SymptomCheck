@@ -1,6 +1,6 @@
 <div class="doctor-card">
   <div class="doctor-image">
-    <img [src]="doctor.profilePhotoUrl || 'assets/images/doctor-placeholder.jpg'" [alt]="doctor.firstName + ' ' + doctor.lastName">
+    <img [src]="getUserImage(doctor?.profilePhotoUrl)|| 'assets/images/doctor-placeholder.jpg'" [alt]="doctor.firstName + ' ' + doctor.lastName">
   </div>
   <div class="doctor-info">
     <h3>Dr. {{ doctor.firstName }} {{ doctor.lastName }}</h3>

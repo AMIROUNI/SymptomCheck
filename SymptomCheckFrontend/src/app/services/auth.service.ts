@@ -22,7 +22,8 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private keycloakService: KeycloakService,
-    private router: Router
+    private router: Router,
+  
   ) {
     this.loadCurrentUser();
   }
@@ -144,6 +145,11 @@ export class AuthService {
   isAuthenticated(): boolean {
     return this.keycloakService.isLoggedIn();
   }
+
+
+  getUserRoles(): string[] {
+  return this.keycloakService?.getUserRoles(true) || [];
+}
 
   /**
    * Get current user

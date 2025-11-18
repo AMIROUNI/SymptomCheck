@@ -1,53 +1,53 @@
 import { KeycloakService } from "keycloak-angular";
+import { Router } from "@angular/router";
 
-export function initializeKeycloak(keycloak: KeycloakService) {
+export function initializeKeycloak(keycloak: KeycloakService, router: Router) {
   return () =>
-    keycloak.init({
-      config: {
-        url: 'http://localhost:8080',
-        realm: 'symptomcheck-realm',
-        clientId: 'angular-client',
-      },
-      initOptions: {
-        onLoad: 'check-sso', // ✅ Check if user is already logged in
-        checkLoginIframe: false,
-        flow: 'standard'
-      },
-      // ✅ Automatically add "Authorization: Bearer <token>" to HTTP requests
-      enableBearerInterceptor: true,
+    keycloak
+      .init({
+        config: {
+          url: 'http://localhost:8080',
+          realm: 'symptomcheck-realm',
+          clientId: 'angular-client',
+        },
+        initOptions: {
+          onLoad: 'check-sso',
+          checkLoginIframe: false,
+          flow: 'standard',
+        },
+        enableBearerInterceptor: true,
+        bearerExcludedUrls: [
+          '/assets',
+          '/api/v1/users/register',
+          '/api/v1/users/public',
+          '/api/v1/auth',
+          'http://localhost:8080'
+        ],
+        bearerPrefix: 'Bearer',
+      })
+      .then(async (authenticated) => {
+        console.log('Keycloak initialized. Authenticated:', authenticated);
 
-      // ✅ Exclude public endpoints
-      bearerExcludedUrls: [
-        '/assets',
-        '/api/v1/users/register',
-        '/api/v1/users/public',
-        '/api/v1/auth',
-        'http://localhost:8080'
-      ],
+        if (!authenticated) {
+          console.log("ℹ️ User not authenticated");
+          return false;
+        }
 
-      bearerPrefix: 'Bearer'
-    })
-    .then(authenticated => {
-      console.log('Keycloak initialized. Authenticated:', authenticated);
+    const roles = keycloak.getUserRoles(true);
+    console.log("################################################################")
+    console.log("🎭 Extracted roles:", roles);
 
-      if (authenticated) {
-        // Get and log user profile
-        keycloak.loadUserProfile().then(profile => {
-          console.log('✅ User profile:', profile);
-        });
+        // REDIRECT BASED ON ROLE
+        if (roles.includes("ADMIN")) {
+          router.navigate(['/admin/dashboard']);
+        }  else {
+          router.navigate(['/']);
+        }
 
-        // Get and log access token
-        keycloak.getToken().then(token => {
-          console.log('✅ Access token:', token);
-        });
-      } else {
-        console.log('ℹ️ User is not authenticated');
-      }
-
-      return authenticated;
-    })
-    .catch(err => {
-      console.error("❌ Keycloak initialization failed:", err);
-      return false;
-    });
+        return true;
+      })
+      .catch(err => {
+        console.error("❌ Keycloak initialization error:", err);
+        return false;
+      });
 }

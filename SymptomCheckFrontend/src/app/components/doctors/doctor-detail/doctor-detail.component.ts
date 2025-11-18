@@ -5,6 +5,8 @@ import { User } from "../../../models/user.model"
 import { DoctorReview } from "../../../models/doctor-review.model"
 import { FormBuilder, FormGroup, Validators } from "@angular/forms"
 import { AuthService } from "@/app/services/auth.service"
+import { UserService } from "@/app/services/user.service"
+import { environment } from "@/environments/environment"
 
 @Component({
   selector: "app-doctor-detail",
@@ -13,7 +15,7 @@ import { AuthService } from "@/app/services/auth.service"
   standalone: false
 })
 export class DoctorDetailComponent implements OnInit {
-  doctorId!: number;
+  doctorId!: string;
   doctor?: User;
   isLoading: boolean = true;
   error: string = '';
@@ -23,7 +25,7 @@ export class DoctorDetailComponent implements OnInit {
   currentUser: User | null = null;
   constructor(
     private route: ActivatedRoute,
-    private doctorService: DoctorService,
+    private doctorService: UserService,
     private fb: FormBuilder,
     private authService:AuthService,
     private router: Router
@@ -41,13 +43,13 @@ export class DoctorDetailComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.doctorId = +this.route.snapshot.paramMap.get('id')!;
+    this.doctorId = this.route.snapshot.paramMap.get('id')!;
     this.loadDoctor();
     this.loadReviews();
   }
 
   loadDoctor(): void {
-    this.doctorService.getDoctorById(this.doctorId).subscribe({
+    this.doctorService.getUserById(this.doctorId).subscribe({
       next: (doctor) => {
         this.doctor = doctor;
         this.isLoading = false;
@@ -61,14 +63,14 @@ export class DoctorDetailComponent implements OnInit {
   }
 
   loadReviews(): void {
-    this.doctorService.getDoctorReviews(this.doctorId).subscribe({
+   /* this.doctorService.getDoctorReviews(this.doctorId).subscribe({
       next: (reviews) => {
         this.reviews = reviews;
       },
       error: (err) => {
         console.error('Error loading reviews:', err);
       }
-    });
+    });*/
   }
 
   toggleReviewForm(): void {
@@ -79,7 +81,7 @@ export class DoctorDetailComponent implements OnInit {
   }
 
   submitReview(): void {
-    if (this.reviewForm.valid) {
+  /*  if (this.reviewForm.valid) {
       const reviewData = {
         doctorId: this.doctorId,
         patientId:this.currentUser?.id,
@@ -97,7 +99,7 @@ export class DoctorDetailComponent implements OnInit {
           console.error('Error submitting review:', err);
         }
       });
-    }
+    }*/
   }
 
   get averageRating(): number {
@@ -105,4 +107,11 @@ export class DoctorDetailComponent implements OnInit {
     const sum = this.reviews.reduce((acc, review) => acc + review.stars, 0);
     return sum / this.reviews.length;
   }
+
+
+   apiUrl = environment.uploadsUrl;
+  
+    getUserImage(filename: string| undefined): string {
+      return `${environment.uploadsUrl}/${filename}`;
+    }
 }
