@@ -21,5 +21,4 @@ public class MedicalClinic {
     private String city;
     private String country;
 
-
 }
