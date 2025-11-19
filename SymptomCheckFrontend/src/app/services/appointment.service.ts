@@ -3,17 +3,30 @@ import { HttpClient, HttpHeaders } from "@angular/common/http"
 import { Observable, of } from "rxjs"
 import { Appointment, AppointmentStatus } from "../models/appointment.model"
 import { AuthService } from "./auth.service"
+import { environment } from "@/environments/environment"
 
 @Injectable({
   providedIn: "root",
 })
 export class AppointmentService {
+  
+  private apiUrl = `${environment.appointmentApiUrl}`;
 
-  private apiUrl = 'http://localhost:5190/api/appointment';
+
   constructor(
     private http: HttpClient,
     private authService: AuthService,
   ) {}
+
+
+getDateTimeOfAppointments(doctorId: string): Observable<string[]> {
+  return this.http.get<string[]>(`${this.apiUrl}/available-date/${doctorId}`);
+}
+
+
+
+
+  //--------------------------------------------------------------------------------------//
 
   getAppointments(id:number): Observable<Appointment[]> {
     return this.http.get<Appointment[]>(`${this.apiUrl}/${id}`);

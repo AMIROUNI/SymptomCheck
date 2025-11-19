@@ -3,12 +3,13 @@ import { HttpClient, HttpHeaders } from "@angular/common/http"
 import { Observable, of } from "rxjs"
 import { HealthcareService } from "../models/healthcare-service.model"
 import { AuthService } from "./auth.service";
+import { environment } from "@/environments/environment";
 
 @Injectable({
   providedIn: "root",
 })
 export class ServiceService {
-  private apiUrl = 'http://localhost:5190/api/HealthcareService';
+  private apiUrl = `${environment.doctorserviceApiUrl}/healthcare/service`;
 
 
 

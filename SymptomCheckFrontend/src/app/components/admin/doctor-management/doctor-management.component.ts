@@ -29,7 +29,7 @@ export class DoctorManagementComponent implements OnInit {
 
   loadDoctors(): void {
     this.loading = true
-    this.userService.getDoctors().subscribe({
+    this.userService.getAllUsersByRole("Doctor").subscribe({
       next: (doctors) => {
         this.doctors = doctors
         this.loading = false

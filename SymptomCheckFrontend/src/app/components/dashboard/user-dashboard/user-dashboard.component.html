@@ -5,7 +5,8 @@
         <div class="dashboard-sidebar">
           <div class="user-profile">
             <div class="user-avatar">
-              <img [src]="getUserImage(currentUser?.profilePhotoUrl) || 'assets/images/user-placeholder.jpg'" [alt]="currentUser?.firstName">
+              <img [src]="getUserImage(currentUser?.profilePhotoUrl) || 'assets/images/user-placeholder.jpg'"
+                [alt]="currentUser?.firstName">
             </div>
             <div class="user-info">
               <h3>{{ currentUser?.firstName }} {{ currentUser?.lastName }}</h3>
@@ -22,7 +23,7 @@
               <i class="fas fa-user"></i>
               <span>My Profile</span>
             </a>
-            <a  routerLink="/appointment" class="menu-item">
+            <a routerLink="/appointment" class="menu-item">
               <i class="fas fa-plus-circle"></i>
               <span>Book Appointment</span>
             </a>
@@ -30,10 +31,11 @@
               <i class="fas fa-clock"></i>
               <span>Manage Availability</span>
             </a>
-            <a  href="/dashboard/add-service" class="menu-item" routerLinkActive="active">
+            <a routerLink="add-service" class="menu-item" routerLinkActive="active">
               <i class="fas fa-stethoscope"></i>
               <span>My Services</span>
             </a>
+
             <a href="javascript:void(0)" (click)="logout()" class="menu-item">
               <i class="fas fa-sign-out-alt"></i>
               <span>Logout</span>

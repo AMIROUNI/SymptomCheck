@@ -23,7 +23,7 @@
           <a routerLink="/register" class="btn btn-primary">Register</a>
         </ng-container>
 
-        <div *ngIf="isLoggedIn" class="user-dropdown">
+        <div *ngIf="isLoggedIn" class="user-dropdown" style=" z-index:  444;">
           <button class="dropdown-toggle">
             <img [src]="getUserImage(currentUser?.profilePhotoUrl)" alt="User" class="user-avatar">
             <span class="user-name">{{ currentUser?.firstName || 'User' }}</span>

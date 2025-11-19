@@ -19,10 +19,8 @@ export class UserDashboardComponent {
   ) {
     this.currentUser = this.authService.getCurrentUser()
 
-    // Redirect if not logged in
-    if (!this.currentUser) {
-      this.router.navigate(["/login"])
-    }
+      console.log(this.currentUser);
+      
   }
 
    ngOnInit(): void {

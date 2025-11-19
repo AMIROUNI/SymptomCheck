@@ -1,12 +1,16 @@
 package com.symptomcheck.clinicservice.controllers;
 
+import com.symptomcheck.clinicservice.dtos.MedicalClinicDto;
 import com.symptomcheck.clinicservice.models.MedicalClinic;
 import com.symptomcheck.clinicservice.services.MedicalClinicService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@Slf4j
 @RestController()
 @RequestMapping("/api/v1/medical/clinic")
 @RequiredArgsConstructor
@@ -16,8 +20,19 @@ public class MedicalClinicController {
 
     // CREATE
     @PostMapping
-    public MedicalClinic createClinic(@RequestBody MedicalClinic clinic) {
-        return clinicService.createClinic(clinic);
+    public ResponseEntity<?> createClinic(@RequestBody MedicalClinicDto clinic) {
+        try {
+            log.info("createClinic called");
+            log.info(clinic.getName());
+            return ResponseEntity.ok(clinicService.createClinic(clinic));
+        }
+        catch (Exception e) {
+            log.info("Exception: ", e);
+            return   ResponseEntity.internalServerError().build();
+
+        }
+
+
     }
 
     // GET ALL

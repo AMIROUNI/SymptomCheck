@@ -1,10 +1,8 @@
 package com.symptomcheck.doctorservice.config;
 
 import com.symptomcheck.doctorservice.models.DoctorAvailability;
-import com.symptomcheck.doctorservice.models.DoctorProfile;
 import com.symptomcheck.doctorservice.models.HealthcareService;
 import com.symptomcheck.doctorservice.repositories.DoctorAvailabilityRepository;
-import com.symptomcheck.doctorservice.repositories.DoctorProfileRepository;
 import com.symptomcheck.doctorservice.repositories.HealthcareServiceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -20,27 +18,14 @@ import java.util.UUID;
 public class DatabaseSeeder implements CommandLineRunner {
 
     private final DoctorAvailabilityRepository availabilityRepository;
-    private final DoctorProfileRepository doctorProfileRepository;
     private final HealthcareServiceRepository serviceRepository;
 
     @Override
     public void run(String... args) throws Exception {
 
         // --- CHECK AND CREATE DOCTOR PROFILE ---
-        UUID doctorUuid = UUID.fromString("fc6274ff-730a-44f0-9245-17ada9054fe8"); // tu peux générer random avec UUID.randomUUID() si tu veux
-        Optional<DoctorProfile> existingDoctor = doctorProfileRepository.findById(doctorUuid);
-        DoctorProfile doctor;
+        UUID doctorUuid = UUID.fromString("fc6274ff-730a-44f0-9245-17ada9054fe8");
 
-        if (existingDoctor.isPresent()) {
-            doctor = existingDoctor.get();
-            System.out.println("Doctor profile already exists: " + doctor.getDoctorId());
-        } else {
-            doctor = new DoctorProfile();
-            doctor.setDoctorId(doctorUuid);
-            doctor.setClinicName("Healthy Clinic");
-            doctorProfileRepository.save(doctor);
-            System.out.println("Doctor profile created.");
-        }
 
         // --- CHECK AND CREATE DOCTOR AVAILABILITY ---
         boolean availabilityExists = availabilityRepository.existsByDoctorIdAndDayOfWeek(doctorUuid, DayOfWeek.MONDAY);

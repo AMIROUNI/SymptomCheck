@@ -1,17 +1,22 @@
 package com.symptomcheck.appointmentservice.services;
 
+import com.symptomcheck.appointmentservice.dtos.AppointmentDto;
 import com.symptomcheck.appointmentservice.models.Appointment;
 import com.symptomcheck.appointmentservice.repositories.AppointmentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -20,23 +25,33 @@ public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final WebClient webClient;
 
-    public Appointment makeAppointment(Appointment appointment) {
+    public Appointment makeAppointment(AppointmentDto dto,String token) {
         // Format dateTime pour URL
-        String formattedDate = appointment.getDateTime().
+        String formattedDate = dto.getDateTime().
                 format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
         Boolean isAvailable = webClient.get()
-                .uri("http://localhost:8082/api/v1/doctor/availability/isAvailable/{id}/{dateTime}",
-                        appointment.getDoctorId(), formattedDate)
+                .uri("http://localhost:8087/api/v1/doctor/availability/isAvailable/{id}/{dateTime}",
+                        dto.getDoctorId(), formattedDate)
+                .header("Authorization", "Bearer " + token)
                 .retrieve()
+
                 .bodyToMono(Boolean.class)
                 .onErrorResume(ex -> {
-                    System.err.println("Error calling Doctor Service: " + ex.getMessage());
+                    log.error(ex.getMessage());
                     return Mono.just(false);
                 })
                 .block();
 
-        if (Boolean.TRUE.equals(isAvailable)) {
+        boolean notExists = appointmentRepository.existsByDoctorIdAndDateTime(dto.getDoctorId(), dto.getDateTime());
+
+        Appointment appointment = new Appointment();
+        appointment.setDescription(dto.getDescription());
+        appointment.setDoctorId(dto.getDoctorId());
+        appointment.setPatientId(dto.getPatientId());
+        appointment.setDateTime(dto.getDateTime());
+
+        if (Boolean.TRUE.equals(isAvailable) && notExists) {
             return appointmentRepository.save(appointment);
         } else {
             throw new IllegalArgumentException(" The doctor is not available at the selected date.");
@@ -45,7 +60,7 @@ public class AppointmentService {
 
 
     // méthode locale (si tu veux récupérer directement depuis ta base)
-    public List<Appointment> getByDoctor(String doctorId) {
+    public List<Appointment> getByDoctor(UUID doctorId) {
         return appointmentRepository.findByDoctorId(doctorId);
     }
 
@@ -60,5 +75,19 @@ public class AppointmentService {
                 .bodyToFlux(Appointment.class)
                 .collectList()
                 .block(); // pour simplifier en synchrone
+    }
+
+
+
+    public  boolean isDoctorAvailable(UUID doctorId, LocalDateTime dateTime) {
+        boolean exists= appointmentRepository.existsByDoctorIdAndDateTime(doctorId,dateTime);
+        return  !exists;
+    }
+
+
+    public List<LocalDateTime> getAvailableDate(UUID doctorId) {
+
+        return  appointmentRepository.getDateTimeByDoctorId(doctorId);
+
     }
 }

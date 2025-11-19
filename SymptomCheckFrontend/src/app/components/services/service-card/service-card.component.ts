@@ -1,6 +1,7 @@
 import { Component, Input } from "@angular/core"
 import  { Router } from "@angular/router"
 import  { HealthcareService } from "../../../models/healthcare-service.model"
+import { environment } from "@/environments/environment"
 
 @Component({
   selector: "app-service-card",
@@ -25,4 +26,12 @@ export class ServiceCardComponent {
   viewDoctor(): void {
     this.router.navigate(["/doctors", this.service.doctorId])
   }
+
+
+    apiUrl = environment.uploadsUrl;
+  
+    getUserImage(filename: string| undefined): string {
+      return `${environment.uploadsUrl}/${filename}`;
+    }
+  
 }

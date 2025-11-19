@@ -8,6 +8,7 @@ import { AuthService } from "./auth.service"
 import { DoctorProfileStatusDTO } from "../models/doctor-profile-status.model"
 import { UserRole } from '../models/user.model';
 import { Router } from "@angular/router"
+import { environment } from "@/environments/environment"
 
 
 @Injectable({
@@ -15,16 +16,16 @@ import { Router } from "@angular/router"
 })
 export class DoctorService {
   apiurl = "http://localhost:5190"
-private doctorApiUrl = 'http://localhost:8087/api/v1/doctor/profile'; // backend doctor-service
+  private doctorApiUrl = `${environment.doctorserviceApiUrl}`; 
 
 
   constructor(private http: HttpClient,private authService: AuthService, private router: Router) {}
 
   getDoctors(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiurl}/api/doctors`);
+    return this.http.get<User[]>(`${this.apiurl}`);
   }
 
-  getDoctorById(id: number): Observable<User> {
+  getDoctorById(id: string): Observable<User> {
     return this.http.get<User>(`${this.apiurl}/api/doctors/${id}`);
   }
 
@@ -45,7 +46,7 @@ private doctorApiUrl = 'http://localhost:8087/api/v1/doctor/profile'; // backend
   }
 
   getDoctorProfileStatus(doctorId: string): Observable<DoctorProfileStatusDTO> {
-    return this.http.get<DoctorProfileStatusDTO>(`${this.doctorApiUrl}/${doctorId}/profile-status`);
+    return this.http.get<DoctorProfileStatusDTO>(`${this.doctorApiUrl}/profile/${doctorId}/profile-status`);
   }
   async loginAndCheckProfile(username: string, password: string): Promise<void> {
     try {
