@@ -1,5 +1,4 @@
 package com.symptomcheck.clinicservice.services;
-
 import com.symptomcheck.clinicservice.dtos.MedicalClinicDto;
 import com.symptomcheck.clinicservice.models.MedicalClinic;
 import com.symptomcheck.clinicservice.repositories.MedicalClinicRepository;
@@ -13,16 +12,25 @@ import java.util.List;
 public class MedicalClinicService {
     private   final MedicalClinicRepository repository;
     // CREATE
+
+
     public MedicalClinic createClinic(MedicalClinicDto dto) {
-         MedicalClinic clinic = new MedicalClinic();
-         clinic.setName(dto.getName());
-         clinic.setAddress(dto.getAddress());
-         clinic.setPhone(dto.getPhone());
-         clinic.setCity(dto.getCity());
-         clinic.setCountry(dto.getCountry());
-         clinic.setWebsiteUrl(dto.getWebsiteUrl());
+
+        if (dto.getName() == null || dto.getName().isBlank()) {
+            throw new IllegalArgumentException("Clinic name cannot be empty.");
+        }
+
+        MedicalClinic clinic = new MedicalClinic();
+        clinic.setName(dto.getName());
+        clinic.setAddress(dto.getAddress());
+        clinic.setPhone(dto.getPhone());
+        clinic.setCity(dto.getCity());
+        clinic.setCountry(dto.getCountry());
+        clinic.setWebsiteUrl(dto.getWebsiteUrl());
+
         return repository.save(clinic);
     }
+
 
     // READ BY ID
     public MedicalClinic getClinicById(Long id) {
@@ -32,7 +40,13 @@ public class MedicalClinicService {
 
     // READ ALL
     public List<MedicalClinic> getAllClinics() {
-        return repository.findAll();
+        List<MedicalClinic> clinics = repository.findAll();
+
+        if (clinics.isEmpty()) {
+            throw new RuntimeException("No clinics found in the database.");
+        }
+
+        return clinics;
     }
 
     // UPDATE
@@ -51,6 +65,11 @@ public class MedicalClinicService {
 
     // DELETE
     public void deleteClinic(Long id) {
-        repository.deleteById(id);
+
+        MedicalClinic existing = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Clinic not found with id: " + id));
+
+        repository.deleteById(existing.getId());
     }
+
 }
