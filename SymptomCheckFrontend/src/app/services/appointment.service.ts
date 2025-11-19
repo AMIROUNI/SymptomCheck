@@ -44,7 +44,7 @@ getDateTimeOfAppointments(doctorId: string): Observable<string[]> {
 
   createAppointment(appointmentData: Appointment): Observable<Appointment> {
     console.log("appointmentData in service:::::", appointmentData);
-     return this.http.post<Appointment>(`${this.apiUrl}`, appointmentData);
+     return this.http.post<Appointment>(`${this.apiUrl}/create`, appointmentData);
   }
 
   updateAppointmentStatus(id: number, status: number): Observable<Appointment> {

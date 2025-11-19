@@ -61,9 +61,11 @@ console.log(normalizedRoles.includes("ADMIN"));
 
 if (normalizedRoles.includes("ADMIN")) {
   this.router.navigate(['/admoun']);
-} else {
+} else if (normalizedRoles.includes("DOCTOR"))  {
+  this.router.navigate(['/doctor-dashboard']);
+} else{
   this.router.navigate(['/']);
-}   console.log('✅ Login successful!');
+}  console.log('✅ Login successful!');
 
       // Navigate to return URL or dashboard
       // this.router.navigateByUrl(this.returnUrl);

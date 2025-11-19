@@ -23,7 +23,7 @@ public class DoctorAvailabilityService {
     private final DoctorAvailabilityRepository availabilityRepository;
     private final HealthcareServiceRepository healthcareRepo;
     private final WebClient webClient;
-    public boolean isDoctorAvailable(Long doctorId, LocalDateTime dateTime) {
+    public boolean isDoctorAvailable(UUID doctorId, LocalDateTime dateTime) {
         DayOfWeek day = dateTime.getDayOfWeek();
         var time = dateTime.toLocalTime();
         return availabilityRepository.findIfAvailable(doctorId, day, time).isPresent();

@@ -26,24 +26,28 @@ public class AppointmentService {
     private final WebClient webClient;
 
     public Appointment makeAppointment(AppointmentDto dto,String token) {
+
+        log.info("stat make appointment");
         // Format dateTime pour URL
-        String formattedDate = dto.getDateTime().
-                format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        String formattedDate = dto.getDateTime()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
 
         Boolean isAvailable = webClient.get()
                 .uri("http://localhost:8087/api/v1/doctor/availability/isAvailable/{id}/{dateTime}",
                         dto.getDoctorId(), formattedDate)
                 .header("Authorization", "Bearer " + token)
                 .retrieve()
-
                 .bodyToMono(Boolean.class)
                 .onErrorResume(ex -> {
-                    log.error(ex.getMessage());
+                    log.error("Error calling Doctor Service:", ex);
                     return Mono.just(false);
                 })
                 .block();
 
-        boolean notExists = appointmentRepository.existsByDoctorIdAndDateTime(dto.getDoctorId(), dto.getDateTime());
+        log.info(isAvailable.toString());
+
+
+
 
         Appointment appointment = new Appointment();
         appointment.setDescription(dto.getDescription());
@@ -51,11 +55,17 @@ public class AppointmentService {
         appointment.setPatientId(dto.getPatientId());
         appointment.setDateTime(dto.getDateTime());
 
-        if (Boolean.TRUE.equals(isAvailable) && notExists) {
+        boolean exists = appointmentRepository.existsByDoctorIdAndDateTime(
+                dto.getDoctorId(),
+                dto.getDateTime()
+        );
+
+        if (Boolean.TRUE.equals(isAvailable) && !exists) {
             return appointmentRepository.save(appointment);
         } else {
-            throw new IllegalArgumentException(" The doctor is not available at the selected date.");
+            throw new IllegalArgumentException("Doctor is not available");
         }
+
     }
 
 

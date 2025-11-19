@@ -55,13 +55,15 @@ import { DashboardComponent } from "./components/admin/dashboard/dashboard.compo
 import { ClinicDialogComponent } from "./components/admin/clinic-management/clinic-dialog/clinic-dialog.component";
 import { UserDialogComponent } from "./components/admin/user-management/user-dialog/user-dialog.component";
 import { DoctorDialogComponent } from "./components/admin/doctor-management/doctor-dialog/doctor-dialog.component";
-
+import { NgApexchartsModule } from "ng-apexcharts";
 import { AuthGuard } from "./guards/auth.guard";
 // ❌ REMOVED: import { AuthInterceptor } from "./interceptors/auth.interceptor";
 import { initializeKeycloak } from "./keycloak-init";
 import { KeycloakAngularModule, KeycloakService } from "keycloak-angular";
 import { CompleteProfileComponent } from './components/doctors/complete-profile/complete-profile.component';
 import { PopupComponent } from "./components/shared/popup/popup.component";
+import { DoctorDashboardComponent } from './components/doctors/doctor-dashboard/doctor-dashboard.component';
+import { GenericChartComponent } from "./components/shared/dashboard-components/growth-chart/generic-chart.component";
 
 @NgModule({
   declarations: [
@@ -95,9 +97,11 @@ import { PopupComponent } from "./components/shared/popup/popup.component";
     ClinicDialogComponent,
     DataTableComponent,
     UserDialogComponent,
-    CompleteProfileComponent
-  ],
-  imports: [
+    CompleteProfileComponent,
+    DoctorDashboardComponent
+      ],
+      imports: [
+    NgApexchartsModule,
     BrowserModule,
     AppRoutingModule,
     FormsModule,
@@ -122,7 +126,8 @@ import { PopupComponent } from "./components/shared/popup/popup.component";
     MatProgressSpinnerModule,
     MatChipsModule,
     KeycloakAngularModule,
-    PopupComponent
+    PopupComponent,
+    GenericChartComponent
 ],
   providers: [
     AuthGuard,

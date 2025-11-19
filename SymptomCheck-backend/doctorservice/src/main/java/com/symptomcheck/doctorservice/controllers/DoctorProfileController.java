@@ -20,7 +20,7 @@ public class DoctorProfileController {
     private final HealthcareServiceService healthcareServiceService;
 
     @GetMapping("/{doctorId}/profile-status")
-    public ResponseEntity<DoctorProfileStatusDTO> getProfileStatus(@PathVariable String doctorId) {
+    public ResponseEntity<Boolean> getProfileStatus(@PathVariable String doctorId) {
 
         // Conversion de la chaîne en UUID
         UUID doctorUuid = UUID.fromString(doctorId);
@@ -29,12 +29,7 @@ public class DoctorProfileController {
         boolean availabilityCompleted = availabilityService.existsByDoctorId(doctorUuid);
         boolean healthcareServiceCompleted = healthcareServiceService.existsByDoctorId(String.valueOf(doctorUuid));
 
-        DoctorProfileStatusDTO dto = new DoctorProfileStatusDTO();
-        dto.setAvailabilityCompleted(availabilityCompleted);
-        dto.setHealthcareServiceCompleted(healthcareServiceCompleted);
-        dto.setProfileCompleted(availabilityCompleted && healthcareServiceCompleted);
-
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(availabilityCompleted && healthcareServiceCompleted);
     }
 
     @PostMapping("/completeprofile")
