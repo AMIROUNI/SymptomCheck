@@ -1,0 +1,90 @@
+<div *ngIf="showCompleteProfileModal" class="modal-backdrop">
+  <div class="modal-content">
+    <h2>Complete Your Profile</h2>
+    <p class="step-indicator">Step {{ step }} of 2</p>
+
+    <!-- Step 1: Availability -->
+    <form *ngIf="step === 1" [formGroup]="availabilityForm">
+      <h3>Set Your Availability</h3>
+
+      <div class="form-group">
+        <label for="dayOfWeek">Day of Week <span class="required">*</span></label>
+        <select id="dayOfWeek" formControlName="dayOfWeek" class="form-control">
+          <option [value]="null" disabled>Select a day</option>
+          <option *ngFor="let day of daysOfWeek" [value]="day">{{ day }}</option>
+        </select>
+        <div *ngIf="availabilityForm.get('dayOfWeek')?.invalid && availabilityForm.get('dayOfWeek')?.touched" class="error">
+          Day of week is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="startTime">Start Time <span class="required">*</span></label>
+        <input id="startTime" type="time" formControlName="startTime" class="form-control" />
+        <div *ngIf="availabilityForm.get('startTime')?.invalid && availabilityForm.get('startTime')?.touched" class="error">
+          Start time is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="endTime">End Time <span class="required">*</span></label>
+        <input id="endTime" type="time" formControlName="endTime" class="form-control" />
+        <div *ngIf="availabilityForm.get('endTime')?.invalid && availabilityForm.get('endTime')?.touched" class="error">
+          End time is required
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="nextStep()">Next</button>
+      </div>
+    </form>
+
+    <!-- Step 2: Medical Service -->
+    <form *ngIf="step === 2" [formGroup]="serviceForm">
+      <h3>Medical Service Details</h3>
+
+      <div class="form-group">
+        <label for="name">Service Name <span class="required">*</span></label>
+        <input id="name" type="text" formControlName="name" class="form-control" placeholder="e.g., General Consultation" />
+        <div *ngIf="serviceForm.get('name')?.invalid && serviceForm.get('name')?.touched" class="error">
+          Service name is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" formControlName="description" class="form-control" rows="3"
+          placeholder="Describe the medical service you provide"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="imageUrl">Image URL</label>
+        <input id="imageUrl" type="url" formControlName="imageUrl" class="form-control" placeholder="https://example.com/image.jpg" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="durationMinutes">Duration (minutes) <span class="required">*</span></label>
+          <input id="durationMinutes" type="number" formControlName="durationMinutes" class="form-control" min="1" />
+          <div *ngIf="serviceForm.get('durationMinutes')?.invalid && serviceForm.get('durationMinutes')?.touched" class="error">
+            Duration is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="price">Price <span class="required">*</span></label>
+          <input id="price" type="number" formControlName="price" class="form-control" min="0" step="0.01" />
+          <div *ngIf="serviceForm.get('price')?.invalid && serviceForm.get('price')?.touched" class="error">
+            Price is required
+          </div>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button type="button" class="btn btn-secondary" (click)="previousStep()">Back</button>
+        <button type="button" class="btn btn-primary" (click)="submit()">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>

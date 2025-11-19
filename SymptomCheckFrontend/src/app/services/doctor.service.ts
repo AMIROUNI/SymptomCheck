@@ -9,6 +9,7 @@ import { DoctorProfileStatusDTO } from "../models/doctor-profile-status.model"
 import { UserRole } from '../models/user.model';
 import { Router } from "@angular/router"
 import { environment } from "@/environments/environment"
+import { AvailabilityHealthDto } from "../models/availability-health-dto"
 
 
 @Injectable({
@@ -16,7 +17,7 @@ import { environment } from "@/environments/environment"
 })
 export class DoctorService {
   apiurl = "http://localhost:5190"
-  private doctorApiUrl = `${environment.doctorserviceApiUrl}`; 
+  private doctorApiUrl = `${environment.doctorserviceApiUrl}`;
 
 
   constructor(private http: HttpClient,private authService: AuthService, private router: Router) {}
@@ -45,10 +46,14 @@ export class DoctorService {
     return this.http.get<User[]>(`${this.apiurl}/api/doctors?specialty=${specialty}`);
   }
 
-  getDoctorProfileStatus(doctorId: string): Observable<DoctorProfileStatusDTO> {
-    return this.http.get<DoctorProfileStatusDTO>(`${this.doctorApiUrl}/profile/${doctorId}/profile-status`);
+  getDoctorProfileStatus(doctorId: string): Observable<Boolean> {
+    return this.http.get<Boolean>(`${this.doctorApiUrl}/profile/${doctorId}/profile-status`);
   }
-  async loginAndCheckProfile(username: string, password: string): Promise<void> {
+
+  completeProfile(AvailabilityHealthDto: AvailabilityHealthDto): Observable<any> {
+    return this.http.post<AvailabilityHealthDto>(`${this.doctorApiUrl}/profile/completeprofile`, AvailabilityHealthDto);
+  }
+ /* async loginAndCheckProfile(username: string, password: string): Promise<void> {
     try {
       await this.authService.loginWithCredentials(username, password);
       const user = this.authService.getCurrentUser();
@@ -72,5 +77,5 @@ export class DoctorService {
       console.error('Login or profile check failed', error);
       throw error;
     }
-  }
+  }*/
 }

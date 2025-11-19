@@ -61,6 +61,7 @@ import { AuthGuard } from "./guards/auth.guard";
 import { initializeKeycloak } from "./keycloak-init";
 import { KeycloakAngularModule, KeycloakService } from "keycloak-angular";
 import { CompleteProfileComponent } from './components/doctors/complete-profile/complete-profile.component';
+import { DoctorDashboardComponent } from './components/doctors/doctor-dashboard/doctor-dashboard.component';
 
 @NgModule({
   declarations: [
@@ -94,7 +95,8 @@ import { CompleteProfileComponent } from './components/doctors/complete-profile/
     ClinicDialogComponent,
     DataTableComponent,
     UserDialogComponent,
-    CompleteProfileComponent
+    CompleteProfileComponent,
+    DoctorDashboardComponent
   ],
   imports: [
     BrowserModule,

@@ -20,6 +20,7 @@ import { DashboardComponent } from "./components/admin/dashboard/dashboard.compo
 import { UserManagementComponent } from "./components/admin/user-management/user-management.component"
 import { DoctorManagementComponent } from "./components/admin/doctor-management/doctor-management.component"
 import { ClinicManagementComponent } from "./components/admin/clinic-management/clinic-management.component"
+import { DoctorDashboardComponent } from "./components/doctors/doctor-dashboard/doctor-dashboard.component"
 
 
 const routes: Routes = [
@@ -28,6 +29,9 @@ const routes: Routes = [
   { path: "login", component: LoginComponent },
   { path: "doctors", component: DoctorListComponent },
   { path: "doctors/:id", component: DoctorDetailComponent },
+
+  {path: "doctor-dashboard", component: DoctorDashboardComponent},
+
   { path: "services", component: ServiceListComponent },
   //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
    {path: "add-service", component: AddServiceComponent },
