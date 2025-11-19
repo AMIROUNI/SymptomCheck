@@ -61,6 +61,7 @@ import { AuthGuard } from "./guards/auth.guard";
 import { initializeKeycloak } from "./keycloak-init";
 import { KeycloakAngularModule, KeycloakService } from "keycloak-angular";
 import { CompleteProfileComponent } from './components/doctors/complete-profile/complete-profile.component';
+import { PopupComponent } from "./components/shared/popup/popup.component";
 
 @NgModule({
   declarations: [
@@ -120,8 +121,9 @@ import { CompleteProfileComponent } from './components/doctors/complete-profile/
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatChipsModule,
-    KeycloakAngularModule
-  ],
+    KeycloakAngularModule,
+    PopupComponent
+],
   providers: [
     AuthGuard,
     {

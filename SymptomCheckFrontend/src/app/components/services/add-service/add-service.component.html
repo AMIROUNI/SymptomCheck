@@ -79,3 +79,12 @@
     </div>
   </form>
 </div> 
+
+<app-popup *ngIf="showPopup"
+           [title]="popupTitle"
+           [message]="popupMessage"
+           [isSuccess]="popupIsSuccess"
+           [redirectPath]="popupRedirectPath"
+           [showCancelButton]="showCancelButton"
+           (closed)="closePopup()">
+</app-popup>
