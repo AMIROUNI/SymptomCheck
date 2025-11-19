@@ -3,7 +3,6 @@ package com.symptomcheck.doctorservice.controllers;
 import com.symptomcheck.doctorservice.dto.AvailabilityHealthDto;
 import com.symptomcheck.doctorservice.dto.DoctorProfileStatusDTO;
 import com.symptomcheck.doctorservice.services.DoctorAvailabilityService;
-import com.symptomcheck.doctorservice.services.DoctorProfileService;
 import com.symptomcheck.doctorservice.services.HealthcareServiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DoctorProfileController {
 
-    private final DoctorProfileService doctorProfileService;
+
     private final DoctorAvailabilityService availabilityService;
     private final HealthcareServiceService healthcareServiceService;
 

@@ -1,5 +1,6 @@
 package com.symptomcheck.clinicservice.services;
 
+import com.symptomcheck.clinicservice.dtos.MedicalClinicDto;
 import com.symptomcheck.clinicservice.models.MedicalClinic;
 import com.symptomcheck.clinicservice.repositories.MedicalClinicRepository;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,14 @@ import java.util.List;
 public class MedicalClinicService {
     private   final MedicalClinicRepository repository;
     // CREATE
-    public MedicalClinic createClinic(MedicalClinic clinic) {
+    public MedicalClinic createClinic(MedicalClinicDto dto) {
+         MedicalClinic clinic = new MedicalClinic();
+         clinic.setName(dto.getName());
+         clinic.setAddress(dto.getAddress());
+         clinic.setPhone(dto.getPhone());
+         clinic.setCity(dto.getCity());
+         clinic.setCountry(dto.getCountry());
+         clinic.setWebsiteUrl(dto.getWebsiteUrl());
         return repository.save(clinic);
     }
 

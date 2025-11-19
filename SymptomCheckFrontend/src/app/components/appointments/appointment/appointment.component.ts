@@ -1,31 +1,34 @@
-import { Component,  OnInit } from "@angular/core"
-import {  FormBuilder,  FormGroup, Validators } from "@angular/forms"
-import  { ActivatedRoute, Router } from "@angular/router"
-import  { DoctorService } from "../../../services/doctor.service"
-import  { ServiceService } from "../../../services/service.service"
-import  { AppointmentService } from "../../../services/appointment.service"
-import  { AuthService } from "../../../services/auth.service"
-import  { User } from "../../../models/user.model"
-import  { HealthcareService } from "../../../models/healthcare-service.model"
-import { AppointmentStatus } from "../../../models/appointment.model"
+import { Component, OnInit } from "@angular/core"
+import { FormBuilder, FormGroup, Validators } from "@angular/forms"
+import { ActivatedRoute, Router } from "@angular/router"
+import { DoctorService } from "../../../services/doctor.service"
+import { ServiceService } from "../../../services/service.service"
+import { AppointmentService } from "../../../services/appointment.service"
+import { AuthService } from "../../../services/auth.service"
+import { User } from "../../../models/user.model"
+import { HealthcareService } from "../../../models/healthcare-service.model"
+import { Appointment, AppointmentStatus } from "../../../models/appointment.model"
+import { UserService } from "@/app/services/user.service"
 
 @Component({
   selector: "app-appointment",
   templateUrl: "./appointment.component.html",
   styleUrls: ["./appointment.component.scss"],
-  standalone:false
+  standalone: false
 })
 export class AppointmentComponent implements OnInit {
   appointmentForm!: FormGroup
   doctors: User[] = []
   services: HealthcareService[] = []
   filteredServices: HealthcareService[] = []
-
+  availableDates: Date[] = []
+  availableTimeSlots: string[] = []
 
   isLoading = true
   isSubmitting = false
   errorMessage = ""
   successMessage = ""
+  currentStep = 1
 
   minDate = new Date()
 
@@ -37,6 +40,7 @@ export class AppointmentComponent implements OnInit {
     private serviceService: ServiceService,
     private appointmentService: AppointmentService,
     private authService: AuthService,
+    private userService: UserService
   ) {
     // Set min date to tomorrow
     this.minDate.setDate(this.minDate.getDate() + 1)
@@ -46,7 +50,6 @@ export class AppointmentComponent implements OnInit {
     this.initForm()
     this.loadDoctors()
     this.loadServices()
-
 
     // Check for query params (doctor and service selection)
     this.route.queryParams.subscribe((params) => {
@@ -75,7 +78,7 @@ export class AppointmentComponent implements OnInit {
   }
 
   loadDoctors(): void {
-    this.doctorService.getDoctors().subscribe({
+    this.userService.getAllUsersByRole('Doctor').subscribe({
       next: (doctors) => {
         this.doctors = doctors
         this.isLoading = false
@@ -101,18 +104,20 @@ export class AppointmentComponent implements OnInit {
     })
   }
 
-
-
   onDoctorChange(): void {
     const doctorId = this.appointmentForm.get("doctorId")?.value
 
     if (doctorId) {
       this.filterServicesByDoctor(doctorId)
+      this.loadAvailableDates(doctorId)
 
       this.appointmentForm.get("serviceId")?.setValue("")
       this.appointmentForm.get("date")?.setValue("")
+      this.appointmentForm.get("time")?.setValue("")
     } else {
       this.filteredServices = this.services
+      this.availableDates = []
+      this.availableTimeSlots = []
     }
   }
 
@@ -122,19 +127,61 @@ export class AppointmentComponent implements OnInit {
     })
   }
 
+  loadAvailableDates(doctorId: number): void {
+    this.appointmentService.getDateTimeOfAppointments(doctorId.toString()).subscribe({
+      next: (dateTimes) => {
+        // Process the available dates from the backend
+        this.availableDates = dateTimes.map(dt => new Date(dt))
+        console.log("Available dates:", this.availableDates)
+      },
+      error: (error) => {
+        console.error("Error fetching available dates:", error)
+      }
+    })
+  }
+
   onDateChange(): void {
     const doctorId = this.appointmentForm.get("doctorId")?.value
     const dateStr = this.appointmentForm.get("date")?.value
 
     if (doctorId && dateStr) {
-      const date = new Date(dateStr)
-
-
+      this.loadAvailableTimeSlots(doctorId, dateStr)
     }
   }
 
+  loadAvailableTimeSlots(doctorId: number, date: string): void {
+    // This would typically call a backend service to get available time slots
+    // For now, we'll generate some sample time slots
+    const selectedDate = new Date(date)
+    const today = new Date()
+    
+    // Generate time slots from 9 AM to 5 PM in 30-minute intervals
+    const timeSlots = []
+    for (let hour = 9; hour <= 17; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        if (hour === 17 && minute > 0) break; // No appointments after 5 PM
+        
+        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
+        timeSlots.push(timeString)
+      }
+    }
+    
+    this.availableTimeSlots = timeSlots
+  }
 
-  
+  nextStep(): void {
+    if (this.currentStep === 1 && this.appointmentForm.get('doctorId')?.valid && this.appointmentForm.get('serviceId')?.valid) {
+      this.currentStep = 2
+    } else if (this.currentStep === 2 && this.appointmentForm.get('date')?.valid && this.appointmentForm.get('time')?.valid) {
+      this.currentStep = 3
+    }
+  }
+
+  prevStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--
+    }
+  }
 
   onSubmit(): void {
     if (this.appointmentForm.invalid) {
@@ -159,21 +206,18 @@ export class AppointmentComponent implements OnInit {
     const [hours, minutes] = formData.time.split(":").map(Number)
     appointmentDate.setHours(hours, minutes)
 
-    const appointmentData = {
+    const appointmentData: Appointment = {
       date: appointmentDate,
       patientId: currentUser.id,
       doctorId: formData.doctorId,
       description: formData.description,
     }
-    console.log("appointmentData:::::", appointmentData);
-/*  
+    console.log("appointmentData:::::", appointmentData)
+
     this.appointmentService.createAppointment(appointmentData).subscribe({
       next: () => {
         this.successMessage = "Appointment booked successfully!"
         this.isSubmitting = false
-
-        // Reset form
-        this.appointmentForm.reset()
 
         // Redirect to dashboard after 2 seconds
         setTimeout(() => {
@@ -186,5 +230,21 @@ export class AppointmentComponent implements OnInit {
       },
     })
   }
-}     */  
-  }}
+
+  formatAppointmentDateTime(): string {
+    const dateStr = this.appointmentForm.get("date")?.value
+    const timeStr = this.appointmentForm.get("time")?.value
+    return  `${dateStr} at ${timeStr}`
+  }
+
+  getSelectedDoctorName(): string {
+    const doctorId = this.appointmentForm.get("doctorId")?.value
+    const doctor = this.doctors.find(d => d.id === doctorId)
+    return doctor ? `${doctor.firstName} ${doctor.lastName}` : ""
+  }
+  getSelectedServiceName(): string {
+    const serviceId = this.appointmentForm.get("serviceId")?.value
+    const service = this.services.find(s => s.id === serviceId)
+    return service ? service.name : ""
+  }
+}

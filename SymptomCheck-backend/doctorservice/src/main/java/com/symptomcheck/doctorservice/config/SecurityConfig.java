@@ -1,4 +1,4 @@
-package com.symptomcheck.clinicservice.config;
+package com.symptomcheck.doctorservice.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -49,9 +49,7 @@ public class SecurityConfig {
                                 "/api/v1/users/public/**",
                                 "/api/v1/auth/**",
                                 "/actuator/health",
-                                "/uploads/**",
-                                "/api/v1/medical/clinic",
-                                "/api/v1/doctor/profile/**").permitAll()
+                                "/uploads/**").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
 
                         .requestMatchers("/api/v1/users/admin/**").hasRole("ADMIN")
@@ -71,7 +69,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:4200")); // ✅ Angular app URL
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true); // ✅ Required when using Keycloak cookies/tokens
 

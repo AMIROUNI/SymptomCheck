@@ -1,6 +1,7 @@
 import { Component,  OnInit } from "@angular/core"
 import  { ServiceService } from "../../../services/service.service"
 import  { HealthcareService } from "../../../models/healthcare-service.model"
+import { environment } from "@/environments/environment"
 
 @Component({
   selector: "app-service-list",
@@ -65,4 +66,8 @@ export class ServiceListComponent implements OnInit {
     this.selectedCategory = category
     this.filterServices()
   }
+
+
+  
+  
 }

@@ -5,8 +5,10 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import java.rmi.server.UID;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 @Entity
@@ -20,10 +22,10 @@ public class Appointment {
     private LocalDateTime dateTime; // moment du rendez-vous
 
     @NotNull
-    private String patientId;   // référence User Service
+    private UUID patientId;   // référence User Service
 
     @NotNull
-    private String doctorId;    // référence Doctor Service / User Service
+    private UUID doctorId;    // référence Doctor Service / User Service
 
     @NotNull
     @Enumerated(EnumType.STRING)

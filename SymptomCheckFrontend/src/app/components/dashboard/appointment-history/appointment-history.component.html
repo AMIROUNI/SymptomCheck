@@ -104,7 +104,7 @@
           <button
             *ngIf="appointment.status === 'Pending' || appointment.status === 'Confirmed'"
             class="btn btn-danger btn-sm"
-            (click)="cancelAppointment(appointment.id)"
+            (click)="cancelAppointment(appointment.id!)"
           >
             Cancel
           </button>
@@ -115,21 +115,21 @@
           <button
             *ngIf="appointment.status === 'Pending'"
             class="btn btn-success btn-sm me-2"
-            (click)="confirmAppointment(appointment.id)"
+            (click)="confirmAppointment(appointment.id!)"
           >
             Confirm
           </button>
           <button
             *ngIf="appointment.status === 'Confirmed'"
             class="btn btn-primary btn-sm me-2"
-            (click)="completeAppointment(appointment.id)"
+            (click)="completeAppointment(appointment.id!)"
           >
             Complete
           </button>
           <button
             *ngIf="appointment.status === 'Pending' || appointment.status === 'Confirmed'"
             class="btn btn-danger btn-sm"
-            (click)="cancelAppointment(appointment.id)"
+            (click)="cancelAppointment(appointment.id!)"
           >
             Cancel
           </button>
