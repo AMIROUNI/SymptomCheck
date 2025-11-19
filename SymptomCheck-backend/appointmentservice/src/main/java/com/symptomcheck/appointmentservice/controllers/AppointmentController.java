@@ -30,6 +30,9 @@ public class AppointmentController {
     public ResponseEntity<?> createAppointment(@RequestBody AppointmentDto appointment,
                                                @AuthenticationPrincipal Jwt jwt) {
         try {
+            log.info("**************************************************************");
+            log.info("*                             createAppointment                                            *");
+            log.info("**************************************************************");
             String token = jwt.getTokenValue();
             Appointment savedAppointment = appointmentService.makeAppointment(appointment, token);
             return ResponseEntity.ok(savedAppointment);
