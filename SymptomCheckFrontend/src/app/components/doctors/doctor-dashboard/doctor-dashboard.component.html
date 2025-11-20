@@ -1,0 +1,417 @@
+<div class="doctor-dashboard">
+  <!-- Header Section -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1 class="dashboard-title">Tableau de Bord Médecin</h1>
+      <p class="dashboard-subtitle">Vue d'ensemble de votre activité médicale</p>
+      <div class="header-actions">
+        <button class="btn-primary" (click)="refreshData()">
+          <i class="icon-refresh"></i>
+          Actualiser
+        </button>
+        <div class="profile-completion-badge" [class.complete]="profileCompleted" [class.incomplete]="!profileCompleted">
+          <i class="icon-profile"></i>
+          {{ profileCompleted ? 'Profil Complet' : 'Profil Incomplet' }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Chargement des données...</p>
+  </div>
+
+  <!-- Main Dashboard Content -->
+  <div *ngIf="!loading" class="dashboard-content">
+    
+    <!-- KPI Cards Section -->
+    <div class="kpi-section">
+      <div class="kpi-grid">
+        <!-- Today's Appointments -->
+        <div class="kpi-card primary">
+          <div class="kpi-icon">
+            <i class="icon-calendar"></i>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ appointmentStats?.todayAppointments || 0 }}</h3>
+            <p class="kpi-label">Rendez-vous Aujourd'hui</p>
+            <div class="kpi-trend positive">
+              <i class="icon-trend-up"></i>
+              <span>+12% vs hier</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending Appointments -->
+        <div class="kpi-card warning">
+          <div class="kpi-icon">
+            <i class="icon-clock"></i>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ appointmentStats?.pendingAppointments || 0 }}</h3>
+            <p class="kpi-label">En Attente</p>
+            <div class="kpi-trend neutral">
+              <i class="icon-minus"></i>
+              <span>Stable</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Completed Appointments -->
+        <div class="kpi-card success">
+          <div class="kpi-icon">
+            <i class="icon-check"></i>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ appointmentStats?.completedAppointments || 0 }}</h3>
+            <p class="kpi-label">Consultations Terminées</p>
+            <div class="kpi-trend positive">
+              <i class="icon-trend-up"></i>
+              <span>+8% cette semaine</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Services -->
+        <div class="kpi-card info">
+          <div class="kpi-icon">
+            <i class="icon-services"></i>
+          </div>
+          <div class="kpi-content">
+            <h3 class="kpi-value">{{ doctorStats?.totalServices || 0 }}</h3>
+            <p class="kpi-label">Services Médicaux</p>
+            <div class="kpi-trend positive">
+              <i class="icon-trend-up"></i>
+              <span>Actifs</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts and Analytics Section -->
+    <div class="analytics-section">
+      <div class="analytics-grid">
+        <!-- Weekly Activity Chart -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Activité Hebdomadaire</h3>
+            <div class="chart-actions">
+              <select class="chart-filter" (change)="onChartPeriodChange($event)">
+                <option value="week">Cette Semaine</option>
+                <option value="month">Ce Mois</option>
+                <option value="quarter">Ce Trimestre</option>
+              </select>
+            </div>
+          </div>
+          <div class="chart-container">
+            <app-generic-chart
+              [chartData]="weeklyAppointmentsData"
+              [chartCategories]="weeklyAppointmentsCategories"
+              chartType="bar"
+              chartTitle=""
+              yAxisTitle="Nombre de Rendez-vous"
+              seriesName="Rendez-vous"
+              color="#4a6cf7"
+              [showLegend]="false"
+              strokeCurve="straight">
+            </app-generic-chart>
+          </div>
+        </div>
+
+        <!-- Appointment Status Distribution -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Répartition des Statuts</h3>
+          </div>
+          <div class="chart-container">
+            <app-generic-chart
+              [chartData]="appointmentStatusData"
+              [chartCategories]="appointmentStatusCategories"
+              chartType="doughnut"
+              chartTitle=""
+              seriesName="Rendez-vous"
+              [showLegend]="true"
+              [chartHeight]="300">
+            </app-generic-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Today's Appointments Section -->
+    <div class="appointments-section">
+      <div class="section-header">
+        <h2>Rendez-vous du Jour</h2>
+        <div class="section-actions">
+          <button class="btn-outline" (click)="viewAllAppointments()">
+            Voir Tout
+            <i class="icon-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="todayAppointments.length === 0" class="empty-state">
+        <i class="icon-calendar-empty"></i>
+        <h3>Aucun rendez-vous aujourd'hui</h3>
+        <p>Vous n'avez pas de consultations programmées pour aujourd'hui.</p>
+      </div>
+
+      <div *ngIf="todayAppointments.length > 0" class="appointments-table">
+        <div class="table-header">
+          <div class="table-row">
+            <div class="table-cell">Patient</div>
+            <div class="table-cell">Heure</div>
+            <div class="table-cell">Type</div>
+            <div class="table-cell">Statut</div>
+            <div class="table-cell">Actions</div>
+          </div>
+        </div>
+        <div class="table-body">
+          <div *ngFor="let appointment of todayAppointments" class="table-row">
+            <div class="table-cell patient-info">
+              <div class="patient-avatar">
+                {{ getInitials(appointment.patientName) }}
+              </div>
+              <div class="patient-details">
+                <strong>{{ appointment.patientName || 'Patient' }}</strong>
+                <span class="patient-phone">{{ appointment.patientPhone || 'N/A' }}</span>
+              </div>
+            </div>
+            <div class="table-cell">
+              <div class="time-slot">
+                <strong>{{ formatTime(appointment.dateTime) }}</strong>
+                <span class="time-duration">30min</span>
+              </div>
+            </div>
+            <div class="table-cell">
+              <span class="service-type">{{ appointment.serviceType || 'Consultation' }}</span>
+            </div>
+            <div class="table-cell">
+              <span class="status-badge" [class]="getStatusClass(appointment.status)">
+                {{ getStatusText(appointment.status) }}
+              </span>
+            </div>
+            <div class="table-cell">
+              <div class="action-buttons">
+                <button class="btn-icon success" title="Confirmer">
+                  <i class="icon-check"></i>
+                </button>
+                <button class="btn-icon warning" title="Modifier">
+                  <i class="icon-edit"></i>
+                </button>
+                <button class="btn-icon danger" title="Annuler">
+                  <i class="icon-cancel"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Services and Availability Section -->
+    <div class="services-section">
+      <div class="services-grid">
+        <!-- Medical Services -->
+        <div class="services-card">
+          <div class="card-header">
+            <h3>Services Médicaux</h3>
+            <button class="btn-icon" title="Ajouter un service">
+              <i class="icon-plus"></i>
+            </button>
+          </div>
+          <div class="services-list">
+            <div *ngFor="let service of doctorServices" class="service-item">
+              <div class="service-icon">
+                <i class="icon-medical"></i>
+              </div>
+              <div class="service-details">
+                <h4>{{ service.name }}</h4>
+                <p class="service-description">{{ service.description || 'Aucune description' }}</p>
+                <div class="service-meta">
+                  <span class="service-price">{{ service.price }} €</span>
+                  <span class="service-duration">{{ service.duration }} min</span>
+                </div>
+              </div>
+              <div class="service-actions">
+                <button class="btn-icon" title="Modifier">
+                  <i class="icon-edit"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="doctorServices.length === 0" class="empty-services">
+            <p>Aucun service médical configuré</p>
+            <button class="btn-outline">Ajouter un Service</button>
+          </div>
+        </div>
+
+        <!-- Availability Schedule -->
+        <div class="availability-card">
+          <div class="card-header">
+            <h3>Disponibilités</h3>
+            <button class="btn-icon" title="Gérer les disponibilités">
+              <i class="icon-settings"></i>
+            </button>
+          </div>
+          <div class="availability-list">
+            <div *ngFor="let slot of doctorAvailability" class="availability-item">
+              <div class="day-indicator">
+                <span class="day-name">{{ getDayName(slot.dayOfWeek) }}</span>
+              </div>
+              <div class="time-slot">
+                <span class="time-range">{{ slot.startTime }} - {{ slot.endTime }}</span>
+                <span class="slot-status" [class.active]="slot.isActive">
+                  {{ slot.isActive ? 'Actif' : 'Inactif' }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="doctorAvailability.length === 0" class="empty-availability">
+            <p>Aucune disponibilité configurée</p>
+            <button class="btn-outline">Définir les Horaires</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats Footer -->
+    <div class="stats-footer">
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value">{{ totalAppointments }}</div>
+          <div class="stat-label">Rendez-vous Totaux</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ completionRate }}%</div>
+          <div class="stat-label">Taux de Completion</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ averageWeeklyAppointments }}</div>
+          <div class="stat-label">Moyenne Hebdomadaire</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ profileCompletionPercentage }}%</div>
+          <div class="stat-label">Profil Complété</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Completion Modal -->
+  <div *ngIf="showCompleteProfileModal" class="modal-overlay active">
+    <div class="modal-content profile-completion-modal">
+      <div class="modal-header">
+        <h2>Complétez votre profil</h2>
+        <button class="btn-icon close-btn" (click)="closeModal()" aria-label="Fermer">
+          <i class="icon-close">✕</i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="step-indicator">
+          <div class="step" [class.active]="step === 1" [class.completed]="step > 1">
+            <span class="step-number">1</span>
+            <span class="step-label">Disponibilités</span>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step" [class.active]="step === 2" [class.completed]="step === 2">
+            <span class="step-number">2</span>
+            <span class="step-label">Service Médical</span>
+          </div>
+        </div>
+
+        <!-- Step 1: Availability -->
+        <form *ngIf="step === 1" [formGroup]="availabilityForm" class="profile-form">
+          <h3>Configurez vos disponibilités</h3>
+          <p class="form-description">Définissez vos horaires de travail pour que les patients puissent prendre rendez-vous.</p>
+
+          <div class="form-group">
+            <label for="dayOfWeek">Jour de la semaine <span class="required">*</span></label>
+            <select id="dayOfWeek" formControlName="dayOfWeek" class="form-control">
+              <option [value]="null" disabled>Sélectionnez un jour</option>
+              <option *ngFor="let day of daysOfWeek" [value]="day">{{ getDayName(day) }}</option>
+            </select>
+            <div *ngIf="availabilityForm.get('dayOfWeek')?.invalid && availabilityForm.get('dayOfWeek')?.touched" class="error-message">
+              Le jour de la semaine est requis
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="startTime">Heure de début <span class="required">*</span></label>
+              <input id="startTime" type="time" formControlName="startTime" class="form-control" />
+              <div *ngIf="availabilityForm.get('startTime')?.invalid && availabilityForm.get('startTime')?.touched" class="error-message">
+                L'heure de début est requise
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="endTime">Heure de fin <span class="required">*</span></label>
+              <input id="endTime" type="time" formControlName="endTime" class="form-control" />
+              <div *ngIf="availabilityForm.get('endTime')?.invalid && availabilityForm.get('endTime')?.touched" class="error-message">
+                L'heure de fin est requise
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">Annuler</button>
+            <button type="button" class="btn btn-primary" (click)="nextStep()">Suivant</button>
+          </div>
+        </form>
+
+        <!-- Step 2: Medical Service -->
+        <form *ngIf="step === 2" [formGroup]="serviceForm" class="profile-form">
+          <h3>Créez votre premier service médical</h3>
+          <p class="form-description">Ajoutez les détails du service médical que vous proposez aux patients.</p>
+
+          <div class="form-group">
+            <label for="name">Nom du service <span class="required">*</span></label>
+            <input id="name" type="text" formControlName="name" class="form-control" placeholder="ex: Consultation générale" />
+            <div *ngIf="serviceForm.get('name')?.invalid && serviceForm.get('name')?.touched" class="error-message">
+              Le nom du service est requis
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" formControlName="description" class="form-control" rows="3"
+              placeholder="Décrivez le service médical que vous proposez..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="imageUrl">URL de l'image</label>
+            <input id="imageUrl" type="url" formControlName="imageUrl" class="form-control" placeholder="https://exemple.com/image.jpg" />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="durationMinutes">Durée (minutes) <span class="required">*</span></label>
+              <input id="durationMinutes" type="number" formControlName="durationMinutes" class="form-control" min="1" />
+              <div *ngIf="serviceForm.get('durationMinutes')?.invalid && serviceForm.get('durationMinutes')?.touched" class="error-message">
+                La durée est requise
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="price">Prix (€) <span class="required">*</span></label>
+              <input id="price" type="number" formControlName="price" class="form-control" min="0" step="0.01" />
+              <div *ngIf="serviceForm.get('price')?.invalid && serviceForm.get('price')?.touched" class="error-message">
+                Le prix est requis
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" (click)="previousStep()">Retour</button>
+            <button type="button" class="btn btn-primary" (click)="submitProfile()">Terminer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

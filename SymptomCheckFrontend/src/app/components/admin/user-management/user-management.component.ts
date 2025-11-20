@@ -12,9 +12,21 @@ import { User, UserRole } from "@/app/models/user.model";
   standalone: false
 })
 export class UserManagementComponent implements OnInit {
+
+//////////////////////////////////
+    showPopup = false;
+  popupTitle = '';
+  popupMessage = '';
+  popupIsSuccess = false;
+  popupRedirectPath: string | null = null;
+  showCancelButton = false;
+  //////////////////////////////////
   users: User[] = [];
   displayedColumns: string[] = ["id", "username", "firstName", "lastName", "email", "role", "actions"];
   loading = false;
+
+
+
 
   constructor(
     private userService: UserService,
@@ -66,8 +78,10 @@ export class UserManagementComponent implements OnInit {
       next: () => {
         user.enabled = false; // update table immediately
         this.snackBar.open("User deactivated successfully", "Close", { duration: 3000 });
+           this.showSuccessPopup("User deactivated successfully")
       },
-      error: () => this.snackBar.open("Error deactivating user", "Close", { duration: 3000 }),
+      error: () =>{this.snackBar.open("Error deactivating user", "Close", { duration: 3000 })
+     this.showErrorPopup("Error deactivating user")} ,
     });
   }
 
@@ -78,12 +92,43 @@ export class UserManagementComponent implements OnInit {
       next: () => {
         user.enabled = true; // update table immediately
         this.snackBar.open("User activated successfully", "Close", { duration: 3000 });
+        this.showSuccessPopup("User activated successfully")
       },
-      error: () => this.snackBar.open("Error activating user", "Close", { duration: 3000 }),
+      error: () =>{ this.snackBar.open("Error activating user", "Close", { duration: 3000 })
+        this.showErrorPopup("Error activating user")
+    
+    }
     });
   }
 
   getRoleName(role: UserRole): string {
     return UserRole[role];
   }
+
+
+  /// popup methods //////////////////////////////////////////
+
+  showSuccessPopup(title: string = 'Success', message: string = 'Operation completed successfully.,',) {
+    this.popupTitle =title;
+    this.popupMessage = message;
+    this.popupIsSuccess = true ;
+    this.popupRedirectPath = '/login';
+    this.showCancelButton = false;
+    this.showPopup = true;
+  }
+
+  showErrorPopup(errorMessage: string) {
+    this.popupTitle = 'Login Failed';
+    this.popupMessage = errorMessage;
+    this.popupIsSuccess = false;
+    this.popupRedirectPath = null;
+    this.showCancelButton = true;
+    this.showPopup = true;
+  }
+
+  closePopup() {
+    this.showPopup = false;
+  }
+////////////////////////////////////
+
 }

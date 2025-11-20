@@ -24,6 +24,10 @@ getDateTimeOfAppointments(doctorId: string): Observable<string[]> {
 }
 
 
+getByDoctorIde(doctorId: string): Observable<Appointment[]> {
+  return this.http.get<Appointment[]>(`${this.apiUrl}/doctor/${doctorId}`);
+}
+
 
 
   //--------------------------------------------------------------------------------------//
@@ -34,7 +38,7 @@ getDateTimeOfAppointments(doctorId: string): Observable<string[]> {
   getPatientAppointments(id:number): Observable<Appointment[]> {
     return this.http.get<Appointment[]>(`${this.apiUrl}/patient/${id}`);
   }
-  getDoctorAppointments(id:number): Observable<Appointment[]> {
+  getDoctorAppointments(id:string): Observable<Appointment[]> {
     return this.http.get<Appointment[]>(`${this.apiUrl}/doctor/${id}`);
   }
 
@@ -44,7 +48,7 @@ getDateTimeOfAppointments(doctorId: string): Observable<string[]> {
 
   createAppointment(appointmentData: Appointment): Observable<Appointment> {
     console.log("appointmentData in service:::::", appointmentData);
-     return this.http.post<Appointment>(`${this.apiUrl}`, appointmentData);
+     return this.http.post<Appointment>(`${this.apiUrl}/create`, appointmentData);
   }
 
   updateAppointmentStatus(id: number, status: number): Observable<Appointment> {

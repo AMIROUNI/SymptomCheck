@@ -6,16 +6,16 @@ import type { Appointment } from "./appointment.model"
 import type { PaymentTransaction } from "./payment-transaction.model"
 
 export enum UserRole {
-  Patient,
-  Doctor,
-  Admin
+  PATIENT = "PATIENT",
+  DOCTOR = "DOCTOR",
+  ADMIN = "ADMIN"
 }
 
 export interface User {
   id: string
   username: string
-  role: UserRole
-  firstName?: string
+ roles: UserRole[] | string[]  
+   firstName?: string
   lastName?: string
   phoneNumber?: string
   email?: string
@@ -33,6 +33,7 @@ export interface User {
   doctorAppointments?: Appointment[]
   patientAppointments?: Appointment[]
   paymentTransactions?: PaymentTransaction[]
+  role: UserRole 
 
 
   enabled?: boolean

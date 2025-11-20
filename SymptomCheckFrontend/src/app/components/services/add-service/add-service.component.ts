@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { MedicalClinicService } from '@/app/services/medical-clinic.service';
@@ -6,6 +6,7 @@ import { HealthcareService } from '@/app/models/healthcare-service.model';
 import { ServiceService } from '@/app/services/service.service';
 import { AuthService } from '@/app/services/auth.service';
 import { FileUploadService } from '@/app/services/file-upload.service';
+import { User } from '@/app/models/user.model';
 
 
 
@@ -15,7 +16,18 @@ import { FileUploadService } from '@/app/services/file-upload.service';
   styleUrls: ['./add-service.component.css'],
   standalone:false
 })
-export class AddServiceComponent {
+export class AddServiceComponent  implements OnInit {
+
+  // popup variables ///////////////////////////////////////////////////////////////
+  showPopup = false;
+  popupTitle = '';
+  popupMessage = '';
+  popupIsSuccess = false;
+  popupRedirectPath: string | null = null;
+  showCancelButton = false;
+
+  /////////////////////////////////////////////////////////////////////////////////////
+
   serviceForm: FormGroup;
   isSubmitting = false;
   submitSuccess = false;
@@ -25,6 +37,7 @@ export class AddServiceComponent {
   healthcareService!: HealthcareService;
   PhotoUrl: string ="";
   errorMessage="";
+  me: User | null = null;
 
   constructor(private fb: FormBuilder, private authService:AuthService,private service:ServiceService,private fileUploadService:FileUploadService) {
     this.serviceForm = this.fb.group({
@@ -36,29 +49,16 @@ export class AddServiceComponent {
       imageUrl: ['']
     });
   }
+  ngOnInit(): void {
+    this.me = this.authService.getCurrentUser();
+  }
 
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
     if (file) {
       this.selectedFile = file;
-      this.uploadPhoto();
+  
     }
-  }
-
-  uploadPhoto(): void {
-    if (!this.selectedFile) return;
-
-    this.isSubmitting = true;
-    this.fileUploadService.uploadProfilePhoto(this.selectedFile).subscribe({
-      next: (response) => {
-        this.PhotoUrl = response.imageUrl;
-        this.isSubmitting = false;
-      },
-      error: (error) => {
-        this.errorMessage = 'Failed to upload profile photo. Please try again.';
-        this.isSubmitting = false;
-      }
-    });
   }
 
   onSubmit(): void {
@@ -67,6 +67,7 @@ export class AddServiceComponent {
     console.log("serviceForm.value:::::", this.serviceForm.value);
     const formData = {
       ...this.serviceForm.value,
+      doctorId: this.me?.id,
       imageUrl: this.PhotoUrl,
    
 
@@ -74,10 +75,12 @@ export class AddServiceComponent {
    /* this.healthcareService = this.serviceForm.value;
     this.healthcareService.doctorId = this.authService.getUserId();
     this.healthcareService.imageUrl = this.PhotoUrl;*/
-    this.service.addService(formData).subscribe((response) => {
+    this.service.addService(formData, this.selectedFile).subscribe((response) => {
       console.log("response:::::", response);
+      this.showSuccessPopup();
     },(error)=>{
       console.log("error adding service : ", error);
+      this.showErrorPopup("Failed to add service. Please try again.");
     });
 
 
@@ -101,4 +104,32 @@ export class AddServiceComponent {
       }
     });
   }
+
+
+  
+  /// popup methods //////////////////////////////////////////
+
+  showSuccessPopup(title: string = 'Success', message: string = 'Operation completed successfully.,',) {
+    this.popupTitle =title;
+    this.popupMessage = message;
+    this.popupIsSuccess = true ;
+    this.popupRedirectPath = '/login';
+    this.showCancelButton = false;
+    this.showPopup = true;
+  }
+
+  showErrorPopup(errorMessage: string) {
+    this.popupTitle = 'Login Failed';
+    this.popupMessage = errorMessage;
+    this.popupIsSuccess = false;
+    this.popupRedirectPath = null;
+    this.showCancelButton = true;
+    this.showPopup = true;
+  }
+
+  closePopup() {
+    this.showPopup = false;
+  }
+////////////////////////////////////
+
 }

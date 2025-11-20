@@ -105,7 +105,7 @@ public class UserController {
         if (userData != null) {
             userMap.put("phoneNumber", userData.getPhoneNumber());
             userMap.put("profilePhotoUrl", userData.getProfilePhotoUrl());
-            userMap.put("isProfileComplete", userData.isProfileComplete());
+            userMap.put("isProfileComplete", userData.getProfileComplete());
             userMap.put("clinicId", userData.getClinicId());
             userMap.put("speciality", userData.getSpeciality());
             userMap.put("description", userData.getDescription());

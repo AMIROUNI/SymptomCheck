@@ -38,4 +38,7 @@ public class UserRegistrationRequest {
     private  String diploma;
    private Long clinicId;
    private  boolean enabled ;
+
+
+    private Boolean profileComplete = false;
 }

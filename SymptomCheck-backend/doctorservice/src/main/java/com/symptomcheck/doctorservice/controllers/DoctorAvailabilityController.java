@@ -2,12 +2,15 @@ package com.symptomcheck.doctorservice.controllers;
 
 import com.symptomcheck.doctorservice.services.DoctorAvailabilityService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/doctor/availability")
 @RequiredArgsConstructor
@@ -24,12 +27,15 @@ public class DoctorAvailabilityController {
     // Endpoint réel pour vérifier la disponibilité
     @GetMapping("/isAvailable/{id}/{dateTime}")
     public ResponseEntity<?> isAvailable(
-            @PathVariable("id") Long id,
+            @PathVariable("id") UUID id,
             @PathVariable("dateTime")
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTime) {
 
         try {
+            log.info("isAvailable id: {}, dateTime: {}", id, dateTime);
             boolean available = doctorAvailabilityService.isDoctorAvailable(id, dateTime);
+
+            log.info("isAvailable : {},",available );
             return ResponseEntity.ok(available);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(e.getMessage());

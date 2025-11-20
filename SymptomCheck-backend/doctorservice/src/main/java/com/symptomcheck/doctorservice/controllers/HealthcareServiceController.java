@@ -1,14 +1,13 @@
 package com.symptomcheck.doctorservice.controllers;
 
-import com.symptomcheck.doctorservice.models.HealthcareService;
+import com.symptomcheck.doctorservice.dtos.HealthcareServiceDto;
 import com.symptomcheck.doctorservice.services.HealthcareServiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @RestController()
@@ -39,5 +38,20 @@ public class HealthcareServiceController {
         catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+
+    @PostMapping()
+        public ResponseEntity<?> saveHealthcareService(@RequestPart("dto") HealthcareServiceDto dto,
+                                                       @RequestPart("file") MultipartFile image) throws IOException {
+try {
+
+    return  ResponseEntity.ok(healthcareService.createHealthcareService(dto, image));
+}
+catch ( Exception e) {
+    return ResponseEntity.internalServerError().build();
+}
+
+
     }
 }
