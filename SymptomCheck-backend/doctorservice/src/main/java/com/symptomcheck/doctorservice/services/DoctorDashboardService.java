@@ -51,21 +51,21 @@ public class DoctorDashboardService {
         );
     }
 
-    private List<DoctorServiceDTO> getDoctorServices(UUID doctorId) {
+    public List<DoctorServiceDTO> getDoctorServices(UUID doctorId) {
         return healthcareServiceRepository.findByDoctorId(doctorId)
                 .stream()
                 .map(this::convertToServiceDTO)
                 .collect(Collectors.toList());
     }
 
-    private List<DoctorAvailabilityDTO> getDoctorAvailability(UUID doctorId) {
+    public List<DoctorAvailabilityDTO> getDoctorAvailability(UUID doctorId) {
         return availabilityRepository.findByDoctorId(doctorId)
                 .stream()
                 .map(this::convertToAvailabilityDTO)
                 .collect(Collectors.toList());
     }
 
-    private ProfileCompletionDTO getProfileCompletion(UUID doctorId) {
+        public ProfileCompletionDTO getProfileCompletion(UUID doctorId) {
         boolean hasAvailability = availabilityRepository.existsByDoctorId(doctorId);
         boolean hasServices = healthcareServiceRepository.existsByDoctorId(doctorId);
         boolean hasBasicInfo = hasAvailability && hasServices; // Simplifié pour l'exemple
