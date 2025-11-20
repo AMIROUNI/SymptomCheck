@@ -23,6 +23,7 @@ export class AppointmentComponent implements OnInit {
   filteredServices: HealthcareService[] = []
   availableDates: Date[] = []
   availableTimeSlots: string[] = []
+  currentUser:User|null= null
 
   isLoading = true
   isSubmitting = false
@@ -47,24 +48,38 @@ export class AppointmentComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+
+    console.log("appointement  Init now !!!!!!!!!!!!!!!!!!!!!!!!!");
+    
     this.initForm()
     this.loadDoctors()
     this.loadServices()
 
     // Check for query params (doctor and service selection)
-    this.route.queryParams.subscribe((params) => {
-      const doctorId = params["doctorId"]
-      const serviceId = params["serviceId"]
+  
 
-      if (doctorId) {
+
+      this.authService.currentUser$.subscribe((user) => {
+      this.currentUser = user;
+      console.log("~###############################################################");
+      
+      console.log('Current user:', user);
+          const doctorId = this.currentUser?.id
+          console.log("***************************************");
+          
+          console.log("doctorId = = = = ="+doctorId);
+          
+        if (doctorId) {
         this.appointmentForm.get("doctorId")?.setValue(+doctorId)
         this.onDoctorChange()
       }
 
-      if (serviceId) {
-        this.appointmentForm.get("serviceId")?.setValue(+serviceId)
-      }
-    })
+
+    
+      
+  
+    });
   }
 
   initForm(): void {
@@ -121,13 +136,13 @@ export class AppointmentComponent implements OnInit {
     }
   }
 
-  filterServicesByDoctor(doctorId: number): void {
+  filterServicesByDoctor(doctorId: string): void {
     this.serviceService.getServicesByDoctor(doctorId).subscribe((services) => {
       this.filteredServices = services
     })
   }
 
-  loadAvailableDates(doctorId: number): void {
+  loadAvailableDates(doctorId: string): void {
     this.appointmentService.getDateTimeOfAppointments(doctorId.toString()).subscribe({
       next: (dateTimes) => {
         // Process the available dates from the backend
@@ -207,7 +222,7 @@ export class AppointmentComponent implements OnInit {
     appointmentDate.setHours(hours, minutes)
 
     const appointmentData: Appointment = {
-      date: appointmentDate,
+      dateTime: appointmentDate,
       patientId: currentUser.id,
       doctorId: formData.doctorId,
       description: formData.description,

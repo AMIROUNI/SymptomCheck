@@ -64,6 +64,7 @@ import { CompleteProfileComponent } from './components/doctors/complete-profile/
 import { PopupComponent } from "./components/shared/popup/popup.component";
 import { DoctorDashboardComponent } from './components/doctors/doctor-dashboard/doctor-dashboard.component';
 import { GenericChartComponent } from "./components/shared/dashboard-components/growth-chart/generic-chart.component";
+import { BarGrowthChartComponent } from "./components/shared/dashboard-components/bar-growth-chart/bar-growth-chart.component";
 
 @NgModule({
   declarations: [
@@ -101,6 +102,7 @@ import { GenericChartComponent } from "./components/shared/dashboard-components/
     DoctorDashboardComponent
       ],
       imports: [
+    BarGrowthChartComponent,
     NgApexchartsModule,
     BrowserModule,
     AppRoutingModule,

@@ -26,6 +26,8 @@ export class AddServiceComponent  implements OnInit {
   popupRedirectPath: string | null = null;
   showCancelButton = false;
 
+  /////////////////////////////////////////////////////////////////////////////////////
+
   serviceForm: FormGroup;
   isSubmitting = false;
   submitSuccess = false;

@@ -24,6 +24,10 @@ getDateTimeOfAppointments(doctorId: string): Observable<string[]> {
 }
 
 
+getByDoctorIde(doctorId: string): Observable<Appointment[]> {
+  return this.http.get<Appointment[]>(`${this.apiUrl}/doctor/${doctorId}`);
+}
+
 
 
   //--------------------------------------------------------------------------------------//
@@ -34,7 +38,7 @@ getDateTimeOfAppointments(doctorId: string): Observable<string[]> {
   getPatientAppointments(id:number): Observable<Appointment[]> {
     return this.http.get<Appointment[]>(`${this.apiUrl}/patient/${id}`);
   }
-  getDoctorAppointments(id:number): Observable<Appointment[]> {
+  getDoctorAppointments(id:string): Observable<Appointment[]> {
     return this.http.get<Appointment[]>(`${this.apiUrl}/doctor/${id}`);
   }
 

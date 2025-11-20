@@ -3,12 +3,12 @@ import { Component, Input, OnChanges, SimpleChanges, OnInit } from '@angular/cor
 import { NgApexchartsModule } from "ng-apexcharts";
 
 
+
 @Component({
   selector: 'app-bar-growth-chart',
   templateUrl: './bar-growth-chart.component.html',
-  styleUrls: ['./bar-growth-chart.component.css'],
-  imports: [NgApexchartsModule],
-
+  standalone: true,
+  imports: [CommonModule, NgApexchartsModule]
 })
 export class BarGrowthChartComponent implements OnChanges, OnInit {
   

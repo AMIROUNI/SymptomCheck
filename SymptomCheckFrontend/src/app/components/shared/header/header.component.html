@@ -13,7 +13,21 @@
           <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
           <li><a routerLink="/doctors" routerLinkActive="active">Doctors</a></li>
           <li><a routerLink="/services" routerLinkActive="active">Services</a></li>
-          <li *ngIf="isLoggedIn"><a routerLink="/appointment" routerLinkActive="active">Book Appointment</a></li>
+          
+          <!-- Patient-specific navigation -->
+          <li *ngIf="isLoggedIn && canBookAppointments()">
+            <a routerLink="/appointment" routerLinkActive="active">Book Appointment</a>
+          </li>
+
+          <!-- Doctor-specific navigation -->
+          <li *ngIf="isLoggedIn && isDoctor()">
+            <a routerLink="/calendar" routerLinkActive="active">My Schedule</a>
+          </li>
+
+          <!-- Admin-specific navigation -->
+          <li *ngIf="isLoggedIn && isAdmin()">
+            <a routerLink="/admin" routerLinkActive="active">Admin Panel</a>
+          </li>
         </ul>
       </nav>
 
@@ -23,22 +37,65 @@
           <a routerLink="/register" class="btn btn-primary">Register</a>
         </ng-container>
 
-        <div *ngIf="isLoggedIn" class="user-dropdown" style=" z-index:  444;">
+        <div *ngIf="isLoggedIn" class="user-dropdown" style="z-index: 444;">
           <button class="dropdown-toggle">
             <img [src]="getUserImage(currentUser?.profilePhotoUrl)" alt="User" class="user-avatar">
             <span class="user-name">{{ currentUser?.firstName || 'User' }}</span>
             <i class="fas fa-chevron-down"></i>
+           
           </button>
           <div class="dropdown-menu">
-            <a routerLink="/dashboard" class="dropdown-item">
-              <i class="fas fa-tachometer-alt"></i> Dashboard
+            <!-- Dynamic Dashboard Link -->
+            <a routerLink="doctor-dashboard" class="dropdown-item">
+              <i class="fas fa-tachometer-alt"></i> {{ getDashboardName() }}
             </a>
+
+            <!-- Common Links for All Roles -->
             <a routerLink="/dashboard/profile" class="dropdown-item">
               <i class="fas fa-user"></i> My Profile
             </a>
-            <a routerLink="/dashboard/appointments" class="dropdown-item">
-              <i class="fas fa-calendar-check"></i> My Appointments
-            </a>
+
+            <!-- Patient-specific Links -->
+            <ng-container *ngIf="isPatient()">
+              <a routerLink="/dashboard/appointments" class="dropdown-item">
+                <i class="fas fa-calendar-check"></i> My Appointments
+              </a>
+              <a routerLink="/dashboard/medical-history" class="dropdown-item">
+                <i class="fas fa-file-medical"></i> Medical History
+              </a>
+            </ng-container>
+
+            <!-- Doctor-specific Links -->
+            <ng-container *ngIf="isDoctor()">
+              <a routerLink="/doctor/appointments" class="dropdown-item">
+                <i class="fas fa-calendar-alt"></i> Appointments
+              </a>
+              <a routerLink="/doctor/patients" class="dropdown-item">
+                <i class="fas fa-users"></i> My Patients
+              </a>
+              <a routerLink="/doctor/availability" class="dropdown-item">
+                <i class="fas fa-clock"></i> Availability
+              </a>
+
+               <a routerLink="/calendar" class="dropdown-item">
+                <i class="fas fa-clock"></i> Calendar
+              </a>
+
+            </ng-container>
+
+            <!-- Admin-specific Links -->
+            <ng-container *ngIf="isAdmin()">
+              <a routerLink="/admin/users" class="dropdown-item">
+                <i class="fas fa-users-cog"></i> Manage Users
+              </a>
+              <a routerLink="/admin/doctors" class="dropdown-item">
+                <i class="fas fa-user-md"></i> Manage Doctors
+              </a>
+              <a routerLink="/admin/appointments" class="dropdown-item">
+                <i class="fas fa-calendar"></i> All Appointments
+              </a>
+            </ng-container>
+
             <div class="dropdown-divider"></div>
             <a href="javascript:void(0)" (click)="logout()" class="dropdown-item">
               <i class="fas fa-sign-out-alt"></i> Logout

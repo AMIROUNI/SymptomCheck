@@ -67,12 +67,12 @@
     <div *ngFor="let appointment of filteredAppointments" class="appointment-card">
       <div class="appointment-header">
         <div class="appointment-date">
-          <div class="date-day">{{ appointment.date | date:'dd' }}</div>
-          <div class="date-month">{{ appointment.date | date:'MMM' }}</div>
-          <div class="date-year">{{ appointment.date | date:'yyyy' }}</div>
+          <div class="date-day">{{ appointment.dateTime | date:'dd' }}</div>
+          <div class="date-month">{{ appointment.dateTime | date:'MMM' }}</div>
+          <div class="date-year">{{ appointment.dateTime | date:'yyyy' }}</div>
         </div>
         <div class="appointment-time">
-          {{ appointment.date | date:'h:mm a' }}
+          {{ appointment.dateTime | date:'h:mm a' }}
         </div>
         <div class="appointment-status" *ngIf="appointment.status">
           <span [ngClass]="getStatusClass(appointment.status)">
@@ -102,7 +102,7 @@
         <ng-container *ngIf="!isDoctor">
           <!-- Patient actions -->
           <button
-            *ngIf="appointment.status === 'Pending' || appointment.status === 'Confirmed'"
+            *ngIf="appointment.status === 'PENDING' || appointment.status === 'CONFIRMED'"
             class="btn btn-danger btn-sm"
             (click)="cancelAppointment(appointment.id!)"
           >
@@ -113,21 +113,21 @@
         <ng-container *ngIf="isDoctor">
           <!-- Doctor actions -->
           <button
-            *ngIf="appointment.status === 'Pending'"
+            *ngIf="appointment.status === 'PENDING'"
             class="btn btn-success btn-sm me-2"
             (click)="confirmAppointment(appointment.id!)"
           >
             Confirm
           </button>
           <button
-            *ngIf="appointment.status === 'Confirmed'"
+            *ngIf="appointment.status === 'CONFIRMED'"
             class="btn btn-primary btn-sm me-2"
             (click)="completeAppointment(appointment.id!)"
           >
             Complete
           </button>
           <button
-            *ngIf="appointment.status === 'Pending' || appointment.status === 'Confirmed'"
+            *ngIf="appointment.status === 'PENDING' || appointment.status === 'CONFIRMED'"
             class="btn btn-danger btn-sm"
             (click)="cancelAppointment(appointment.id!)"
           >

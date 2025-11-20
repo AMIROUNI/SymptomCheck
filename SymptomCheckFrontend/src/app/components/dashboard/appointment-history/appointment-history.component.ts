@@ -44,8 +44,8 @@ export class AppointmentHistoryComponent implements OnInit {
   loadAppointments(): void {
     this.isLoading = true;
     if (this.currentUser) {
-      console.log(this.currentUser.role, '      ', UserRole.Patient);
-      if (this.currentUser.role == UserRole.Patient)
+      console.log(this.currentUser.roles, '      ', UserRole.PATIENT);
+      if (this.currentUser.roles?.includes(UserRole.PATIENT))
         this.appointmentService
           .getPatientAppointments(Number(this.currentUser.id))
           .subscribe({
@@ -67,7 +67,7 @@ export class AppointmentHistoryComponent implements OnInit {
           });
       else
         this.appointmentService
-          .getDoctorAppointments(Number(this.currentUser.id))
+          .getDoctorAppointments(this.currentUser.id)
           .subscribe({
             next: (appointments) => {
               this.appointments = appointments.map((app) =>
@@ -107,7 +107,7 @@ export class AppointmentHistoryComponent implements OnInit {
 
     // Sort by date (newest first)
     this.filteredAppointments.sort((a, b) => {
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
+      return new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime();
     });
   }
 
@@ -127,7 +127,7 @@ export class AppointmentHistoryComponent implements OnInit {
               (a) => a.id === appointmentId
             );
             if (appointment) {
-              appointment.status = AppointmentStatus.Cancelled;
+              appointment.status = AppointmentStatus.CANCELLED;
               this.filterAppointments();
             }
           },
@@ -141,13 +141,13 @@ export class AppointmentHistoryComponent implements OnInit {
 
   getStatusClass(status: AppointmentStatus): string {
     switch (status) {
-      case AppointmentStatus.Pending:
+      case AppointmentStatus.PENDING:
         return 'status-pending';
-      case AppointmentStatus.Confirmed:
+      case AppointmentStatus.CONFIRMED:
         return 'status-confirmed';
-      case AppointmentStatus.Completed:
+      case AppointmentStatus.COMPLETED:
         return 'status-completed';
-      case AppointmentStatus.Cancelled:
+      case AppointmentStatus.CANCELLED:
         return 'status-cancelled';
       default:
         return '';
@@ -178,7 +178,7 @@ export class AppointmentHistoryComponent implements OnInit {
               (a) => a.id === appointmentId
             );
             if (appointment) {
-              appointment.status = AppointmentStatus.Confirmed;
+              appointment.status = AppointmentStatus.CONFIRMED;
               this.filterAppointments();
             }
           },
@@ -204,7 +204,7 @@ export class AppointmentHistoryComponent implements OnInit {
               (a) => a.id === appointmentId
             );
             if (appointment) {
-              appointment.status = AppointmentStatus.Completed;
+              appointment.status = AppointmentStatus.COMPLETED;
               this.filterAppointments();
             }
           },
@@ -218,10 +218,10 @@ export class AppointmentHistoryComponent implements OnInit {
 
   private normalizeAppointmentStatus(appointment: Appointment): Appointment {
     const statusMap: { [key: number]: AppointmentStatus } = {
-      0: AppointmentStatus.Pending,
-      1: AppointmentStatus.Confirmed,
-      2: AppointmentStatus.Cancelled,
-      3: AppointmentStatus.Completed,
+      0: AppointmentStatus.PENDING,
+      1: AppointmentStatus.CONFIRMED,
+      2: AppointmentStatus.CANCELLED,
+      3: AppointmentStatus.COMPLETED,
     };
 
     if (typeof appointment.status === 'number') {

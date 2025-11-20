@@ -1,0 +1,138 @@
+<div class="calendar-wrapper">
+  <div class="calendar-header">
+    <h1>Appointment Calendar</h1>
+    <div class="calendar-header-actions">
+      <button class="calendar-header-button" (click)="refreshAppointments()">
+        <i class="icon-refresh">🔄</i>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <div class="calendar-view-controls">
+    <button class="calendar-view-button" [class.active]="currentView === 'dayGridMonth'" (click)="changeView('dayGridMonth')">Month</button>
+    <button class="calendar-view-button" [class.active]="currentView === 'dayGridWeek'" (click)="changeView('dayGridWeek')">Week</button>
+    <button class="calendar-view-button" [class.active]="currentView === 'dayGridDay'" (click)="changeView('dayGridDay')">Day</button>
+    <button class="calendar-view-button" [class.active]="currentView === 'listWeek'" (click)="changeView('listWeek')">List</button>
+  </div>
+
+  <div class="calendar-filters">
+    <div class="calendar-filter-group">
+      <label class="calendar-filter-label">Status</label>
+      <select class="calendar-filter-select" [(ngModel)]="selectedStatus" (ngModelChange)="filterEvents()">
+        <option value="all">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="cancelled">Cancelled</option>
+        <option value="completed">Completed</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="calendar-legend">
+    <div class="calendar-legend-item">
+      <div class="calendar-legend-color legend-color-pending"></div>
+      <span>Pending</span>
+    </div>
+    <div class="calendar-legend-item">
+      <div class="calendar-legend-color legend-color-confirmed"></div>
+      <span>Confirmed</span>
+    </div>
+    <div class="calendar-legend-item">
+      <div class="calendar-legend-color legend-color-cancelled"></div>
+      <span>Cancelled</span>
+    </div>
+    <div class="calendar-legend-item">
+      <div class="calendar-legend-color legend-color-completed"></div>
+      <span>Completed</span>
+    </div>
+  </div>
+
+  <div class="calendar-search">
+    <i class="calendar-search-icon">🔍</i>
+    <input type="text" class="calendar-search-input" placeholder="Search appointments..." 
+           [(ngModel)]="searchQuery" (ngModelChange)="handleSearch()">
+  </div>
+
+  <div *ngIf="loading" class="calendar-loading">
+    <div class="calendar-loading-spinner"></div>
+    <p>Loading appointments...</p>
+  </div>
+
+  <div *ngIf="!loading && filteredAppointments.length === 0" class="calendar-empty">
+    <div class="calendar-empty-icon">📅</div>
+    <h3 class="calendar-empty-title">No appointments found</h3>
+    <p class="calendar-empty-description" *ngIf="selectedStatus === 'all' && !searchQuery">
+      You don't have any appointments scheduled.
+    </p>
+    <p class="calendar-empty-description" *ngIf="selectedStatus !== 'all' || searchQuery">
+      No appointments match your current filters. Try adjusting your search criteria.
+    </p>
+    <button class="calendar-header-button" (click)="refreshAppointments()">
+      <i class="icon-refresh">🔄</i>
+      Refresh
+    </button>
+  </div>
+
+  <full-calendar *ngIf="calendarOptions && filteredAppointments.length > 0" [options]="calendarOptions"></full-calendar>
+
+  <div class="calendar-stats" *ngIf="filteredAppointments.length > 0">
+    <div class="calendar-stat-item calendar-stat-pending">
+      <div class="calendar-stat-value">{{ getAppointmentsByStatus(AppointmentStatus.PENDING).length }}</div>
+      <div class="calendar-stat-label">Pending</div>
+    </div>
+    <div class="calendar-stat-item calendar-stat-confirmed">
+      <div class="calendar-stat-value">{{ getAppointmentsByStatus(AppointmentStatus.CONFIRMED).length }}</div>
+      <div class="calendar-stat-label">Confirmed</div>
+    </div>
+    <div class="calendar-stat-item calendar-stat-cancelled">
+      <div class="calendar-stat-value">{{ getAppointmentsByStatus(AppointmentStatus.CANCELLED).length }}</div>
+      <div class="calendar-stat-label">Cancelled</div>
+    </div>
+    <div class="calendar-stat-item calendar-stat-completed">
+      <div class="calendar-stat-value">{{ getAppointmentsByStatus(AppointmentStatus.COMPLETED).length }}</div>
+      <div class="calendar-stat-label">Completed</div>
+    </div>
+    <div class="calendar-stat-item">
+      <div class="calendar-stat-value">{{ filteredAppointments.length }}</div>
+      <div class="calendar-stat-label">Total</div>
+    </div>
+  </div>
+
+  <div class="calendar-event-modal" [class.active]="showEventModal">
+    <div class="calendar-event-modal-content">
+      <div class="calendar-event-modal-header">
+        <h2 class="calendar-event-modal-title">Appointment Details</h2>
+        <button class="calendar-event-modal-close" (click)="closeEventModal()">×</button>
+      </div>
+      <div class="calendar-event-modal-body" *ngIf="selectedEvent">
+        <div class="calendar-event-detail">
+          <div class="calendar-event-detail-label">Patient ID</div>
+          <div class="calendar-event-detail-value">{{ selectedEvent.patientId }}</div>
+        </div>
+        <div class="calendar-event-detail">
+          <div class="calendar-event-detail-label">Status</div>
+          <div class="calendar-event-detail-value">
+            <span class="status-indicator" [class]="'status-' + getStatusClass(selectedEvent.status)"></span>
+            {{ getStatusDisplayText(selectedEvent.status) }}
+          </div>
+        </div>
+        <div class="calendar-event-detail">
+          <div class="calendar-event-detail-label">Date & Time</div>
+          <div class="calendar-event-detail-value">{{ formatAppointmentTime(selectedEvent.start) }}</div>
+        </div>
+        <div class="calendar-event-detail" *ngIf="selectedEvent.end">
+          <div class="calendar-event-detail-label">End Time</div>
+          <div class="calendar-event-detail-value">{{ formatAppointmentTime(selectedEvent.end) }}</div>
+        </div>
+        <div class="calendar-event-detail" *ngIf="selectedEvent.description">
+          <div class="calendar-event-detail-label">Description</div>
+          <div class="calendar-event-detail-value">{{ selectedEvent.description || 'No description provided' }}</div>
+        </div>
+      </div>
+      <div class="calendar-event-modal-footer">
+        <button class="calendar-event-modal-button calendar-event-modal-button-secondary" (click)="closeEventModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

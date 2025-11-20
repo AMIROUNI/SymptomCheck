@@ -33,7 +33,7 @@ export class ServiceService {
   }
 
 
-  getServicesByDoctor(doctorId: number): Observable<HealthcareService[]> {
+  getServicesByDoctor(doctorId: string): Observable<HealthcareService[]> {
         return this.http.get<HealthcareService[]>(`${this.apiUrl}/doctor/${doctorId}`);
 
   }
