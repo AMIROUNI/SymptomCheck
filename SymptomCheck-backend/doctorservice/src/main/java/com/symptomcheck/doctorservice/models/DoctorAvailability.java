@@ -14,7 +14,7 @@ import java.util.UUID;
 public class DoctorAvailability {
     @Id
     @GeneratedValue
-    private UUID id;
+    private Long id;
 
     private UUID doctorId;
     @NotNull
