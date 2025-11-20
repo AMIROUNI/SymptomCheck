@@ -1,4 +1,4 @@
-package com.symptomcheck.doctorservice.dto;
+package com.symptomcheck.doctorservice.dtos;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotNull;

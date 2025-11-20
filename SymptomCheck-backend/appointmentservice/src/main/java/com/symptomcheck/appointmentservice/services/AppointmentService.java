@@ -71,11 +71,12 @@ public class AppointmentService {
 
     // méthode locale (si tu veux récupérer directement depuis ta base)
     public List<Appointment> getByDoctor(UUID doctorId) {
+
         return appointmentRepository.findByDoctorId(doctorId);
     }
 
     // méthode distante (si tu veux appeler un autre microservice)
-    public List<Appointment> getByDoctorFromDoctorService(int doctorId, String token) {
+    public List<Appointment> getByDoctorFromDoctorService(UUID doctorId, String token) {
         String doctorServiceUrl = "http://doctorservice:8082/api/doctors/" + doctorId + "/appointments";
 
         return webClient.get()

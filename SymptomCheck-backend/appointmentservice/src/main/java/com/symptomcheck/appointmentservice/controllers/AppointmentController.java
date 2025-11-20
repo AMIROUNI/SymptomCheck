@@ -47,11 +47,12 @@ public class AppointmentController {
     @GetMapping("/doctor/{doctorId}")
     public ResponseEntity<List<Appointment>> getByDoctor(@PathVariable UUID doctorId) {
         try {
+            log.info("**************************************************************");
+            log.info(doctorId.toString());
             List<Appointment> appointments = appointmentService.getByDoctor(doctorId);
             return ResponseEntity.ok(appointments);
-        }
-        catch (Exception ex) {
-            return  ResponseEntity.internalServerError().body(List.of());
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError().body(List.of());
         }
 
     }
@@ -60,7 +61,7 @@ public class AppointmentController {
     @GetMapping("/doctor/{doctorId}/remote")
     @PreAuthorize("hasRole('Doctor')")
     public ResponseEntity<List<Appointment>> getByDoctorRemote(
-            @PathVariable int doctorId,
+            @PathVariable UUID doctorId,
             @AuthenticationPrincipal Jwt jwt
     ) {
         String token = jwt.getTokenValue();
@@ -69,25 +70,16 @@ public class AppointmentController {
     }
 
 
-
-    @GetMapping("available-date/{doctorId}" )
-    public  ResponseEntity<?>  getAvailableDate(
+    @GetMapping("available-date/{doctorId}")
+    public ResponseEntity<?> getAvailableDate(
             @PathVariable UUID doctorId
-    ){
-        try{
-            return ResponseEntity.ok().body(appointmentService.getAvailableDate(doctorId))  ;
-        }
-        catch (Exception ex){
-            return  ResponseEntity.internalServerError().body(List.of());
+    ) {
+        try {
+            return ResponseEntity.ok().body(appointmentService.getAvailableDate(doctorId));
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError().body(List.of());
         }
     }
-
-
-
-
-
-
-
 
 
 }

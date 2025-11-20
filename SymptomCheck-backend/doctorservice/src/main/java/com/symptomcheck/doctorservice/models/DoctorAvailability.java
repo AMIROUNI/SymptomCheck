@@ -18,7 +18,7 @@ public class DoctorAvailability {
 
     private UUID doctorId;
     @NotNull
-    private DayOfWeek dayOfWeek;
+    private  DayOfWeek dayOfWeek;
     @NotNull
     private LocalTime startTime;
     @NotNull

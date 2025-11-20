@@ -1,7 +1,6 @@
 package com.symptomcheck.doctorservice.controllers;
 
-import com.symptomcheck.doctorservice.dto.AvailabilityHealthDto;
-import com.symptomcheck.doctorservice.dto.DoctorProfileStatusDTO;
+import com.symptomcheck.doctorservice.dtos.AvailabilityHealthDto;
 import com.symptomcheck.doctorservice.services.DoctorAvailabilityService;
 import com.symptomcheck.doctorservice.services.HealthcareServiceService;
 import lombok.RequiredArgsConstructor;

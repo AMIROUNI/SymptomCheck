@@ -10,8 +10,6 @@ import java.util.List;
 @Repository
 public interface UserDataRepository extends JpaRepository<UserData,String> {
 
-
-
     // Find doctors (users with clinicId)
     List<UserData> findByClinicIdIsNotNull();
 
@@ -32,5 +30,4 @@ public interface UserDataRepository extends JpaRepository<UserData,String> {
 
     // Find users created in date range
     List<UserData> findByCreatedAtBetween(Instant start, Instant end);
-
 }

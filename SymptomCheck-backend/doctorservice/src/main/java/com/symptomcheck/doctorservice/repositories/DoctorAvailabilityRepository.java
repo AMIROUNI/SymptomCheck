@@ -37,4 +37,7 @@ public interface DoctorAvailabilityRepository extends JpaRepository<DoctorAvaila
 
     @Query("SELECT COUNT(da) FROM DoctorAvailability da WHERE da.doctorId = :doctorId")
     Long countByDoctorId(@Param("doctorId") UUID doctorId);
+
+
+    Long countDoctorsWithAvailability();
 }

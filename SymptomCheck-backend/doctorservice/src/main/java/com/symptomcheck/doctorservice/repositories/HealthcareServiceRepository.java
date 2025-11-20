@@ -24,4 +24,11 @@ public interface HealthcareServiceRepository  extends JpaRepository<HealthcareSe
 
     @Query("SELECT DISTINCT hs.category FROM HealthcareService hs WHERE hs.doctorId = :doctorId")
     List<String> findCategoriesByDoctorId(@Param("doctorId") UUID doctorId);
+
+
+
+    @Query("SELECT COUNT(DISTINCT hs.doctorId) FROM HealthcareService hs")
+    Long countDoctorsWithServices();
+
+    List<HealthcareService> findByCategory(String category);
 }

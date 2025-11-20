@@ -1,4 +1,4 @@
-package com.symptomcheck.doctorservice.dto.dashboardDto;
+package com.symptomcheck.doctorservice.dtos.dashboardDto;
 
 
 

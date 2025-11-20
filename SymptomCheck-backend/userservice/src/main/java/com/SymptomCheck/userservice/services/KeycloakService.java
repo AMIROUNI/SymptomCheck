@@ -263,6 +263,8 @@ public class KeycloakService {
                     ur.setClinicId(userData.getClinicId());
                     ur.setDescription(userData.getDescription());
                     ur.setDiploma(userData.getDiploma());
+                    // Ajoutez le profileComplete
+                    ur.setProfileComplete(userData.getProfileComplete() != null ? userData.getProfileComplete() : false);
                 });
                 log.info("userData: {}", userDataOpt.orElse(null));
                 result.add(ur);

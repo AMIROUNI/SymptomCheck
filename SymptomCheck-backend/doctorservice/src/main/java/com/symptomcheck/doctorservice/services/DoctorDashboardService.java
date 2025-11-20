@@ -1,6 +1,6 @@
 package com.symptomcheck.doctorservice.services;
 
-import com.symptomcheck.doctorservice.dto.dashboardDto.*;
+import com.symptomcheck.doctorservice.dtos.dashboardDto.*;
 import com.symptomcheck.doctorservice.models.DoctorAvailability;
 import com.symptomcheck.doctorservice.models.HealthcareService;
 import com.symptomcheck.doctorservice.repositories.DoctorAvailabilityRepository;

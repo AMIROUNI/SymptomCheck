@@ -56,7 +56,6 @@ public class UserService {
             userData.setId(userId);
             userData.setPhoneNumber(userRegistrationRequest.getPhoneNumber());
             userData.setProfileComplete(false);
-            userData.setProfilePhotoUrl(userRegistrationRequest.getProfilePhotoUrl());
             userData.setDescription(userRegistrationRequest.getDescription());
             userData.setDiploma(userRegistrationRequest.getDiploma());
             userData.setClinicId(userRegistrationRequest.getClinicId());

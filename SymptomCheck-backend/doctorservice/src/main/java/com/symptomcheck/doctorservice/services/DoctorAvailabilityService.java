@@ -1,6 +1,6 @@
 package com.symptomcheck.doctorservice.services;
 
-import com.symptomcheck.doctorservice.dto.AvailabilityHealthDto;
+import com.symptomcheck.doctorservice.dtos.AvailabilityHealthDto;
 import com.symptomcheck.doctorservice.models.DoctorAvailability;
 import com.symptomcheck.doctorservice.models.HealthcareService;
 import com.symptomcheck.doctorservice.repositories.DoctorAvailabilityRepository;
@@ -8,7 +8,6 @@ import com.symptomcheck.doctorservice.repositories.HealthcareServiceRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
