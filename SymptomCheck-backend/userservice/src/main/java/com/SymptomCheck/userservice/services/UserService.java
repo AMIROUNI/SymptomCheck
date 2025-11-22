@@ -74,10 +74,24 @@ public class UserService {
      * Vérifie si un utilisateur existe dans Keycloak
      */
     public boolean userExists(String username) {
-        return keycloakService.userExists(username);
+
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("Username cannot be null or empty.");
+        }
+
+        try {
+            return keycloakService.userExists(username);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to check user existence", e);
+        }
     }
 
+
     public Map<String, Object> getUserDetails(String username) {
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("Username cannot be null or empty");
+        }
+
         return keycloakService.getUserDetails(username);
     }
 

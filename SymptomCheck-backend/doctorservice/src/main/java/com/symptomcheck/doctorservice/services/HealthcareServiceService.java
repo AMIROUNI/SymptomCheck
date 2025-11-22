@@ -5,6 +5,7 @@ import com.symptomcheck.doctorservice.models.HealthcareService;
 import com.symptomcheck.doctorservice.repositories.HealthcareServiceRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,11 +16,18 @@ import java.util.UUID;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class HealthcareServiceService {
     private final HealthcareServiceRepository healthcareServiceRepository  ;
     private final LocalFileStorageService localFileStorageService;
     public boolean existsByDoctorId(String doctorId) {
-        return healthcareServiceRepository.existsByDoctorId(UUID.fromString(doctorId));
+        try {
+            UUID uuid = UUID.fromString(doctorId);
+            return healthcareServiceRepository.existsByDoctorId(uuid);
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid doctorId UUID: {}", doctorId);
+            return false; // test-friendly: no exception explosion
+        }
     }
 
     public List<HealthcareService> getAll() {
