@@ -5,7 +5,7 @@ import { DashboardDoctorService } from '@/app/services/dashboard-doctor.service'
 import { AuthService } from '@/app/services/auth.service';
 import { DoctorService } from '@/app/services/doctor.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AvailabilityHealthDto, DayOfWeek } from '@/app/models/availability-health-dto';
+import { AvailabilityHealthDto } from '@/app/models/availability-health-dto';
 
 @Component({
   selector: 'app-doctor-dashboard',
@@ -43,7 +43,15 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
   step = 1;
   availabilityForm: FormGroup;
   serviceForm: FormGroup;
-  daysOfWeek = Object.values(DayOfWeek);
+  daysOfWeek = [
+    { label: 'Lundi', value: 'MONDAY' },
+    { label: 'Mardi', value: 'TUESDAY' },
+    { label: 'Mercredi', value: 'WEDNESDAY' },
+    { label: 'Jeudi', value: 'THURSDAY' },
+    { label: 'Vendredi', value: 'FRIDAY' },
+    { label: 'Samedi', value: 'SATURDAY' },
+    { label: 'Dimanche', value: 'SUNDAY' }
+  ];
   doctorId: string = '';
 
   constructor(
@@ -53,11 +61,11 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
     private router: Router,
     private fb: FormBuilder
   ) {
-    // Step 1: Availability fields
+    // Step 1: Availability fields avec liste de jours
     this.availabilityForm = this.fb.group({
-      dayOfWeek: [null, Validators.required],
-      startTime: ['', Validators.required],
-      endTime: ['', Validators.required]
+      daysOfWeek: [[], Validators.required],
+      startTime: ['09:00', Validators.required],
+      endTime: ['17:00', Validators.required]
     });
 
     // Step 2: Service fields
@@ -66,7 +74,8 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
       description: [''],
       imageUrl: [''],
       durationMinutes: [30, [Validators.required, Validators.min(1)]],
-      price: [0, [Validators.required, Validators.min(0)]]
+      price: [0, [Validators.required, Validators.min(0)]],
+      category: ['']
     });
   }
 
@@ -87,14 +96,10 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
           this.doctorId = user.id.toString();
           this.loadDashboardData();
           
-          // Check profile status
           this.doctorService.getDoctorProfileStatus(this.doctorId).subscribe({
             next: (status) => {
-              // Ensure we assign a primitive boolean (not the Boolean wrapper)
-              const isCompleted = !!status;
-              this.profileCompleted = isCompleted;
-              if (!isCompleted) {
-                console.log('Profile incomplete, showing modal.');
+              this.profileCompleted = !!status;
+              if (!this.profileCompleted) {
                 this.showCompleteProfileModal = true;
               }
             },
@@ -106,6 +111,7 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
       });
   }
 
+  // ✅ Ajouter la méthode manquante
   loadDashboardData(): void {
     this.loading = true;
 
@@ -184,69 +190,7 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
     this.averageWeeklyAppointments = Math.round(this.totalAppointments / 4);
   }
 
-  // Profile Completion Modal Methods
-  nextStep() {
-    if (this.availabilityForm.valid) {
-      this.step = 2;
-    } else {
-      this.availabilityForm.markAllAsTouched();
-    }
-  }
-
-  previousStep() {
-    this.step = 1;
-  }
-
-  submitProfile() {
-    if (!this.serviceForm.valid) {
-      this.serviceForm.markAllAsTouched();
-      return;
-    }
-
-    // Combine both forms into the DTO
-    const completeProfileData: AvailabilityHealthDto = {
-      doctorId: this.doctorId,
-      // Availability fields from step 1
-      dayOfWeek: this.availabilityForm.value.dayOfWeek,
-      startTime: this.availabilityForm.value.startTime,
-      endTime: this.availabilityForm.value.endTime,
-      // Service fields from step 2
-      name: this.serviceForm.value.name,
-      description: this.serviceForm.value.description,
-      imageUrl: this.serviceForm.value.imageUrl || undefined,
-      durationMinutes: this.serviceForm.value.durationMinutes,
-      price: this.serviceForm.value.price
-    };
-
-    this.doctorService.completeProfile(completeProfileData).subscribe({
-      next: (res) => {
-        console.log('Profile completed successfully', res);
-        this.showCompleteProfileModal = false;
-        this.profileCompleted = true;
-        this.profileCompletionPercentage = 100;
-        this.resetForms();
-        // Reload dashboard data to reflect changes
-        this.loadDashboardData();
-      },
-      error: (err) => {
-        console.error('Error completing profile', err);
-        alert('Failed to complete profile. Please try again.');
-      }
-    });
-  }
-
-  closeModal() {
-    this.showCompleteProfileModal = false;
-    this.resetForms();
-  }
-
-  private resetForms() {
-    this.step = 1;
-    this.availabilityForm.reset();
-    this.serviceForm.reset({ durationMinutes: 30, price: 0 });
-  }
-
-  // Existing Dashboard Methods
+  // ✅ Méthodes pour le template
   refreshData(): void {
     this.loadDashboardData();
   }
@@ -254,15 +198,11 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
   onChartPeriodChange(event: any): void {
     const period = event.target.value;
     console.log('Period changed to:', period);
-    // Implement period-based data loading here
+    // Implémenter le chargement des données par période ici
   }
 
   viewAllAppointments(): void {
     this.router.navigate(['/doctor/appointments']);
-  }
-
-  goToProfile(): void {
-    this.router.navigate(['/doctor/profile']);
   }
 
   getInitials(name: string): string {
@@ -307,5 +247,105 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
       'SUNDAY': 'Dimanche'
     };
     return dayMap[day] || day;
+  }
+
+  // Méthodes pour gérer les jours dans le modal
+  toggleDay(day: string, event: any) {
+    const daysArray = this.availabilityForm.get('daysOfWeek')!.value as string[];
+    
+    if (event.target.checked) {
+      if (!daysArray.includes(day)) {
+        daysArray.push(day);
+      }
+    } else {
+      const idx = daysArray.indexOf(day);
+      if (idx !== -1) {
+        daysArray.splice(idx, 1);
+      }
+    }
+    
+    this.availabilityForm.get('daysOfWeek')!.setValue([...daysArray]);
+  }
+
+  isDaySelected(day: string): boolean {
+    const daysArray = this.availabilityForm.get('daysOfWeek')!.value as string[];
+    return daysArray.includes(day);
+  }
+
+  // Profile Completion Modal Methods
+  nextStep() {
+    if (this.availabilityForm.valid) {
+      this.step = 2;
+    } else {
+      this.availabilityForm.markAllAsTouched();
+    }
+  }
+
+  previousStep() {
+    this.step = 1;
+  }
+
+  submitProfile() {
+    if (!this.serviceForm.valid) {
+      this.serviceForm.markAllAsTouched();
+      return;
+    }
+
+    // ✅ Corriger le DTO - utiliser dayOfWeek au lieu de daysOfWeek si c'est le nom dans le DTO
+    const completeProfileData: any = {
+      doctorId: this.doctorId,
+      // Utiliser le bon nom de propriété selon votre DTO
+      dayOfWeek: this.availabilityForm.value.daysOfWeek, // ou daysOfWeek selon votre DTO
+      startTime: this.availabilityForm.value.startTime,
+      endTime: this.availabilityForm.value.endTime,
+      name: this.serviceForm.value.name,
+      description: this.serviceForm.value.description,
+      imageUrl: this.serviceForm.value.imageUrl || undefined,
+      durationMinutes: this.serviceForm.value.durationMinutes,
+      price: this.serviceForm.value.price,
+      category: this.serviceForm.value.category || 'General'
+    };
+
+    this.doctorService.completeProfile(completeProfileData).subscribe({
+      next: (res) => {
+        console.log('Profile completed successfully', res);
+        this.showCompleteProfileModal = false;
+        this.profileCompleted = true;
+        this.profileCompletionPercentage = 100;
+        this.resetForms();
+        this.loadDashboardData();
+      },
+      error: (err) => {
+        console.error('Error completing profile', err);
+        alert('Failed to complete profile. Please try again.');
+      }
+    });
+  }
+
+  closeModal() {
+    this.showCompleteProfileModal = false;
+    this.resetForms();
+  }
+
+  private resetForms() {
+    this.step = 1;
+    this.availabilityForm.reset({
+      daysOfWeek: [],
+      startTime: '09:00',
+      endTime: '17:00'
+    });
+    this.serviceForm.reset({ 
+      durationMinutes: 30, 
+      price: 0,
+      category: ''
+    });
+  }
+
+  // Méthode pour afficher plusieurs jours dans le dashboard
+  getDaysDisplay(days: string[]): string {
+    if (!days || days.length === 0) return 'Aucun jour';
+    if (days.length === 7) return 'Tous les jours';
+    
+    return days.map(day => this.getDayName(day)).join(', ');
   }
 }

@@ -27,11 +27,11 @@
               <i class="fas fa-plus-circle"></i>
               <span>Book Appointment</span>
             </a>
-            <a href="#" class="menu-item">
+            <a *ngIf="isDoctor()" href="#" class="menu-item">
               <i class="fas fa-clock"></i>
               <span>Manage Availability</span>
             </a>
-            <a routerLink="add-service" class="menu-item" routerLinkActive="active">
+            <a *ngIf="isDoctor()" routerLink="add-service" class="menu-item" routerLinkActive="active">
               <i class="fas fa-stethoscope"></i>
               <span>My Services</span>
             </a>

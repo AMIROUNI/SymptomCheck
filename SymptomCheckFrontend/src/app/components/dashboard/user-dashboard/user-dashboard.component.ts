@@ -1,7 +1,7 @@
 import { Component } from "@angular/core"
 import  { Router } from "@angular/router"
 import  { AuthService } from "../../../services/auth.service"
-import  { User } from "../../../models/user.model"
+import  { User, UserRole } from "../../../models/user.model"
 import { environment } from "@/environments/environment"
 
 @Component({
@@ -45,5 +45,9 @@ export class UserDashboardComponent {
 
     getUserImage(filename: string| undefined): string {
       return `${environment.uploadsUrl}/${filename}`;
+    }
+    isDoctor(): boolean {
+      console.log('Current user roles:', this.currentUser?.roles);
+      return this.currentUser?.roles?.includes(UserRole.DOCTOR) ?? false;
     }
 }
