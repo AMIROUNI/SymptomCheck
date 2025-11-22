@@ -15,7 +15,7 @@ import { AvailabilityHealthDto } from '@/app/models/availability-health-dto';
 })
 export class DoctorDashboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
-  
+
   loading = true;
   profileCompleted = false;
   profileCompletionPercentage = 0;
@@ -26,7 +26,7 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
   doctorServices: any[] = [];
   doctorAvailability: any[] = [];
   todayAppointments: any[] = [];
-  
+
   // Chart data
   weeklyAppointmentsData: number[] = [];
   weeklyAppointmentsCategories: string[] = [];
@@ -95,7 +95,7 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
         if (user && user.id) {
           this.doctorId = user.id.toString();
           this.loadDashboardData();
-          
+
           this.doctorService.getDoctorProfileStatus(this.doctorId).subscribe({
             next: (status) => {
               this.profileCompleted = !!status;
@@ -182,11 +182,11 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
 
   calculateStats(dashboardData: any): void {
     this.totalAppointments = this.appointmentStats.totalAppointments || 0;
-    
+
     const completed = this.appointmentStats.completedAppointments || 0;
     const total = this.totalAppointments;
     this.completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
-    
+
     this.averageWeeklyAppointments = Math.round(this.totalAppointments / 4);
   }
 
@@ -219,7 +219,7 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
   getStatusClass(status: string): string {
     const statusMap: { [key: string]: string } = {
       'COMPLETED': 'completed',
-      'CONFIRMED': 'confirmed', 
+      'CONFIRMED': 'confirmed',
       'PENDING': 'pending',
       'CANCELLED': 'cancelled'
     };
@@ -252,7 +252,7 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
   // Méthodes pour gérer les jours dans le modal
   toggleDay(day: string, event: any) {
     const daysArray = this.availabilityForm.get('daysOfWeek')!.value as string[];
-    
+
     if (event.target.checked) {
       if (!daysArray.includes(day)) {
         daysArray.push(day);
@@ -263,7 +263,7 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
         daysArray.splice(idx, 1);
       }
     }
-    
+
     this.availabilityForm.get('daysOfWeek')!.setValue([...daysArray]);
   }
 
@@ -295,7 +295,7 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
     const completeProfileData: any = {
       doctorId: this.doctorId,
       // Utiliser le bon nom de propriété selon votre DTO
-      dayOfWeek: this.availabilityForm.value.daysOfWeek, // ou daysOfWeek selon votre DTO
+      daysOfWeek: this.availabilityForm.value.daysOfWeek, // ou daysOfWeek selon votre DTO
       startTime: this.availabilityForm.value.startTime,
       endTime: this.availabilityForm.value.endTime,
       name: this.serviceForm.value.name,
@@ -305,6 +305,8 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
       price: this.serviceForm.value.price,
       category: this.serviceForm.value.category || 'General'
     };
+
+    console.log('///////////////////////////////', completeProfileData);
 
     this.doctorService.completeProfile(completeProfileData).subscribe({
       next: (res) => {
@@ -334,8 +336,8 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
       startTime: '09:00',
       endTime: '17:00'
     });
-    this.serviceForm.reset({ 
-      durationMinutes: 30, 
+    this.serviceForm.reset({
+      durationMinutes: 30,
       price: 0,
       category: ''
     });
@@ -345,7 +347,7 @@ export class DoctorDashboardComponent implements OnInit, OnDestroy {
   getDaysDisplay(days: string[]): string {
     if (!days || days.length === 0) return 'Aucun jour';
     if (days.length === 7) return 'Tous les jours';
-    
+
     return days.map(day => this.getDayName(day)).join(', ');
   }
 }

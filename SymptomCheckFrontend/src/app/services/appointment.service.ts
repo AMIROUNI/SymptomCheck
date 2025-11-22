@@ -9,7 +9,7 @@ import { environment } from "@/environments/environment"
   providedIn: "root",
 })
 export class AppointmentService {
-  
+
   private apiUrl = `${environment.appointmentApiUrl}`;
 
 
@@ -55,6 +55,15 @@ getByDoctorIde(doctorId: string): Observable<Appointment[]> {
     return this.http.put<Appointment>(
       `${this.apiUrl}/${id}`,status
     );
+  }
+
+
+
+
+  ////////////////
+  getTakenAppointments(doctorId: string, date: string): Observable<string[]> {
+  
+    return this.http.get<string[]>(`${this.apiUrl}/taken-appointments/${doctorId}?date=${date}`);
   }
 
 }
