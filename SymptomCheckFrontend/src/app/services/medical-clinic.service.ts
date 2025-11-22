@@ -7,7 +7,7 @@ import { environment } from '@/environments/environment';
   providedIn: 'root',
 })
 export class MedicalClinicService {
-  private apiUrl = `${environment.clincApiUrl}/medical/clinic`;
+  private apiUrl = `${environment.clinicApiUrl}/medical/clinic`;
 
   constructor(private http: HttpClient) {}
 
