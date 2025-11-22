@@ -13,7 +13,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+
 @Slf4j
 @Service
 @Transactional
@@ -22,25 +24,37 @@ public class DoctorAvailabilityService {
     private final DoctorAvailabilityRepository availabilityRepository;
     private final HealthcareServiceRepository healthcareRepo;
     private final WebClient webClient;
+
     public boolean isDoctorAvailable(UUID doctorId, LocalDateTime dateTime) {
         DayOfWeek day = dateTime.getDayOfWeek();
         var time = dateTime.toLocalTime();
-        return availabilityRepository.findIfAvailable(doctorId, day, time).isPresent();
+
+        // Récupérer toutes les disponibilités du docteur
+        List<DoctorAvailability> availabilities = availabilityRepository.findByDoctorId(doctorId);
+
+        // Vérifier si le jour et l'heure sont dans une des disponibilités
+        return availabilities.stream()
+                .anyMatch(availability ->
+                        availability.getDaysOfWeek().contains(day) &&
+                                !time.isBefore(availability.getStartTime()) &&
+                                !time.isAfter(availability.getEndTime())
+                );
     }
 
     public boolean existsByDoctorId(UUID doctorId) {
         return availabilityRepository.existsByDoctorId(doctorId);
     }
 
-
     public void createAvailabilityHealth(AvailabilityHealthDto availabilityHealthDto) {
+        // Créer une seule entrée de disponibilité avec la liste des jours
         DoctorAvailability da = new DoctorAvailability();
         da.setDoctorId(availabilityHealthDto.getDoctorId());
         da.setStartTime(availabilityHealthDto.getStartTime());
         da.setEndTime(availabilityHealthDto.getEndTime());
-        da.setDayOfWeek(availabilityHealthDto.getDayOfWeek());
+        da.setDaysOfWeek(availabilityHealthDto.getDaysOfWeek()); // Liste des jours
         availabilityRepository.save(da);
 
+        // Créer le service de santé
         HealthcareService hc = new HealthcareService();
         hc.setDoctorId(availabilityHealthDto.getDoctorId());
         hc.setCategory(availabilityHealthDto.getCategory());
@@ -51,7 +65,4 @@ public class DoctorAvailabilityService {
         hc.setDurationMinutes(availabilityHealthDto.getDurationMinutes());
         healthcareRepo.save(hc);
     }
-
-
-
 }

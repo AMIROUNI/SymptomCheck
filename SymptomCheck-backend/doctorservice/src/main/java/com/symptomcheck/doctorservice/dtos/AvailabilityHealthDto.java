@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -13,7 +14,7 @@ import java.util.UUID;
 public class AvailabilityHealthDto {
     private UUID doctorId;
     @NotNull
-    private DayOfWeek dayOfWeek;
+    private List<DayOfWeek> daysOfWeek;
     @NotNull
     private LocalTime startTime;
     @NotNull
