@@ -27,6 +27,7 @@ export class DoctorDetailComponent implements OnInit {
   currentUser: User | null = null;
   hasUserReviewed: boolean = false;
   userReview?: DoctorReview;
+  UserRole = UserRole; // Exposer UserRole pour le template
 
   constructor(
     private route: ActivatedRoute,
@@ -68,8 +69,6 @@ export class DoctorDetailComponent implements OnInit {
     
     this.loadDoctor();
     console.log('🔄 ngOnInit - Component initialization completed');
-
-    this.toggleReviewForm()
   }
 
   loadDoctor(): void {
@@ -178,7 +177,7 @@ export class DoctorDetailComponent implements OnInit {
     console.log('🔄 checkIfUserReviewed - Checking if user reviewed this doctor');
     console.log('👤 Current user:', this.currentUser ? `${this.currentUser.firstName} ${this.currentUser.lastName}` : 'No user');
     
-    if (this.currentUser?.roles.includes(UserRole.PATIENT)) {
+    if (this.currentUser?.roles?.includes(UserRole.PATIENT)) {
       console.log('✅ User is a PATIENT - proceeding with review check');
       console.log('📋 Doctor ID:', this.doctorId);
       
@@ -560,5 +559,20 @@ export class DoctorDetailComponent implements OnInit {
     
     console.log('✅ Formatted date:', formattedDate);
     return formattedDate;
+  }
+
+  // Getter pour le compteur de caractères
+  get commentLength(): number {
+    return this.reviewForm.get('comment')?.value?.length || 0;
+  }
+
+  // Vérifier si on approche de la limite
+  get isNearLimit(): boolean {
+    return this.commentLength > 1800;
+  }
+
+  // Vérifier si on dépasse la limite
+  get isOverLimit(): boolean {
+    return this.commentLength > 2000;
   }
 }
