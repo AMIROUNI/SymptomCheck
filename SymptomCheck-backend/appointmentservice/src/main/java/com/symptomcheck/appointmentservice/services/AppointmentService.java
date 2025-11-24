@@ -1,6 +1,7 @@
 package com.symptomcheck.appointmentservice.services;
 
 import com.symptomcheck.appointmentservice.dtos.AppointmentDto;
+import com.symptomcheck.appointmentservice.enums.AppointmentStatus;
 import com.symptomcheck.appointmentservice.models.Appointment;
 import com.symptomcheck.appointmentservice.repositories.AppointmentRepository;
 import jakarta.transaction.Transactional;
@@ -97,5 +98,27 @@ public class AppointmentService {
                 .map(a -> a.getDateTime().toLocalTime().toString()) // extract time only
                 .sorted()
                 .collect(Collectors.toList());
+    }
+
+    public List<Appointment> getByPatientId(UUID userId) {
+        return appointmentRepository.findByPatientId(userId);
+    }
+
+    public void updateAppointmentStatus(Long id, int statusNumber) {
+
+
+        AppointmentStatus[] statuses = AppointmentStatus.values();
+
+        if (statusNumber < 0 || statusNumber >= statuses.length) {
+            throw new IllegalArgumentException("Invalid status number: " + statusNumber);
+        }
+
+        AppointmentStatus newStatus = statuses[statusNumber];
+
+        int updated = appointmentRepository.updateAppointmentStatus(id, newStatus);
+
+        if (updated == 0) {
+            throw new IllegalArgumentException("Appointment with ID " + id + " not found");
+        }
     }
 }

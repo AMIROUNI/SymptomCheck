@@ -47,9 +47,10 @@ export class AppointmentHistoryComponent implements OnInit {
       console.log(this.currentUser.roles, '      ', UserRole.PATIENT);
       if (this.currentUser.roles?.includes(UserRole.PATIENT))
         this.appointmentService
-          .getPatientAppointments(Number(this.currentUser.id))
+          .getPatientAppointments(this.currentUser.id)
           .subscribe({
             next: (appointments) => {
+              console.log('appointments= ', appointments);
               this.appointments = appointments.map((app) =>
                 this.normalizeAppointmentStatus(app)
               );
@@ -159,6 +160,7 @@ export class AppointmentHistoryComponent implements OnInit {
   }
 
   get isDoctor(): boolean {
+    if (this.currentUser?.roles.includes(UserRole.DOCTOR)) return true;
    // return this.authService.isDoctor();
    return false;
   }

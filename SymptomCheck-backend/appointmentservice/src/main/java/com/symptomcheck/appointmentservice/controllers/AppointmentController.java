@@ -90,5 +90,32 @@ public class AppointmentController {
         return appointmentService.getTakenAppointments(doctorId, date);
     }
 
+    @GetMapping("{userId}")
+    public ResponseEntity<?> getByPatient(
+            @PathVariable UUID userId
+    ) {
+        try {
+            return ResponseEntity.ok().body(appointmentService.getByPatientId(userId));
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError().body(List.of());
+        }
+    }
+
+    @PutMapping("/{id}/status/{statusNumber}")
+    public ResponseEntity<Boolean> updateStatus(
+            @PathVariable Long id,
+            @PathVariable int statusNumber) {
+
+        try {
+            appointmentService.updateAppointmentStatus(id, statusNumber);
+            return ResponseEntity.ok(true);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.ok(false);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(false);
+        }
+    }
+
+
 
 }
