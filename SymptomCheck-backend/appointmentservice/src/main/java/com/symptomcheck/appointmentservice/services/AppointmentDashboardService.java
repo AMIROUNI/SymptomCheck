@@ -89,6 +89,8 @@ public class AppointmentDashboardService {
         return (long) dayAppointments.size();
     }
 
+
+
     // Méthodes supplémentaires pour le dashboard
     public List<Appointment> getTodayAppointments(UUID doctorId) {
         LocalDateTime startOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);

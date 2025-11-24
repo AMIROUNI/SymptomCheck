@@ -4,11 +4,12 @@ import com.symptomcheck.doctorservice.dtos.AvailabilityHealthDto;
 import com.symptomcheck.doctorservice.services.DoctorAvailabilityService;
 import com.symptomcheck.doctorservice.services.HealthcareServiceService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/doctor/profile")
 @RequiredArgsConstructor
@@ -34,6 +35,10 @@ public class DoctorProfileController {
     @PostMapping("/completeprofile")
     public ResponseEntity<?> complete(@RequestBody AvailabilityHealthDto availabilityHealthDto){
         try {
+            log.info("Recelived request to compete profile");
+
+                log.info(availabilityHealthDto.getDaysOfWeek().get(0).toString()+"//////////////////");
+
             availabilityService.createAvailabilityHealth(availabilityHealthDto);
             return ResponseEntity.ok().body(true);
 

@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +80,14 @@ public class AppointmentController {
         } catch (Exception ex) {
             return ResponseEntity.internalServerError().body(List.of());
         }
+    }
+
+
+    @GetMapping("/taken-appointments/{doctorId}")
+    public List<String> getTakenAppointments(
+            @PathVariable UUID doctorId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return appointmentService.getTakenAppointments(doctorId, date);
     }
 
 

@@ -9,6 +9,8 @@ import { User } from "../../../models/user.model"
 import { HealthcareService } from "../../../models/healthcare-service.model"
 import { Appointment, AppointmentStatus } from "../../../models/appointment.model"
 import { UserService } from "@/app/services/user.service"
+import { AvailabilityHealthDto } from "@/app/models/availability-health-dto"
+import { DoctorAvailabilityService } from "@/app/services/availability.service"
 
 @Component({
   selector: "app-appointment",
@@ -41,7 +43,8 @@ export class AppointmentComponent implements OnInit {
     private serviceService: ServiceService,
     private appointmentService: AppointmentService,
     private authService: AuthService,
-    private userService: UserService
+    private userService: UserService,
+    private doctorAvailabilityService: DoctorAvailabilityService,
   ) {
     // Set min date to tomorrow
     this.minDate.setDate(this.minDate.getDate() + 1)
@@ -51,34 +54,34 @@ export class AppointmentComponent implements OnInit {
 
 
     console.log("appointement  Init now !!!!!!!!!!!!!!!!!!!!!!!!!");
-    
+
     this.initForm()
     this.loadDoctors()
     this.loadServices()
 
     // Check for query params (doctor and service selection)
-  
+
 
 
       this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user;
       console.log("~###############################################################");
-      
+
       console.log('Current user:', user);
           const doctorId = this.currentUser?.id
           console.log("***************************************");
-          
+
           console.log("doctorId = = = = ="+doctorId);
-          
+
         if (doctorId) {
         this.appointmentForm.get("doctorId")?.setValue(+doctorId)
         this.onDoctorChange()
       }
 
 
-    
-      
-  
+
+
+
     });
   }
 
@@ -156,33 +159,52 @@ export class AppointmentComponent implements OnInit {
   }
 
   onDateChange(): void {
-    const doctorId = this.appointmentForm.get("doctorId")?.value
-    const dateStr = this.appointmentForm.get("date")?.value
+  const doctorId = this.appointmentForm.get("doctorId")?.value;
+  const dateStr = this.appointmentForm.get("date")?.value;
 
-    if (doctorId && dateStr) {
-      this.loadAvailableTimeSlots(doctorId, dateStr)
-    }
-  }
+  if (doctorId && dateStr) {
+    // 1️⃣ Get available slots
+    this.doctorAvailabilityService.getAvailableTimeSlots(doctorId, dateStr).subscribe({
+      next: (slots) => {
+        console.log("Available slots from availability service:", slots);
+        // 2️⃣ Get taken appointments
+        this.appointmentService.getTakenAppointments(doctorId, dateStr).subscribe({
+          next: (takenSlots) => {
+            console.log("Taken slots from appointment service:", takenSlots);
+            // 3️⃣ Remove taken slots from available slots
+            this.availableTimeSlots = slots.filter(slot => !takenSlots.includes(slot));
+          },
+          error: (err) => {
 
-  loadAvailableTimeSlots(doctorId: number, date: string): void {
-    // This would typically call a backend service to get available time slots
-    // For now, we'll generate some sample time slots
-    const selectedDate = new Date(date)
-    const today = new Date()
-    
-    // Generate time slots from 9 AM to 5 PM in 30-minute intervals
-    const timeSlots = []
-    for (let hour = 9; hour <= 17; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) {
-        if (hour === 17 && minute > 0) break; // No appointments after 5 PM
-        
-        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
-        timeSlots.push(timeString)
+            console.error("Error fetching taken appointments", err);
+            this.availableTimeSlots = slots; // fallback
+          }
+        });
+      },
+      error: (err) => {
+        console.error("Error fetching available slots", err);
+        this.availableTimeSlots = [];
       }
-    }
-    
-    this.availableTimeSlots = timeSlots
+    });
   }
+}
+
+
+  loadAvailableTimeSlots(doctorId: string, date: string): void {
+  this.availableTimeSlots = [];
+
+  this.doctorAvailabilityService.getAvailableTimeSlots(doctorId, date).subscribe({
+    next: (slots) => {
+      this.availableTimeSlots = slots;
+      console.log("Available time slots:", this.availableTimeSlots);
+    },
+    error: (error) => {
+      console.error("Error fetching slots:", error);
+      this.availableTimeSlots = [];
+    }
+  });
+}
+
 
   nextStep(): void {
     if (this.currentStep === 1 && this.appointmentForm.get('doctorId')?.valid && this.appointmentForm.get('serviceId')?.valid) {

@@ -11,10 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -27,44 +30,24 @@ public class AppointmentService {
 
     public Appointment makeAppointment(AppointmentDto dto,String token) {
 
-        log.info("stat make appointment");
+        log.info("start make appointment");
         // Format dateTime pour URL
+        log.info("appointment dto: {}", dto.getDateTime());
         String formattedDate = dto.getDateTime()
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
-
-        Boolean isAvailable = webClient.get()
-                .uri("http://localhost:8087/api/v1/doctor/availability/isAvailable/{id}/{dateTime}",
-                        dto.getDoctorId(), formattedDate)
-                .header("Authorization", "Bearer " + token)
-                .retrieve()
-                .bodyToMono(Boolean.class)
-                .onErrorResume(ex -> {
-                    log.error("Error calling Doctor Service:", ex);
-                    return Mono.just(false);
-                })
-                .block();
-
-        log.info(isAvailable.toString());
-
-
-
-
+        log.info("formatted date: " + formattedDate);
         Appointment appointment = new Appointment();
         appointment.setDescription(dto.getDescription());
         appointment.setDoctorId(dto.getDoctorId());
         appointment.setPatientId(dto.getPatientId());
         appointment.setDateTime(dto.getDateTime());
 
-        boolean exists = appointmentRepository.existsByDoctorIdAndDateTime(
-                dto.getDoctorId(),
-                dto.getDateTime()
-        );
 
-        if (Boolean.TRUE.equals(isAvailable) && !exists) {
+
+
             return appointmentRepository.save(appointment);
-        } else {
-            throw new IllegalArgumentException("Doctor is not available");
-        }
+
+
 
     }
 
@@ -100,5 +83,19 @@ public class AppointmentService {
 
         return  appointmentRepository.getDateTimeByDoctorId(doctorId);
 
+    }
+
+
+    public List<String> getTakenAppointments(UUID doctorId, LocalDate date) {
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+
+        List<Appointment> takenAppointments = appointmentRepository
+                .findByDoctorIdAndDateTimeBetween(doctorId, startOfDay, endOfDay);
+
+        return takenAppointments.stream()
+                .map(a -> a.getDateTime().toLocalTime().toString()) // extract time only
+                .sorted()
+                .collect(Collectors.toList());
     }
 }

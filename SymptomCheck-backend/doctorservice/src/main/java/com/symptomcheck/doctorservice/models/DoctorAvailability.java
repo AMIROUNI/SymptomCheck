@@ -23,7 +23,7 @@ public class DoctorAvailability {
     @CollectionTable(name = "availability_days", joinColumns = @JoinColumn(name = "availability_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "day_of_week")
-    private List<DayOfWeek> daysOfWeek; // Liste de jours
+    private List<DayOfWeek> daysOfWeek;
     @NotNull
     private LocalTime startTime;
     @NotNull

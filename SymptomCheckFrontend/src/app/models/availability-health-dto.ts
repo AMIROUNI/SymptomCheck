@@ -2,7 +2,7 @@
 
 export interface AvailabilityHealthDto {
   doctorId: string;
-  dayOfWeek: string[];
+  daysOfWeek: string[];
   startTime: string;
   endTime: string;
   name?: string;
