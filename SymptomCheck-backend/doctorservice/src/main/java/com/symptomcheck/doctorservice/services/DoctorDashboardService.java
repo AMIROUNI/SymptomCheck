@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -87,9 +88,14 @@ public class DoctorDashboardService {
     }
 
     private DoctorAvailabilityDTO convertToAvailabilityDTO(DoctorAvailability availability) {
+        // Convertir la liste des jours en String
+        String daysString = availability.getDaysOfWeek().stream()
+                .map(DayOfWeek::name)
+                .collect(Collectors.joining(", "));
+
         return new DoctorAvailabilityDTO(
                 availability.getId().toString(),
-                availability.getDayOfWeek().name(),
+                daysString, // Utiliser la chaîne de jours
                 availability.getStartTime().toString(),
                 availability.getEndTime().toString(),
                 true
@@ -105,7 +111,6 @@ public class DoctorDashboardService {
 
         return (completedItems * 100) / totalItems;
     }
-
     // Méthodes supplémentaires pour le dashboard
     public List<String> getServiceCategories(UUID doctorId) {
         return healthcareServiceRepository.findCategoriesByDoctorId(doctorId);

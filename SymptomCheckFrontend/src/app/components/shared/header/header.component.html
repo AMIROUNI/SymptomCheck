@@ -1,4 +1,4 @@
-<header class="site-header">
+<header class="site-header"   *ngIf="!isAdmin()">
   <div class="container">
     <div class="header-content">
       <div class="logo">
@@ -46,7 +46,7 @@
           </button>
           <div class="dropdown-menu">
             <!-- Dynamic Dashboard Link -->
-            <a routerLink="doctor-dashboard" class="dropdown-item">
+            <a *ngIf="isDoctor()" routerLink="doctor-dashboard" class="dropdown-item">
               <i class="fas fa-tachometer-alt"></i> {{ getDashboardName() }}
             </a>
 
@@ -67,7 +67,7 @@
 
             <!-- Doctor-specific Links -->
             <ng-container *ngIf="isDoctor()">
-              <a routerLink="/doctor/appointments" class="dropdown-item">
+              <a routerLink="/dashboard/appointments" class="dropdown-item">
                 <i class="fas fa-calendar-alt"></i> Appointments
               </a>
               <a routerLink="/doctor/patients" class="dropdown-item">

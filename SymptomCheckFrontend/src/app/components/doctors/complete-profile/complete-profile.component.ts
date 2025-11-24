@@ -15,13 +15,22 @@ export class CompleteProfileComponent implements OnInit {
   profileForm!: FormGroup;
   loading = false;
   errorMessage = '';
+  daysOfWeek = [
+    { label: 'Lundi', value: 'MONDAY' },
+    { label: 'Mardi', value: 'TUESDAY' },
+    { label: 'Mercredi', value: 'WEDNESDAY' },
+    { label: 'Jeudi', value: 'THURSDAY' },
+    { label: 'Vendredi', value: 'FRIDAY' },
+    { label: 'Samedi', value: 'SATURDAY' },
+    { label: 'Dimanche', value: 'SUNDAY' }
+  ];
 
-  private doctorApiUrl = 'http://localhost:8083/api/v1/doctor/profile'; // backend doctor-service
+  private doctorApiUrl = 'http://localhost:8083/api/v1/doctor/profile';
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router,
+    public router: Router, // ✅ Rendre public pour le template
     private http: HttpClient
   ) {}
 
@@ -46,6 +55,9 @@ export class CompleteProfileComponent implements OnInit {
         clinicId: currentUser.clinicId || ''
       });
     }
+
+    // Ajouter une disponibilité par défaut
+    this.addAvailability();
   }
 
   get availabilities(): FormArray {
@@ -57,11 +69,13 @@ export class CompleteProfileComponent implements OnInit {
   }
 
   addAvailability() {
-    this.availabilities.push(this.fb.group({
-      day: [0, Validators.required],
-      startTime: ['', Validators.required],
-      endTime: ['', Validators.required]
-    }));
+    this.availabilities.push(
+      this.fb.group({
+        days: [[], Validators.required],
+        startTime: ['09:00', Validators.required],
+        endTime: ['17:00', Validators.required]
+      })
+    );
   }
 
   removeAvailability(index: number) {
@@ -74,8 +88,8 @@ export class CompleteProfileComponent implements OnInit {
       description: [''],
       category: [''],
       imageUrl: [''],
-      price: [0],
-      durationMinutes: [30, Validators.required]
+      price: [0, [Validators.required, Validators.min(0)]],
+      durationMinutes: [30, [Validators.required, Validators.min(1)]]
     }));
   }
 
@@ -83,13 +97,43 @@ export class CompleteProfileComponent implements OnInit {
     this.services.removeAt(index);
   }
 
+  toggleDay(index: number, day: string, event: any) {
+    const daysArray = this.availabilities.at(index).get('days')!.value as string[];
+    
+    if (event.target.checked) {
+      if (!daysArray.includes(day)) {
+        daysArray.push(day);
+      }
+    } else {
+      const idx = daysArray.indexOf(day);
+      if (idx !== -1) {
+        daysArray.splice(idx, 1);
+      }
+    }
+    
+    this.availabilities.at(index).get('days')!.setValue([...daysArray]);
+  }
+
+  isDaySelected(index: number, day: string): boolean {
+    const daysArray = this.availabilities.at(index).get('days')!.value as string[];
+    return daysArray.includes(day);
+  }
+
   submitForm() {
-    if (this.profileForm.invalid) return;
+    if (this.profileForm.invalid) {
+      this.markFormGroupTouched(this.profileForm);
+      return;
+    }
 
     this.loading = true;
-    const doctorData = this.profileForm.value as DoctorProfileStatusDTO & {
-      availabilities: any[],
-      services: any[]
+    const formData = this.profileForm.value;
+
+    const doctorData = {
+      ...formData,
+      availabilities: formData.availabilities.map((avail: any) => ({
+        ...avail,
+        daysOfWeek: avail.days
+      }))
     };
 
     const currentUser = this.authService.getCurrentUser();
@@ -104,7 +148,7 @@ export class CompleteProfileComponent implements OnInit {
         next: () => {
           this.loading = false;
           this.authService.loadCurrentUser();
-          this.router.navigate(['/home']);
+          this.router.navigate(['/doctor/dashboard']);
         },
         error: (err) => {
           console.error('Erreur mise à jour profil:', err);
@@ -112,5 +156,29 @@ export class CompleteProfileComponent implements OnInit {
           this.loading = false;
         }
       });
+  }
+
+  private markFormGroupTouched(formGroup: FormGroup) {
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.get(key);
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      } else if (control instanceof FormArray) {
+        control.controls.forEach((arrayControl: any) => {
+          if (arrayControl instanceof FormGroup) {
+            this.markFormGroupTouched(arrayControl);
+          } else {
+            arrayControl.markAsTouched();
+          }
+        });
+      } else {
+        control?.markAsTouched();
+      }
+    });
+  }
+
+  // ✅ Ajouter la méthode pour naviguer
+  navigateToDashboard() {
+    this.router.navigate(['/dashboard']);
   }
 }

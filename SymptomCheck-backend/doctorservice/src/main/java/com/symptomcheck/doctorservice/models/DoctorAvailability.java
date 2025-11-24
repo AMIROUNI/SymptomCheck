@@ -6,6 +6,7 @@ import lombok.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -18,7 +19,11 @@ public class DoctorAvailability {
 
     private UUID doctorId;
     @NotNull
-    private  DayOfWeek dayOfWeek;
+    @ElementCollection
+    @CollectionTable(name = "availability_days", joinColumns = @JoinColumn(name = "availability_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "day_of_week")
+    private List<DayOfWeek> daysOfWeek;
     @NotNull
     private LocalTime startTime;
     @NotNull

@@ -13,6 +13,7 @@ import com.symptomcheck.doctorservice.repositories.HealthcareServiceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -120,9 +121,15 @@ public class AdminDashboardService {
     }
 
     private AvailabilityDto convertToAvailabilityDto(DoctorAvailability availability) {
-       AvailabilityDto dto = new AvailabilityDto();
+        AvailabilityDto dto = new AvailabilityDto();
         dto.setId(availability.getId());
-        dto.setDayOfWeek(availability.getDayOfWeek().name());
+
+        // Convertir la liste des jours en String
+        String daysString = availability.getDaysOfWeek().stream()
+                .map(DayOfWeek::name)
+                .collect(Collectors.joining(", "));
+        dto.setDayOfWeek(daysString);
+
         dto.setStartTime(availability.getStartTime().toString());
         dto.setEndTime(availability.getEndTime().toString());
         return dto;

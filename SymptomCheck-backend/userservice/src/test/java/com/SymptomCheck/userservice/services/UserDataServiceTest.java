@@ -62,7 +62,7 @@ class UserDataServiceTest {
             assertTrue(result.isPresent());
             assertEquals("abc123", result.get().getId());
             assertEquals("Cardiology", result.get().getSpeciality());
-            assertTrue(result.get().isProfileComplete());
+            assertTrue(result.get().getProfileComplete());
 
             verify(userDataRepository, times(1)).findById(id);
         }

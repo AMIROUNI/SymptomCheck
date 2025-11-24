@@ -45,38 +45,31 @@
           <!-- Step 1: Doctor & Service Selection -->
           <div *ngIf="currentStep === 1" class="form-step">
             <h2>Select Doctor & Service</h2>
-            
+
             <div class="form-group">
               <label for="doctorId" class="form-label">Select Doctor</label>
-              <select
-                id="doctorId"
-                formControlName="doctorId"
-                class="form-select"
-                (change)="onDoctorChange()"
-              >
+              <select id="doctorId" formControlName="doctorId" class="form-select" (change)="onDoctorChange()">
                 <option value="">-- Select a Doctor --</option>
                 <option *ngFor="let doctor of doctors" [value]="doctor.id">
                   Dr. {{ doctor.firstName }} {{ doctor.lastName }} ({{ doctor.speciality }})
                 </option>
               </select>
-              <div *ngIf="appointmentForm.get('doctorId')?.invalid && appointmentForm.get('doctorId')?.touched" class="error-text">
+              <div *ngIf="appointmentForm.get('doctorId')?.invalid && appointmentForm.get('doctorId')?.touched"
+                class="error-text">
                 Please select a doctor
               </div>
             </div>
 
             <div class="form-group">
               <label for="serviceId" class="form-label">Select Service</label>
-              <select
-                id="serviceId"
-                formControlName="serviceId"
-                class="form-select"
-              >
+              <select id="serviceId" formControlName="serviceId" class="form-select">
                 <option value="">-- Select a Service --</option>
                 <option *ngFor="let service of filteredServices" [value]="service.id">
                   {{ service.name }} (${{ service.price }} - {{ service.durationMinutes }} min)
                 </option>
               </select>
-              <div *ngIf="appointmentForm.get('serviceId')?.invalid && appointmentForm.get('serviceId')?.touched" class="error-text">
+              <div *ngIf="appointmentForm.get('serviceId')?.invalid && appointmentForm.get('serviceId')?.touched"
+                class="error-text">
                 Please select a service
               </div>
               <div *ngIf="filteredServices.length === 0 && appointmentForm.get('doctorId')?.value" class="warning-text">
@@ -86,8 +79,8 @@
             </div>
 
             <div class="step-actions">
-              <button type="button" class="btn btn-primary" (click)="nextStep()" 
-                      [disabled]="!appointmentForm.get('doctorId')?.valid || !appointmentForm.get('serviceId')?.valid">
+              <button type="button" class="btn btn-primary" (click)="nextStep()"
+                [disabled]="!appointmentForm.get('doctorId')?.valid || !appointmentForm.get('serviceId')?.valid">
                 Next: Date & Time
               </button>
             </div>
@@ -96,18 +89,13 @@
           <!-- Step 2: Date & Time Selection -->
           <div *ngIf="currentStep === 2" class="form-step">
             <h2>Select Date & Time</h2>
-            
+
             <div class="form-group">
               <label for="date" class="form-label">Select Date</label>
-              <input
-                type="date"
-                id="date"
-                formControlName="date"
-                class="form-control"
-                [min]="minDate.toISOString().split('T')[0]"
-                (change)="onDateChange()"
-              >
-              <div *ngIf="appointmentForm.get('date')?.invalid && appointmentForm.get('date')?.touched" class="error-text">
+              <input type="date" id="date" formControlName="date" class="form-control"
+                [min]="minDate.toISOString().split('T')[0]" (change)="onDateChange()">
+              <div *ngIf="appointmentForm.get('date')?.invalid && appointmentForm.get('date')?.touched"
+                class="error-text">
                 Please select a date
               </div>
             </div>
@@ -115,19 +103,18 @@
             <div class="form-group">
               <label for="time" class="form-label">Select Time</label>
               <div class="time-slots" *ngIf="availableTimeSlots.length > 0">
-                <div 
-                  *ngFor="let timeSlot of availableTimeSlots" 
-                  class="time-slot"
+                <div *ngFor="let timeSlot of availableTimeSlots" class="time-slot"
                   [class.selected]="appointmentForm.get('time')?.value === timeSlot"
-                  (click)="appointmentForm.get('time')?.setValue(timeSlot)"
-                >
+                  (click)="appointmentForm.get('time')?.setValue(timeSlot)">
                   {{ timeSlot }}
                 </div>
               </div>
               <div *ngIf="availableTimeSlots.length === 0 && appointmentForm.get('date')?.value" class="info-text">
-                Please select a date to see available time slots
+                No available time slots for this date.
               </div>
-              <div *ngIf="appointmentForm.get('time')?.invalid && appointmentForm.get('time')?.touched" class="error-text">
+
+              <div *ngIf="appointmentForm.get('time')?.invalid && appointmentForm.get('time')?.touched"
+                class="error-text">
                 Please select a time
               </div>
             </div>
@@ -136,8 +123,8 @@
               <button type="button" class="btn btn-secondary" (click)="prevStep()">
                 Back
               </button>
-              <button type="button" class="btn btn-primary" (click)="nextStep()" 
-                      [disabled]="!appointmentForm.get('date')?.valid || !appointmentForm.get('time')?.valid">
+              <button type="button" class="btn btn-primary" (click)="nextStep()"
+                [disabled]="!appointmentForm.get('date')?.valid || !appointmentForm.get('time')?.valid">
                 Next: Details
               </button>
             </div>
@@ -146,7 +133,7 @@
           <!-- Step 3: Appointment Details -->
           <div *ngIf="currentStep === 3" class="form-step">
             <h2>Appointment Details</h2>
-            
+
             <div class="appointment-summary">
               <div class="summary-item">
                 <span class="summary-label">Doctor:</span>
@@ -170,19 +157,15 @@
 
             <div class="form-group">
               <label for="description" class="form-label">Reason for Visit</label>
-              <textarea
-                id="description"
-                formControlName="description"
-                class="form-control"
-                rows="4"
-                placeholder="Please describe your symptoms or reason for the appointment"
-              ></textarea>
+              <textarea id="description" formControlName="description" class="form-control" rows="4"
+                placeholder="Please describe your symptoms or reason for the appointment"></textarea>
               <div class="char-counter">
                 <span [class.over-limit]="appointmentForm.get('description')?.value?.length > 1000">
                   {{ appointmentForm.get('description')?.value?.length || 0 }}/1000
                 </span>
               </div>
-              <div *ngIf="appointmentForm.get('description')?.invalid && appointmentForm.get('description')?.touched" class="error-text">
+              <div *ngIf="appointmentForm.get('description')?.invalid && appointmentForm.get('description')?.touched"
+                class="error-text">
                 Please provide a reason for your visit (max 1000 characters)
               </div>
             </div>
@@ -191,11 +174,7 @@
               <button type="button" class="btn btn-secondary" (click)="prevStep()">
                 Back
               </button>
-              <button
-                type="submit"
-                class="btn btn-primary"
-                [disabled]="appointmentForm.invalid || isSubmitting"
-              >
+              <button type="submit" class="btn btn-primary" [disabled]="appointmentForm.invalid || isSubmitting">
                 <span *ngIf="isSubmitting" class="spinner"></span>
                 {{ isSubmitting ? 'Booking...' : 'Confirm Appointment' }}
               </button>

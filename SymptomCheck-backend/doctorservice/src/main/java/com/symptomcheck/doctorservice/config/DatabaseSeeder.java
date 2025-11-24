@@ -10,7 +10,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.Optional;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -22,21 +23,25 @@ public class DatabaseSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
-        // --- CHECK AND CREATE DOCTOR PROFILE ---
         UUID doctorUuid = UUID.fromString("fc6274ff-730a-44f0-9245-17ada9054fe8");
 
-
-        // --- CHECK AND CREATE DOCTOR AVAILABILITY ---
-        boolean availabilityExists = availabilityRepository.existsByDoctorIdAndDayOfWeek(doctorUuid, DayOfWeek.MONDAY);
+        // --- CHECK AND CREATE DOCTOR AVAILABILITY WITH MULTIPLE DAYS ---
+        boolean availabilityExists = availabilityRepository.existsByDoctorId(doctorUuid);
         if (!availabilityExists) {
             DoctorAvailability availability = new DoctorAvailability();
             availability.setDoctorId(doctorUuid);
-            availability.setDayOfWeek(DayOfWeek.MONDAY);
+
+            // Liste des jours de travail
+            List<DayOfWeek> workingDays = Arrays.asList(
+                    DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY,
+                    DayOfWeek.THURSDAY, DayOfWeek.FRIDAY
+            );
+            availability.setDaysOfWeek(workingDays);
+
             availability.setStartTime(LocalTime.of(9, 0));
             availability.setEndTime(LocalTime.of(17, 0));
             availabilityRepository.save(availability);
-            System.out.println("Doctor availability created.");
+            System.out.println("Doctor availability with multiple days created.");
         } else {
             System.out.println("Doctor availability already exists.");
         }
