@@ -29,10 +29,11 @@
 
     <properties>
         <java.version>17</java.version>
-        <spring-boot.version>3.5.6</spring-boot.version> <!-- ✅ Corrigé pour correspondre au parent -->
+        <spring-boot.version>3.5.6</spring-boot.version>
         <springdoc.version>2.5.0</springdoc.version>
         <jakarta.validation.version>3.0.2</jakarta.validation.version>
-        <keycloak.version>24.0.5</keycloak.version> <!-- ✅ Ajouté pour Keycloak -->
+        <keycloak.version>24.0.5</keycloak.version>
+        <jacoco.version>0.8.11</jacoco.version> <!-- ✅ Added JaCoCo version -->
     </properties>
 
     <!--  Centralized dependency management -->
@@ -128,18 +129,58 @@
     </dependencyManagement>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <!-- ✅ JaCoCo Maven Plugin - Centralized configuration -->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                        <!-- Optional: Aggregate report for all modules -->
+                        <execution>
+                            <id>report-aggregate</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>report-aggregate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <!-- Spring Boot Maven Plugin -->
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <configuration>
+                        <excludes>
+                            <exclude>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                            </exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
         <plugins>
+            <!-- ✅ Apply JaCoCo to all modules -->
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
