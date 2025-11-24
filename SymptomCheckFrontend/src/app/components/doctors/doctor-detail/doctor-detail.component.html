@@ -1,3 +1,4 @@
+<!-- doctor-detail.component.html -->
 <div *ngIf="isLoading">Loading...</div>
 <div *ngIf="error">{{ error }}</div>
 
@@ -5,8 +6,7 @@
   <div class="doctor-profile">
     <div class="left-section">
       <img
-        *ngIf="doctor?.profilePhotoUrl"
-         [src]="getUserImage(doctor?.profilePhotoUrl)"
+        [src]="getUserImage(doctor?.profilePhotoUrl)"
         alt="Doctor's photo"
         class="profile-photo"
       />
@@ -15,10 +15,15 @@
       <h2 class="doctor-name">
         {{ doctor.firstName }} {{ doctor.lastName }}
       </h2>
+      
+      <!-- Section Rating avec statistiques -->
       <div class="rating-section">
         <app-star-rating [rating]="averageRating" [readOnly]="true"></app-star-rating>
-        <span class="rating-text">{{ averageRating | number:'1.1-1' }} ({{ reviews.length }} reviews)</span>
+        <span class="rating-text">
+          {{ averageRating | number:'1.1-1' }} ({{ totalReviews }} reviews)
+        </span>
       </div>
+
       <div class="doctor-info">
         <p><i class="fas fa-user-md"></i> <strong>Speciality:</strong> {{ doctor.speciality }}</p>
         <p><i class="fas fa-envelope"></i> <strong>Email:</strong> {{ doctor.email }}</p>
@@ -28,20 +33,43 @@
         <p *ngIf="doctor.clinicId"><i class="fas fa-clinic-medical"></i> <strong>Clinic ID:</strong> {{ doctor.clinicId }}</p>
       </div>
 
-      <button class="btn btn-primary" (click)="toggleReviewForm()">
-        {{ showReviewForm ? 'Cancel' : 'Leave a Review' }}
-      </button>
+      <!-- Bouton Review pour les patients seulement -->
+      <div *ngIf="currentUser?.role === 'PATIENT'" class="review-actions">
+        <button 
+          class="btn btn-primary" 
+          (click)="toggleReviewForm()"
+          *ngIf="!hasUserReviewed; else editReview">
+          Leave a Review
+        </button>
+        
+        <ng-template #editReview>
+          <div class="user-review-actions">
+            <button class="btn btn-outline-primary" (click)="toggleReviewForm()">
+              Edit Your Review
+            </button>
+            <button class="btn btn-outline-danger" (click)="deleteReview()">
+              Delete Review
+            </button>
+          </div>
+        </ng-template>
+      </div>
 
+      <!-- Formulaire de review -->
       <div *ngIf="showReviewForm" class="review-form">
-        <h3>Write a Review</h3>
+        <h3>{{ hasUserReviewed ? 'Edit Your Review' : 'Write a Review' }}</h3>
         <form [formGroup]="reviewForm" (ngSubmit)="submitReview()">
           <div class="form-group">
             <label>Rating:</label>
             <app-star-rating
-              formControlName="stars"
+              formControlName="rating"
               [readOnly]="false">
             </app-star-rating>
+            <div *ngIf="reviewForm.get('rating')?.invalid && reviewForm.get('rating')?.touched" 
+                 class="error-message">
+              Rating is required
+            </div>
           </div>
+          
           <div class="form-group">
             <label for="comment">Comment:</label>
             <textarea
@@ -49,27 +77,66 @@
               formControlName="comment"
               class="form-control"
               rows="4"
-              placeholder="Share your experience with this doctor..."></textarea>
+              placeholder="Share your experience with this doctor..."
+              maxlength="2000"></textarea>
+            <div class="char-count">
+              {{ reviewForm.get('comment')?.value?.length || 0 }}/2000
+            </div>
+            <div *ngIf="reviewForm.get('comment')?.invalid && reviewForm.get('comment')?.touched" 
+                 class="error-message">
+              <span *ngIf="reviewForm.get('comment')?.errors?.['required']">Comment is required</span>
+              <span *ngIf="reviewForm.get('comment')?.errors?.['maxlength']">Comment must be less than 2000 characters</span>
+            </div>
           </div>
-          <button
-            type="submit"
-            class="btn btn-primary"
-            [disabled]="!reviewForm.valid">
-            Submit Review
-          </button>
+          
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="reviewForm.invalid">
+              {{ hasUserReviewed ? 'Update Review' : 'Submit Review' }}
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="toggleReviewForm()">
+              Cancel
+            </button>
+          </div>
         </form>
       </div>
     </div>
   </div>
 
-  <div class="reviews-section" *ngIf="reviews.length">
-    <h3>Patient Reviews</h3>
-    <div class="review-card" *ngFor="let review of reviews">
+  <!-- Section des reviews -->
+  <div class="reviews-section" *ngIf="reviews.length > 0">
+    <h3>Patient Reviews ({{ totalReviews }})</h3>
+    
+    <!-- Review de l'utilisateur courant -->
+    <div *ngIf="userReview" class="review-card user-review">
       <div class="review-header">
-        <app-star-rating [rating]="review.stars" [readOnly]="true"></app-star-rating>
-        <span class="review-date">{{ review.datePosted | date:'mediumDate' }}</span>
+        <div class="review-rating">
+          <app-star-rating [rating]="userReview.rating" [readOnly]="true"></app-star-rating>
+          <span class="review-label">Your Review</span>
+        </div>
+        <span class="review-date">{{ formatDate(userReview.datePosted) }}</span>
       </div>
-      <p class="review-comment">{{ review.comment }}</p>
+      <p class="review-comment">{{ userReview.comment }}</p>
     </div>
+
+    <!-- Autres reviews (exclure le review de l'utilisateur) -->
+    <div class="review-card" *ngFor="let review of reviews">
+      <div *ngIf="!userReview || review.id !== userReview.id" class="review-header">
+        <app-star-rating [rating]="review.rating" [readOnly]="true"></app-star-rating>
+        <span class="review-date">{{ formatDate(review.datePosted) }}</span>
+      </div>
+      <p *ngIf="!userReview || review.id !== userReview.id" class="review-comment">
+        {{ review.comment }}
+      </p>
+    </div>
+  </div>
+
+  <div *ngIf="reviews.length === 0" class="no-reviews">
+    <p>No reviews yet. Be the first to review this doctor!</p>
   </div>
 </div>
