@@ -1,6 +1,14 @@
 <!-- doctor-detail.component.html -->
-<div *ngIf="isLoading">Loading...</div>
-<div *ngIf="error">{{ error }}</div>
+<div *ngIf="isLoading" class="loading-container">
+  <div class="loading-spinner"></div>
+  <p>Loading doctor information...</p>
+</div>
+
+<div *ngIf="error" class="error-container">
+  <div class="error-icon">⚠️</div>
+  <p class="error-message">{{ error }}</p>
+  <button class="btn btn-secondary" routerLink="/doctors">Back to Doctors</button>
+</div>
 
 <div *ngIf="doctor && !isLoading" class="doctor-detail-container">
   <div class="doctor-profile">
@@ -34,21 +42,21 @@
       </div>
 
       <!-- Bouton Review pour les patients seulement -->
-      <div *ngIf="currentUser?.role === 'PATIENT'" class="review-actions">
+      <div *ngIf="currentUser?.roles?.includes(UserRole.PATIENT)" class="review-actions">
         <button 
           class="btn btn-primary" 
           (click)="toggleReviewForm()"
           *ngIf="!hasUserReviewed; else editReview">
-          Leave a Review
+          <i class="fas fa-edit"></i> Leave a Review
         </button>
         
         <ng-template #editReview>
           <div class="user-review-actions">
             <button class="btn btn-outline-primary" (click)="toggleReviewForm()">
-              Edit Your Review
+              <i class="fas fa-edit"></i> Edit Your Review
             </button>
             <button class="btn btn-outline-danger" (click)="deleteReview()">
-              Delete Review
+              <i class="fas fa-trash"></i> Delete Review
             </button>
           </div>
         </ng-template>
@@ -79,8 +87,10 @@
               rows="4"
               placeholder="Share your experience with this doctor..."
               maxlength="2000"></textarea>
-            <div class="char-count">
-              {{ reviewForm.get('comment')?.value?.length || 0 }}/2000
+            <div class="char-count" 
+                 [class.near-limit]="isNearLimit"
+                 [class.over-limit]="isOverLimit">
+              {{ commentLength }}/2000
             </div>
             <div *ngIf="reviewForm.get('comment')?.invalid && reviewForm.get('comment')?.touched" 
                  class="error-message">
@@ -93,7 +103,7 @@
             <button
               type="submit"
               class="btn btn-primary"
-              [disabled]="reviewForm.invalid">
+              [disabled]="reviewForm.invalid || isOverLimit">
               {{ hasUserReviewed ? 'Update Review' : 'Submit Review' }}
             </button>
             <button
@@ -117,7 +127,7 @@
       <div class="review-header">
         <div class="review-rating">
           <app-star-rating [rating]="userReview.rating" [readOnly]="true"></app-star-rating>
-          <span class="review-label">Your Review</span>
+         <!-- <span class="review-label">Your Review</span>-->
         </div>
         <span class="review-date">{{ formatDate(userReview.datePosted) }}</span>
       </div>
@@ -125,18 +135,26 @@
     </div>
 
     <!-- Autres reviews (exclure le review de l'utilisateur) -->
-    <div class="review-card" *ngFor="let review of reviews">
-      <div *ngIf="!userReview || review.id !== userReview.id" class="review-header">
-        <app-star-rating [rating]="review.rating" [readOnly]="true"></app-star-rating>
-        <span class="review-date">{{ formatDate(review.datePosted) }}</span>
+    <div *ngFor="let review of reviews">
+      <div *ngIf="!userReview || review.id !== userReview.id" class="review-card">
+        <div class="review-header">
+          <app-star-rating [rating]="review.rating" [readOnly]="true"></app-star-rating>
+          <span class="review-date">{{ formatDate(review.datePosted) }}</span>
+        </div>
+        <p class="review-comment">
+          {{ review.comment }}
+        </p>
       </div>
-      <p *ngIf="!userReview || review.id !== userReview.id" class="review-comment">
-        {{ review.comment }}
-      </p>
     </div>
   </div>
 
-  <div *ngIf="reviews.length === 0" class="no-reviews">
+  <div *ngIf="reviews.length === 0 && !isLoading" class="no-reviews">
     <p>No reviews yet. Be the first to review this doctor!</p>
+    <button 
+      *ngIf="currentUser?.roles?.includes(UserRole.PATIENT) && !hasUserReviewed"
+      class="btn btn-primary" 
+      (click)="toggleReviewForm()">
+      Be the First to Review
+    </button>
   </div>
 </div>

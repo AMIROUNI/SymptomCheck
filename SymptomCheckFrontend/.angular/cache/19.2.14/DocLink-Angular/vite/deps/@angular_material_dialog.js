@@ -10,10 +10,17 @@ import {
   OverlayRef,
   PortalModule,
   TemplatePortal
+<<<<<<< HEAD
 } from "./chunk-FEU2CRPU.js";
 import {
   CdkScrollable
 } from "./chunk-CNXSYUBX.js";
+=======
+} from "./chunk-QKBBG5TN.js";
+import {
+  CdkScrollable
+} from "./chunk-GZWGXMEO.js";
+>>>>>>> e1f17c155b7f75b68cd0a68dea4fd8860f59fd7b
 import "./chunk-2VJG4NBP.js";
 import "./chunk-IBYU652R.js";
 import "./chunk-42FJBLFI.js";
@@ -28,6 +35,7 @@ import {
   _IdGenerator,
   _getFocusedElementPierceShadowDom,
   hasModifierKey
+<<<<<<< HEAD
 } from "./chunk-I3TOOHHD.js";
 import "./chunk-T7A2XIJF.js";
 import {
@@ -41,6 +49,21 @@ import "./chunk-QODMAC7P.js";
 import {
   DOCUMENT
 } from "./chunk-D4PSHWS4.js";
+=======
+} from "./chunk-7UYQUKYG.js";
+import {
+  Directionality
+} from "./chunk-NJ6V4T54.js";
+import "./chunk-T7A2XIJF.js";
+import {
+  Platform,
+  coerceNumberProperty
+} from "./chunk-XEZNIQBN.js";
+import "./chunk-V3NHMBNA.js";
+import {
+  DOCUMENT
+} from "./chunk-LW63EBUO.js";
+>>>>>>> e1f17c155b7f75b68cd0a68dea4fd8860f59fd7b
 import {
   ANIMATION_MODULE_TYPE,
   ChangeDetectionStrategy,
