@@ -1,11 +1,20 @@
+<<<<<<< HEAD
+=======
 import "./chunk-MYI4C4DP.js";
+>>>>>>> e1f17c155b7f75b68cd0a68dea4fd8860f59fd7b
 import {
   CdkScrollable,
   CdkScrollableModule,
   ScrollDispatcher,
   ViewportRuler
+<<<<<<< HEAD
+} from "./chunk-CNXSYUBX.js";
+import "./chunk-2VJG4NBP.js";
+import "./chunk-MYI4C4DP.js";
+=======
 } from "./chunk-GZWGXMEO.js";
 import "./chunk-2VJG4NBP.js";
+>>>>>>> e1f17c155b7f75b68cd0a68dea4fd8860f59fd7b
 import {
   coerceBooleanProperty
 } from "./chunk-IBYU652R.js";
@@ -18,6 +27,21 @@ import {
   InteractivityChecker,
   MatCommonModule,
   hasModifierKey
+<<<<<<< HEAD
+} from "./chunk-I3TOOHHD.js";
+import "./chunk-T7A2XIJF.js";
+import {
+  Directionality
+} from "./chunk-6DI5HFSH.js";
+import {
+  Platform,
+  coerceNumberProperty
+} from "./chunk-RO4UNA3H.js";
+import "./chunk-QODMAC7P.js";
+import {
+  DOCUMENT
+} from "./chunk-D4PSHWS4.js";
+=======
 } from "./chunk-7UYQUKYG.js";
 import {
   Directionality
@@ -31,6 +55,7 @@ import "./chunk-V3NHMBNA.js";
 import {
   DOCUMENT
 } from "./chunk-LW63EBUO.js";
+>>>>>>> e1f17c155b7f75b68cd0a68dea4fd8860f59fd7b
 import {
   ANIMATION_MODULE_TYPE,
   ChangeDetectionStrategy,

@@ -10,7 +10,7 @@ export enum AppointmentStatus {
 
 export interface Appointment {
   id?: number
-  dateTime: Date
+  dateTime: Date | string
   patientId: string
   patient?: User
   doctorId: string

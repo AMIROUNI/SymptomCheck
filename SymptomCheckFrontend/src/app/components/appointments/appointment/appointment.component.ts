@@ -221,52 +221,58 @@ export class AppointmentComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.appointmentForm.invalid) {
-      return
-    }
-
-    this.isSubmitting = true
-    this.errorMessage = ""
-    this.successMessage = ""
-
-    const formData = this.appointmentForm.value
-    const currentUser = this.authService.getCurrentUser()
-
-    if (!currentUser) {
-      this.errorMessage = "You must be logged in to book an appointment."
-      this.isSubmitting = false
-      return
-    }
-
-    // Create appointment date from selected date and time slot
-    const appointmentDate = new Date(formData.date)
-    const [hours, minutes] = formData.time.split(":").map(Number)
-    appointmentDate.setHours(hours, minutes)
-
-    const appointmentData: Appointment = {
-      dateTime: appointmentDate,
-      patientId: currentUser.id,
-      doctorId: formData.doctorId,
-      description: formData.description,
-    }
-    console.log("appointmentData:::::", appointmentData)
-
-    this.appointmentService.createAppointment(appointmentData).subscribe({
-      next: () => {
-        this.successMessage = "Appointment booked successfully!"
-        this.isSubmitting = false
-
-        // Redirect to dashboard after 2 seconds
-        setTimeout(() => {
-          this.router.navigate(["/dashboard/appointments"])
-        }, 2000)
-      },
-      error: (error) => {
-        this.errorMessage = error.message || "Failed to book appointment. Please try again."
-        this.isSubmitting = false
-      },
-    })
+  if (this.appointmentForm.invalid) {
+    return;
   }
+
+  this.isSubmitting = true;
+  this.errorMessage = "";
+  this.successMessage = "";
+
+  const formData = this.appointmentForm.value;
+  const currentUser = this.authService.getCurrentUser();
+
+  if (!currentUser) {
+    this.errorMessage = "You must be logged in to book an appointment.";
+    this.isSubmitting = false;
+    return;
+  }
+
+  // Build date + time into a single Date object (local time)
+  const appointmentDate = new Date(formData.date);
+  const [hours, minutes] = formData.time.split(":").map(Number);
+  appointmentDate.setHours(hours, minutes, 0, 0);
+  appointmentDate.setHours(appointmentDate.getHours() + 1);
+
+
+  // Convert to local datetime WITHOUT timezone
+  const localDateTime = appointmentDate.toISOString().slice(0, 19);
+
+  const appointmentData: Appointment = {
+    dateTime: localDateTime,
+    patientId: currentUser.id,
+    doctorId: formData.doctorId,
+    description: formData.description,
+  };
+
+  console.log("Sending appointmentData:", appointmentData);
+
+  this.appointmentService.createAppointment(appointmentData).subscribe({
+    next: () => {
+      this.successMessage = "Appointment booked successfully!";
+      this.isSubmitting = false;
+
+      setTimeout(() => {
+        this.router.navigate(["/dashboard/appointments"]);
+      }, 2000);
+    },
+    error: (error) => {
+      this.errorMessage = error.message || "Failed to book appointment. Please try again.";
+      this.isSubmitting = false;
+    },
+  });
+}
+
 
   formatAppointmentDateTime(): string {
     const dateStr = this.appointmentForm.get("date")?.value
