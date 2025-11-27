@@ -6,6 +6,7 @@ import com.symptomcheck.appointmentservice.services.AdminDashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.rmi.server.UID;
@@ -47,6 +48,7 @@ public class AdminDashboardController {
         return ResponseEntity.ok(adminDashboardService.getAppointmentsByDoctor(doctorId));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/appointments/{appointmentId}/status")
     public ResponseEntity<AdminAppointmentDto> updateAppointmentStatus(
             @PathVariable Long appointmentId,
