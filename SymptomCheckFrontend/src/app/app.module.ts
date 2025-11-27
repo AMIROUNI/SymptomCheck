@@ -65,6 +65,7 @@ import { PopupComponent } from "./components/shared/popup/popup.component";
 import { DoctorDashboardComponent } from './components/doctors/doctor-dashboard/doctor-dashboard.component';
 import { GenericChartComponent } from "./components/shared/dashboard-components/growth-chart/generic-chart.component";
 import { BarGrowthChartComponent } from "./components/shared/dashboard-components/bar-growth-chart/bar-growth-chart.component";
+import { ReviewService } from "./services/review.service";
 
 @NgModule({
   declarations: [
@@ -133,6 +134,7 @@ import { BarGrowthChartComponent } from "./components/shared/dashboard-component
 ],
   providers: [
     AuthGuard,
+    ReviewService,
     {
       provide: APP_INITIALIZER,
       useFactory: initializeKeycloak,

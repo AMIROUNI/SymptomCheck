@@ -2,8 +2,10 @@ package com.symptomcheck.clinicservice.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lombok.Getter;
 
 @Data
+@Getter
 public class MedicalClinicDto {
     @NotBlank
     private String name;

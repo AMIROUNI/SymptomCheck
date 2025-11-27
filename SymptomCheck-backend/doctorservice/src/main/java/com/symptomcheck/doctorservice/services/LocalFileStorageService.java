@@ -13,8 +13,15 @@ import java.nio.file.StandardCopyOption;
 
 @Service
 public class LocalFileStorageService {
+
     @Value("${app.upload-dir:uploads}")
     private String uploadDir;
+
+    // ✅ REMOVE this constructor - it's causing the injection problem
+    // @Autowired(required = false)
+    // public LocalFileStorageService(String uploadDir) {
+    //     this.uploadDir = uploadDir;
+    // }
 
     @PostConstruct
     public void init() throws IOException {
@@ -23,12 +30,24 @@ public class LocalFileStorageService {
     }
 
     public String store(MultipartFile file) throws IOException {
-        if(file != null){
-        String filename = System.currentTimeMillis() + "_" + Path.of(file.getOriginalFilename()).getFileName();
-        Path target = Paths.get(uploadDir).resolve(filename);
-        Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
-        return target.toString();
+        if (file == null) {
+            return "";
         }
-        return "";
+
+        try {
+            // ✅ FIX: Add .toString() to getFileName()
+            String filename = System.currentTimeMillis() + "_" +
+                    Path.of(file.getOriginalFilename()).getFileName().toString();
+
+            Path target = Paths.get(uploadDir).resolve(filename);
+
+            Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+
+            return target.toString();
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new IOException("Failed to store file", e);
+        }
     }
 }

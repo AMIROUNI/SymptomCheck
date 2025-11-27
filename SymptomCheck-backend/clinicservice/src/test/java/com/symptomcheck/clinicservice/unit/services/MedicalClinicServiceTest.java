@@ -1,14 +1,14 @@
-package com.symptomcheck.clinicservice.services;
+package com.symptomcheck.clinicservice.unit.services;
 
 import com.symptomcheck.clinicservice.dtos.MedicalClinicDto;
 import com.symptomcheck.clinicservice.models.MedicalClinic;
 import com.symptomcheck.clinicservice.repositories.MedicalClinicRepository;
+import com.symptomcheck.clinicservice.services.MedicalClinicService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -16,15 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.never;
-import static org.mockito.ArgumentMatchers.anyLong;
-
-
-
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @DisplayName("Medical clinic Unit Tests")
 @ExtendWith(MockitoExtension.class)
@@ -41,8 +34,6 @@ class MedicalClinicServiceTest {
 
     @BeforeEach
     void setUp() {
-
-
         medicalClinicDto = new MedicalClinicDto();
         medicalClinicDto.setName("City Clinic");
         medicalClinicDto.setAddress("123 Main Street");
@@ -68,16 +59,11 @@ class MedicalClinicServiceTest {
         @Test
         @DisplayName("should create a medical clinic successfully")
         void shouldCreateSuccessfully() {
-
-            // Given
             when(repository.save(any(MedicalClinic.class)))
                     .thenReturn(savedClinic);
 
-            // When
-            MedicalClinic result =
-                    medicalClinicServiceMock.createClinic(medicalClinicDto);
+            MedicalClinic result = medicalClinicServiceMock.createClinic(medicalClinicDto);
 
-            // Then
             assertNotNull(result);
             assertEquals(1L, result.getId());
             assertEquals("City Clinic", result.getName());
@@ -86,58 +72,61 @@ class MedicalClinicServiceTest {
             verify(repository).save(any(MedicalClinic.class));
         }
 
-
         @Test
         @DisplayName("should throw an exception when name is missing")
         void shouldThrowExceptionWhenNameIsMissing() {
-
-            // Given
-            medicalClinicDto.setName(null); // invalid
-
-            // When / Then
+            medicalClinicDto.setName(null);
             assertThrows(IllegalArgumentException.class, () ->
                     medicalClinicServiceMock.createClinic(medicalClinicDto)
             );
+            verify(repository, never()).save(any(MedicalClinic.class));
+        }
+
+        @Test
+        @DisplayName("should throw exception when name is blank")
+        void shouldThrowExceptionWhenNameIsBlank() {
+            medicalClinicDto.setName("   ");
+            assertThrows(IllegalArgumentException.class, () ->
+                    medicalClinicServiceMock.createClinic(medicalClinicDto)
+            );
+            verify(repository, never()).save(any(MedicalClinic.class));
         }
     }
+
     @Nested
-    @DisplayName("find bi id medical clinic tests")
+    @DisplayName("Find by ID medical clinic tests")
     class FindByIdMedicalClinicTests {
 
         @Test
         @DisplayName("should return a clinic when ID exists")
         void shouldReturnClinicWhenIdExists() {
-                // Given
-                when(repository.findById(1L)).thenReturn(Optional.of(savedClinic));
+            when(repository.findById(1L)).thenReturn(Optional.of(savedClinic));
 
-                // When
-                MedicalClinic result = medicalClinicServiceMock.getClinicById(1L);
+            MedicalClinic result = medicalClinicServiceMock.getClinicById(1L);
 
-                // Then
-                assertNotNull(result);
-                assertEquals(savedClinic.getId(), result.getId());
-                assertEquals(savedClinic.getName(), result.getName());
+            assertNotNull(result);
+            assertEquals(savedClinic.getId(), result.getId());
+            assertEquals(savedClinic.getName(), result.getName());
 
-                verify(repository).findById(1L);
-            }
-
-            @Test
-            @DisplayName("should throw exception when ID does not exist")
-            void shouldThrowExceptionWhenIdNotExists() {
-                // Given
-                when(repository.findById(2L)).thenReturn(Optional.empty());
-
-                // When
-                RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                        medicalClinicServiceMock.getClinicById(2L)
-                );
-                // Then
-
-                assertEquals("Clinic not found with id: 2", exception.getMessage());
-
-                verify(repository).findById(2L);
-            }
+            verify(repository).findById(1L);
         }
+
+        @Test
+        @DisplayName("should throw exception when ID does not exist")
+        void shouldThrowExceptionWhenIdNotExists() {
+            when(repository.findById(2L)).thenReturn(Optional.empty());
+
+            RuntimeException exception = assertThrows(RuntimeException.class, () ->
+                    medicalClinicServiceMock.getClinicById(2L)
+            );
+
+            assertEquals("Clinic not found with id: 2", exception.getMessage());
+            verify(repository).findById(2L);
+        }
+
+
+    }
+
     @Nested
     @DisplayName("Update clinic tests")
     class UpdateClinicTests {
@@ -145,11 +134,8 @@ class MedicalClinicServiceTest {
         @Test
         @DisplayName("should update a clinic successfully when ID exists")
         void shouldUpdateClinicSuccessfully() {
-            // Given
-            // existing clinic returned by getClinicById
             when(repository.findById(1L)).thenReturn(Optional.of(savedClinic));
 
-            // new clinic data to update
             MedicalClinic updatedData = new MedicalClinic();
             updatedData.setName("Updated Clinic");
             updatedData.setAddress("456 New Street");
@@ -158,7 +144,6 @@ class MedicalClinicServiceTest {
             updatedData.setCity("Sfax");
             updatedData.setCountry("Tunisia");
 
-            // mock repository.save to return the updated clinic
             MedicalClinic updatedClinic = new MedicalClinic();
             updatedClinic.setId(1L);
             updatedClinic.setName("Updated Clinic");
@@ -170,10 +155,8 @@ class MedicalClinicServiceTest {
 
             when(repository.save(any(MedicalClinic.class))).thenReturn(updatedClinic);
 
-            // When
             MedicalClinic result = medicalClinicServiceMock.updateClinic(1L, updatedData);
 
-            // Then
             assertNotNull(result);
             assertEquals(1L, result.getId());
             assertEquals("Updated Clinic", result.getName());
@@ -189,13 +172,11 @@ class MedicalClinicServiceTest {
         @Test
         @DisplayName("should throw exception when updating a non-existing clinic")
         void shouldThrowExceptionWhenIdNotExists() {
-            // Given
             when(repository.findById(2L)).thenReturn(Optional.empty());
 
             MedicalClinic updatedData = new MedicalClinic();
             updatedData.setName("Updated Clinic");
 
-            // When / Then
             RuntimeException exception = assertThrows(RuntimeException.class, () ->
                     medicalClinicServiceMock.updateClinic(2L, updatedData)
             );
@@ -203,12 +184,14 @@ class MedicalClinicServiceTest {
             assertEquals("Clinic not found with id: 2", exception.getMessage());
 
             verify(repository).findById(2L);
-            // save should never be called
             verify(repository, never()).save(any(MedicalClinic.class));
         }
+
+
     }
+
     @Nested
-    @DisplayName("get all medical clinic tests")
+    @DisplayName("Get all medical clinic tests")
     class GetAllMedicalClinicTests {
         @Test
         @DisplayName("should return all clinics when list is not empty")
@@ -233,7 +216,20 @@ class MedicalClinicServiceTest {
             assertEquals("No clinics found in the database.", exception.getMessage());
         }
 
+        @Test
+        @DisplayName("should return multiple clinics")
+        void shouldReturnMultipleClinics() {
+            MedicalClinic c2 = new MedicalClinic();
+            c2.setId(2L);
+            c2.setName("Clinic Two");
+
+            when(repository.findAll()).thenReturn(List.of(savedClinic, c2));
+
+            List<MedicalClinic> result = medicalClinicServiceMock.getAllClinics();
+            assertEquals(2, result.size());
+        }
     }
+
     @Nested
     @DisplayName("Delete clinic tests")
     class DeleteClinicTests {
@@ -241,13 +237,10 @@ class MedicalClinicServiceTest {
         @Test
         @DisplayName("should delete a clinic successfully when ID exists")
         void shouldDeleteClinicSuccessfully() {
-            // Given
             when(repository.findById(1L)).thenReturn(Optional.of(savedClinic));
 
-            // When
             medicalClinicServiceMock.deleteClinic(1L);
 
-            // Then
             verify(repository).findById(1L);
             verify(repository).deleteById(1L);
         }
@@ -255,10 +248,8 @@ class MedicalClinicServiceTest {
         @Test
         @DisplayName("should throw exception when deleting non-existing clinic")
         void shouldThrowExceptionWhenIdNotExists() {
-            // Given
             when(repository.findById(2L)).thenReturn(Optional.empty());
 
-            // When / Then
             RuntimeException exception = assertThrows(RuntimeException.class, () ->
                     medicalClinicServiceMock.deleteClinic(2L)
             );
@@ -266,8 +257,19 @@ class MedicalClinicServiceTest {
             assertEquals("Clinic not found with id: 2", exception.getMessage());
 
             verify(repository).findById(2L);
-            // deleteById should never be called
             verify(repository, never()).deleteById(anyLong());
+        }
+
+        @Test
+        @DisplayName("should throw exception if deleteById fails")
+        void shouldThrowExceptionWhenDeleteFails() {
+            when(repository.findById(1L)).thenReturn(Optional.of(savedClinic));
+            doThrow(new RuntimeException("DB error")).when(repository).deleteById(1L);
+
+            RuntimeException ex = assertThrows(RuntimeException.class,
+                    () -> medicalClinicServiceMock.deleteClinic(1L));
+
+            assertEquals("DB error", ex.getMessage());
         }
     }
 }

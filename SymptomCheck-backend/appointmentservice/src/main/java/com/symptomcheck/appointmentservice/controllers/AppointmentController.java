@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,28 +59,44 @@ public class AppointmentController {
     }
 
     // version WebClient (appelle un autre microservice)
-    @GetMapping("/doctor/{doctorId}/remote")
-    @PreAuthorize("hasRole('Doctor')")
-    public ResponseEntity<List<Appointment>> getByDoctorRemote(
+
+
+
+
+
+    @GetMapping("/taken-appointments/{doctorId}")
+    public List<String> getTakenAppointments(
             @PathVariable UUID doctorId,
-            @AuthenticationPrincipal Jwt jwt
-    ) {
-        String token = jwt.getTokenValue();
-        List<Appointment> appointments = appointmentService.getByDoctorFromDoctorService(doctorId, token);
-        return ResponseEntity.ok(appointments);
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return appointmentService.getTakenAppointments(doctorId, date);
     }
 
-
-    @GetMapping("available-date/{doctorId}")
-    public ResponseEntity<?> getAvailableDate(
-            @PathVariable UUID doctorId
+    @GetMapping("{userId}")
+    public ResponseEntity<?> getByPatient(
+            @PathVariable UUID userId
     ) {
         try {
-            return ResponseEntity.ok().body(appointmentService.getAvailableDate(doctorId));
+            return ResponseEntity.ok().body(appointmentService.getByPatientId(userId));
         } catch (Exception ex) {
             return ResponseEntity.internalServerError().body(List.of());
         }
     }
+
+    @PutMapping("/{id}/status/{statusNumber}")
+    public ResponseEntity<Boolean> updateStatus(
+            @PathVariable Long id,
+            @PathVariable int statusNumber) {
+
+        try {
+            appointmentService.updateAppointmentStatus(id, statusNumber);
+            return ResponseEntity.ok(true);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.ok(false);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(false);
+        }
+    }
+
 
 
 }

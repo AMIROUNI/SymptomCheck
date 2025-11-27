@@ -9,7 +9,7 @@ import { environment } from "@/environments/environment"
   providedIn: "root",
 })
 export class AppointmentService {
-  
+
   private apiUrl = `${environment.appointmentApiUrl}`;
 
 
@@ -29,15 +29,22 @@ getByDoctorIde(doctorId: string): Observable<Appointment[]> {
 }
 
 
+getPatientAppointments(id:string): Observable<Appointment[]> {
+    return this.http.get<Appointment[]>(`${this.apiUrl}/${id}`);
+  }
 
+
+   updateAppointmentStatus(id: number, status: number): Observable<Appointment> {
+    return this.http.put<Appointment>(
+      `${this.apiUrl}/${id}/status/${status}`,{}
+    );
+  }
   //--------------------------------------------------------------------------------------//
 
   getAppointments(id:number): Observable<Appointment[]> {
     return this.http.get<Appointment[]>(`${this.apiUrl}/${id}`);
   }
-  getPatientAppointments(id:number): Observable<Appointment[]> {
-    return this.http.get<Appointment[]>(`${this.apiUrl}/patient/${id}`);
-  }
+
   getDoctorAppointments(id:string): Observable<Appointment[]> {
     return this.http.get<Appointment[]>(`${this.apiUrl}/doctor/${id}`);
   }
@@ -51,10 +58,15 @@ getByDoctorIde(doctorId: string): Observable<Appointment[]> {
      return this.http.post<Appointment>(`${this.apiUrl}/create`, appointmentData);
   }
 
-  updateAppointmentStatus(id: number, status: number): Observable<Appointment> {
-    return this.http.put<Appointment>(
-      `${this.apiUrl}/${id}`,status
-    );
+
+
+
+
+
+  ////////////////
+  getTakenAppointments(doctorId: string, date: string): Observable<string[]> {
+
+    return this.http.get<string[]>(`${this.apiUrl}/taken-appointments/${doctorId}?date=${date}`);
   }
 
 }
