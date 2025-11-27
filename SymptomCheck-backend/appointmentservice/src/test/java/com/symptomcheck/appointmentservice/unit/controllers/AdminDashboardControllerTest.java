@@ -1,4 +1,4 @@
-package com.symptomcheck.appointmentservice.controllers;
+package com.symptomcheck.appointmentservice.unit.controllers;
 
 import com.symptomcheck.appointmentservice.AppointmentserviceApplication;
 import org.junit.jupiter.api.BeforeEach;

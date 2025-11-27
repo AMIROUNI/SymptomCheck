@@ -1,6 +1,7 @@
-package com.symptomcheck.appointmentservice.models;
+package com.symptomcheck.appointmentservice.unit.models;
 
 import com.symptomcheck.appointmentservice.enums.AppointmentStatus;
+import com.symptomcheck.appointmentservice.models.Appointment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

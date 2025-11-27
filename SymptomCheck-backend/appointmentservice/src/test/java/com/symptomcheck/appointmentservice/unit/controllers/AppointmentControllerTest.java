@@ -1,5 +1,6 @@
-package com.symptomcheck.appointmentservice.controllers;
+package com.symptomcheck.appointmentservice.unit.controllers;
 
+import com.symptomcheck.appointmentservice.controllers.AppointmentController;
 import com.symptomcheck.appointmentservice.dtos.AppointmentDto;
 import com.symptomcheck.appointmentservice.models.Appointment;
 import com.symptomcheck.appointmentservice.services.AppointmentService;
@@ -115,52 +116,16 @@ class AppointmentControllerTest {
     }
 
 
-    // ----------------------------------------------------------
-    // GET BY DOCTOR REMOTE
-    // ----------------------------------------------------------
-    @Nested
-    class GetByDoctorRemoteTests {
-
-        @Test
-        void shouldReturnRemoteAppointments() {
-            List<Appointment> list = List.of(new Appointment());
-
-            when(appointmentService.getByDoctorFromDoctorService(doctorId, "fake-token"))
-                    .thenReturn(list);
-
-            ResponseEntity<List<Appointment>> response =
-                    controller.getByDoctorRemote(doctorId, jwt);
-
-            assertEquals(200, response.getStatusCodeValue());
-            assertEquals(1, response.getBody().size());
-        }
-    }
-
-
-    // ----------------------------------------------------------
-    // AVAILABLE DATE
-    // ----------------------------------------------------------
-    @Nested
-    class GetAvailableDateTests {
 
 
 
-        @Test
-        void shouldReturn500OnException() {
-            when(appointmentService.getAvailableDate(doctorId))
-                    .thenThrow(new RuntimeException("fail"));
-
-            ResponseEntity<?> response = controller.getAvailableDate(doctorId);
-
-            assertEquals(500, response.getStatusCodeValue());
-            assertEquals(List.of(), response.getBody());
-        }
-    }
 
 
-    // ----------------------------------------------------------
-    // TAKEN APPOINTMENTS
-    // ----------------------------------------------------------
+
+
+
+
+
     @Nested
     class GetTakenAppointmentsTests {
 
@@ -176,6 +141,77 @@ class AppointmentControllerTest {
 
             assertEquals(2, result.size());
             assertEquals("10:00", result.get(0));
+        }
+    }
+
+    @Nested
+    class UpdateStatus {
+
+        private final Long VALID_ID = 1L;
+        private final int VALID_STATUS = 2;
+
+        @Test
+        void shouldReturnTrueWhenUpdateIsSuccessful() {
+            // Act
+            ResponseEntity<Boolean> response = controller.updateStatus(VALID_ID, VALID_STATUS);
+
+            // Assert
+            assertTrue(response.getBody());
+            assertEquals(200, response.getStatusCodeValue());
+            verify(appointmentService).updateAppointmentStatus(VALID_ID, VALID_STATUS);
+        }
+
+        @Test
+        void shouldReturnFalseWhenIllegalArgumentExceptionIsThrown() {
+            // Arrange
+            doThrow(new IllegalArgumentException("Invalid status"))
+                    .when(appointmentService)
+                    .updateAppointmentStatus(VALID_ID, VALID_STATUS);
+
+            // Act
+            ResponseEntity<Boolean> response = controller.updateStatus(VALID_ID, VALID_STATUS);
+
+            // Assert
+            assertFalse(response.getBody());
+            assertEquals(200, response.getStatusCodeValue());
+            verify(appointmentService).updateAppointmentStatus(VALID_ID, VALID_STATUS);
+        }
+
+        @Test
+        void shouldReturnFalseWith500StatusCodeWhenGenericExceptionIsThrown() {
+            // Arrange
+            doThrow(new RuntimeException("Database error"))
+                    .when(appointmentService)
+                    .updateAppointmentStatus(VALID_ID, VALID_STATUS);
+
+            // Act
+            ResponseEntity<Boolean> response = controller.updateStatus(VALID_ID, VALID_STATUS);
+
+            // Assert
+            assertFalse(response.getBody());
+            assertEquals(500, response.getStatusCodeValue());
+            verify(appointmentService).updateAppointmentStatus(VALID_ID, VALID_STATUS);
+        }
+
+        @Test
+        void shouldHandleNullId() {
+            // Act
+            ResponseEntity<Boolean> response = controller.updateStatus(null, VALID_STATUS);
+
+            // Assert
+            assertNotNull(response);
+            // The actual behavior depends on how appointmentService handles null ID
+            // This test verifies the method doesn't throw an exception with null input
+        }
+
+        @Test
+        void shouldHandleNegativeStatusNumber() {
+            // Act
+            ResponseEntity<Boolean> response = controller.updateStatus(VALID_ID, -1);
+
+            // Assert
+            assertNotNull(response);
+            // The actual behavior depends on business logic validation
         }
     }
 }

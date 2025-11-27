@@ -59,28 +59,9 @@ public class AppointmentController {
     }
 
     // version WebClient (appelle un autre microservice)
-    @GetMapping("/doctor/{doctorId}/remote")
-    @PreAuthorize("hasRole('Doctor')")
-    public ResponseEntity<List<Appointment>> getByDoctorRemote(
-            @PathVariable UUID doctorId,
-            @AuthenticationPrincipal Jwt jwt
-    ) {
-        String token = jwt.getTokenValue();
-        List<Appointment> appointments = appointmentService.getByDoctorFromDoctorService(doctorId, token);
-        return ResponseEntity.ok(appointments);
-    }
 
 
-    @GetMapping("available-date/{doctorId}")
-    public ResponseEntity<?> getAvailableDate(
-            @PathVariable UUID doctorId
-    ) {
-        try {
-            return ResponseEntity.ok().body(appointmentService.getAvailableDate(doctorId));
-        } catch (Exception ex) {
-            return ResponseEntity.internalServerError().body(List.of());
-        }
-    }
+
 
 
     @GetMapping("/taken-appointments/{doctorId}")

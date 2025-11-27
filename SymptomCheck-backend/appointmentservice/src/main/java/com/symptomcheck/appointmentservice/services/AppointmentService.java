@@ -60,19 +60,6 @@ public class AppointmentService {
     }
 
     // méthode distante (si tu veux appeler un autre microservice)
-    public List<Appointment> getByDoctorFromDoctorService(UUID doctorId, String token) {
-        String doctorServiceUrl = "http://doctorservice:8082/api/doctors/" + doctorId + "/appointments";
-
-        return webClient.get()
-                .uri(doctorServiceUrl)
-                .header("Authorization", "Bearer " + token)
-                .retrieve()
-                .bodyToFlux(Appointment.class)
-                .collectList()
-                .block(); // pour simplifier en synchrone
-    }
-
-
 
     public  boolean isDoctorAvailable(UUID doctorId, LocalDateTime dateTime) {
         boolean exists= appointmentRepository.existsByDoctorIdAndDateTime(doctorId,dateTime);
@@ -104,7 +91,7 @@ public class AppointmentService {
         return appointmentRepository.findByPatientId(userId);
     }
 
-    public void updateAppointmentStatus(Long id, int statusNumber) {
+    public boolean updateAppointmentStatus(Long id, int statusNumber) {
 
 
         AppointmentStatus[] statuses = AppointmentStatus.values();
@@ -120,5 +107,6 @@ public class AppointmentService {
         if (updated == 0) {
             throw new IllegalArgumentException("Appointment with ID " + id + " not found");
         }
+        return  true ;
     }
 }

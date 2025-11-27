@@ -1,5 +1,6 @@
-package com.symptomcheck.appointmentservice.controllers;
+package com.symptomcheck.appointmentservice.unit.controllers;
 
+import com.symptomcheck.appointmentservice.controllers.AppointmentDashboardController;
 import com.symptomcheck.appointmentservice.dtos.dashboardDto.AppointmentDashboardDTO;
 import com.symptomcheck.appointmentservice.dtos.dashboardDto.AppointmentStatsDTO;
 import com.symptomcheck.appointmentservice.models.Appointment;

@@ -1,10 +1,11 @@
-package com.symptomcheck.appointmentservice.services;
+package com.symptomcheck.appointmentservice.unit.services;
 
 import com.symptomcheck.appointmentservice.dtos.dashboardDto.AppointmentDashboardDTO;
 import com.symptomcheck.appointmentservice.dtos.dashboardDto.AppointmentStatsDTO;
 import com.symptomcheck.appointmentservice.enums.AppointmentStatus;
 import com.symptomcheck.appointmentservice.models.Appointment;
 import com.symptomcheck.appointmentservice.repositories.AppointmentRepository;
+import com.symptomcheck.appointmentservice.services.AppointmentDashboardService;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Nested;
 import org.mockito.InjectMocks;

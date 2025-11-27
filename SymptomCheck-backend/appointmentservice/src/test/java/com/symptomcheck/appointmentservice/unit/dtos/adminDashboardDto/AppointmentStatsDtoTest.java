@@ -1,5 +1,6 @@
-package com.symptomcheck.appointmentservice.dtos.adminDashboardDto;
+package com.symptomcheck.appointmentservice.unit.dtos.adminDashboardDto;
 
+import com.symptomcheck.appointmentservice.dtos.adminDashboardDto.AppointmentStatsDto;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
