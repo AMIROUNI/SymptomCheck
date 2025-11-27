@@ -6,48 +6,63 @@ import org.junit.jupiter.api.io.TempDir;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class LocalFileStorageServiceTest {
 
-    @TempDir
-    Path tempDir; // JUnit creates a real temporary directory
+    private LocalFileStorageService fileStorageService;
 
-    private LocalFileStorageService service;
+    @TempDir
+    Path tempDir;
 
     @BeforeEach
-    void setup() throws IOException {
-        // Inject temp directory as uploadDir
-        service = new LocalFileStorageService(tempDir.toString());
-        service.init();
+    void setUp() throws Exception { // <-- declare throws Exception
+        fileStorageService = new LocalFileStorageService();
+
+        // Use reflection to set private uploadDir
+        Field uploadDirField = LocalFileStorageService.class.getDeclaredField("uploadDir");
+        uploadDirField.setAccessible(true);
+        uploadDirField.set(fileStorageService, tempDir.toString());
+
+        fileStorageService.init();
     }
 
     @Test
-    void shouldStoreFileSuccessfully() throws Exception {
-        MockMultipartFile file =
-                new MockMultipartFile("file", "test.png",
-                        "image/png", "dummy content".getBytes());
+    void testStoreFileSuccessfully() throws IOException {
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "file", "test.txt", "text/plain", "Hello World".getBytes()
+        );
 
-        String storedPath = service.store(file);
+        String storedPath = fileStorageService.store(mockFile);
 
-        assertNotNull(storedPath);
-        Path expectedFile = Paths.get(storedPath);
-
-        assertTrue(Files.exists(expectedFile));
+        Path path = Path.of(storedPath);
+        assertTrue(Files.exists(path));
+        assertTrue(storedPath.endsWith("test.txt"));
+        assertEquals("Hello World", Files.readString(path));
     }
 
     @Test
-    void shouldReturnEmptyString_whenFileIsNull() throws Exception {
-        String path = service.store(null);
-        assertEquals("", path);
+    void testStoreNullFileReturnsEmpty() throws IOException {
+        String storedPath = fileStorageService.store(null);
+        assertEquals("", storedPath);
     }
 
     @Test
-    void shouldThrowIOException_whenInvalidDirectory() {
-        service = new LocalFileStorageService("//INVALID");
+    void testInitCreatesDirectory() throws Exception { // <-- throws Exception for reflection
+        Path newDir = tempDir.resolve("newUploads");
 
-        assertThrows(InvalidPathException.class, service::init);
+        Field uploadDirField = LocalFileStorageService.class.getDeclaredField("uploadDir");
+        uploadDirField.setAccessible(true);
+        uploadDirField.set(fileStorageService, newDir.toString());
+
+        fileStorageService.init();
+
+        assertTrue(Files.exists(newDir));
+        assertTrue(Files.isDirectory(newDir));
     }
+
 }

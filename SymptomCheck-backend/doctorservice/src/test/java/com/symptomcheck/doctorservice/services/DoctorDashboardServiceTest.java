@@ -44,7 +44,7 @@ class DoctorDashboardServiceTest {
         void setupMocks() {
             DoctorAvailability availability = new DoctorAvailability();
             availability.setId(1L);
-            availability.setDayOfWeek(DayOfWeek.MONDAY);
+            availability.setDaysOfWeek(List.of(DayOfWeek.MONDAY));
             availability.setStartTime(LocalTime.of(9, 0));
             availability.setEndTime(LocalTime.of(12, 0));
 
@@ -127,7 +127,7 @@ class DoctorDashboardServiceTest {
         void setupMocks() {
             DoctorAvailability availability = new DoctorAvailability();
             availability.setId(1L);
-            availability.setDayOfWeek(DayOfWeek.MONDAY);
+            availability.setDaysOfWeek(List.of(DayOfWeek.MONDAY));
             availability.setStartTime(LocalTime.of(9, 0));
             availability.setEndTime(LocalTime.of(12, 0));
 

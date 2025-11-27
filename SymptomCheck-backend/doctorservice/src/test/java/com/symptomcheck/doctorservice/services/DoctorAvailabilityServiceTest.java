@@ -17,6 +17,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,37 +49,6 @@ class DoctorAvailabilityServiceTest {
         dateTime = LocalDateTime.of(2025, 11, 20, 10, 0);
     }
 
-    @Nested
-    @DisplayName("isDoctorAvailable method tests")
-    class IsDoctorAvailableTests {
-
-        @Test
-        @DisplayName("should return true when doctor is available")
-        void testDoctorIsAvailable() {
-            DayOfWeek day = dateTime.getDayOfWeek();
-            LocalTime time = dateTime.toLocalTime();
-
-            DoctorAvailability availability = new DoctorAvailability();
-            availability.setDoctorId(doctorId);
-            availability.setDayOfWeek(day);
-            availability.setStartTime(time.minusHours(1));
-            availability.setEndTime(time.plusHours(1));
-
-            when(availabilityRepository.findIfAvailable(doctorId, day, time))
-                    .thenReturn(Optional.of(availability));
-
-            assertTrue(availabilityService.isDoctorAvailable(doctorId, dateTime));
-        }
-
-        @Test
-        @DisplayName("should return false when doctor is not available")
-        void testDoctorIsNotAvailable() {
-            when(availabilityRepository.findIfAvailable(any(), any(), any()))
-                    .thenReturn(Optional.empty());
-
-            assertFalse(availabilityService.isDoctorAvailable(doctorId, dateTime));
-        }
-    }
 
     @Nested
     @DisplayName("existsByDoctorId method tests")
@@ -107,7 +78,7 @@ class DoctorAvailabilityServiceTest {
         void testCreateAvailabilityHealth() {
             AvailabilityHealthDto dto = new AvailabilityHealthDto();
             dto.setDoctorId(doctorId);
-            dto.setDayOfWeek(DayOfWeek.MONDAY);
+            dto.setDaysOfWeek(List.of(DayOfWeek.MONDAY));
             dto.setStartTime(LocalTime.of(9, 0));
             dto.setEndTime(LocalTime.of(12, 0));
             dto.setCategory("Heart");

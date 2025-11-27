@@ -20,6 +20,7 @@ import java.time.LocalTime;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import static java.time.DayOfWeek.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -52,14 +53,16 @@ class AdminDashboardServiceTest {
         service.setDurationMinutes(30);
         service.setDescription("Heart checkup");
 
+        // CORRECT: Initialize List<DayOfWeek> properly
+        List<DayOfWeek> days = Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY);
+
         availability = new DoctorAvailability();
         availability.setId(1L);
         availability.setDoctorId(doctorId);
-        availability.setDayOfWeek(DayOfWeek.MONDAY);
+        availability.setDaysOfWeek(days); // Set the list
         availability.setStartTime(LocalTime.of(9, 0));
         availability.setEndTime(LocalTime.of(12, 0));
     }
-
     @Nested
     @DisplayName("getDoctorStatistics method tests")
     class GetDoctorStatisticsTests {
