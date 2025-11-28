@@ -39,7 +39,6 @@ import { FooterComponent } from "./components/shared/footer/footer.component";
 import { StarRatingComponent } from "./components/shared/star-rating/star-rating.component";
 import { TestimonialsComponent } from "./components/shared/testimonials/testimonials.component";
 import { AppointmentHistoryComponent } from "./components/dashboard/appointment-history/appointment-history.component";
-import { ProfileEditComponent } from "./components/dashboard/profile-edit/profile-edit.component";
 import { ServiceCardComponent } from "./components/services/service-card/service-card.component";
 import { DoctorCardComponent } from "./components/doctors/doctor-card/doctor-card.component";
 import { AddServiceComponent } from './components/services/add-service/add-service.component';
@@ -66,6 +65,8 @@ import { DoctorDashboardComponent } from './components/doctors/doctor-dashboard/
 import { GenericChartComponent } from "./components/shared/dashboard-components/growth-chart/generic-chart.component";
 import { BarGrowthChartComponent } from "./components/shared/dashboard-components/bar-growth-chart/bar-growth-chart.component";
 import { ReviewService } from "./services/review.service";
+import { DoctorReviewsComponent } from './components/doctors/doctor-reviews/doctor-reviews.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -83,7 +84,6 @@ import { ReviewService } from "./services/review.service";
     StarRatingComponent,
     TestimonialsComponent,
     AppointmentHistoryComponent,
-    ProfileEditComponent,
     ServiceCardComponent,
     DoctorCardComponent,
     AddServiceComponent,
@@ -100,7 +100,9 @@ import { ReviewService } from "./services/review.service";
     DataTableComponent,
     UserDialogComponent,
     CompleteProfileComponent,
-    DoctorDashboardComponent
+    DoctorDashboardComponent,
+    DoctorReviewsComponent,
+    ProfileComponent
       ],
       imports: [
     BarGrowthChartComponent,

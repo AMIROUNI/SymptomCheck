@@ -1,0 +1,180 @@
+<!-- doctor-reviews.component.html -->
+<div class="doctor-reviews-container">
+  <!-- Header Section -->
+  <div class="reviews-header">
+    <div class="header-content">
+      <h1><i class="fas fa-star"></i> My Reviews</h1>
+      <p class="subtitle">Manage and monitor your patient reviews</p>
+    </div>
+    
+    <!-- Stats Overview -->
+    <div class="stats-overview" *ngIf="reviewStats">
+      <div class="stat-card primary">
+        <div class="stat-value">{{ averageRating | number:'1.1-1' }}</div>
+        <div class="stat-label">Average Rating</div>
+        <div class="stat-stars">{{ getStars(getRoundedAverageRating()) }}</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-value">{{ totalReviews }}</div>
+        <div class="stat-label">Total Reviews</div>
+        <div class="stat-trend">All Time</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-value">{{ fiveStarReviews }}</div>
+        <div class="stat-label">5-Star Reviews</div>
+        <div class="stat-stars">★★★★★</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Loading your reviews...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-state">
+    <div class="error-icon">⚠️</div>
+    <h3>Unable to Load Reviews</h3>
+    <p>{{ error }}</p>
+    <button class="btn btn-primary" (click)="loadReviews()">
+      <i class="fas fa-redo"></i> Try Again
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="!isLoading && !error" class="reviews-content">
+    
+    <!-- Filters and Controls -->
+    <div class="controls-section">
+      <div class="search-box">
+        <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+          <div class="search-input-group">
+            <i class="fas fa-search"></i>
+            <input 
+              type="text" 
+              formControlName="searchTerm"
+              placeholder="Search in reviews..."
+              class="search-input">
+            <button type="submit" class="btn btn-primary">
+              Search
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="filter-controls">
+        <div class="filter-group">
+          <label>Filter by Rating:</label>
+          <select [(ngModel)]="filterRating" (change)="onFilterChange()" class="filter-select">
+            <option [value]="0">All Ratings</option>
+            <option [value]="5">5 Stars</option>
+            <option [value]="4">4 Stars</option>
+            <option [value]="3">3 Stars</option>
+            <option [value]="2">2 Stars</option>
+            <option [value]="1">1 Star</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label>Sort by:</label>
+          <select [(ngModel)]="sortBy" (change)="onSortChange()" class="filter-select">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="highest">Highest Rating</option>
+            <option value="lowest">Lowest Rating</option>
+          </select>
+        </div>
+
+        <button class="btn btn-outline-primary" (click)="exportReviews()">
+          <i class="fas fa-download"></i> Export
+        </button>
+      </div>
+    </div>
+
+    <!-- Rating Distribution -->
+    <div class="rating-distribution" *ngIf="reviewStats">
+      <h3>Rating Distribution</h3>
+      <div class="distribution-bars">
+        <div *ngFor="let dist of getRatingDistribution()" class="distribution-item">
+          <span class="rating-label">{{ dist.rating }} ★</span>
+          <div class="distribution-bar">
+            <div class="bar-fill" [style.width.%]="dist.percentage"></div>
+          </div>
+          <span class="rating-count">{{ dist.count }} ({{ dist.percentage | number:'1.0-0' }}%)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews List -->
+    <div class="reviews-list">
+      <div class="results-info">
+        <span class="results-count">
+          Showing {{ paginatedReviews.length }} of {{ filteredReviews.length }} reviews
+        </span>
+      </div>
+
+      <!-- No Results -->
+      <div *ngIf="filteredReviews.length === 0" class="no-results">
+        <i class="fas fa-search"></i>
+        <h3>No reviews found</h3>
+        <p>Try adjusting your search or filters</p>
+        <button class="btn btn-primary" (click)="filterRating = 0; searchForm.reset(); applyFilters()">
+          Clear Filters
+        </button>
+      </div>
+
+      <!-- Reviews Grid -->
+      <div *ngIf="filteredReviews.length > 0" class="reviews-grid">
+        <div *ngFor="let review of paginatedReviews" class="review-card" [class]="'rating-' + review.rating">
+          <div class="review-header">
+            <div class="rating-display">
+              <span class="stars">{{ getStars(review.rating) }}</span>
+              <span class="rating-number">{{ review.rating }}/5</span>
+            </div>
+            <span class="review-date">{{ formatDate(review.datePosted) }}</span>
+          </div>
+
+          <div class="review-content">
+            <p class="review-comment">{{ review.comment }}</p>
+          </div>
+
+          <div class="review-actions">
+            <button class="btn btn-outline-primary btn-sm" (click)="replyToReview(review)">
+              <i class="fas fa-reply"></i> Reply
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" (click)="markAsHelpful(review)">
+              <i class="fas fa-thumbs-up"></i> Helpful
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div *ngIf="totalPages > 1" class="pagination">
+        <button 
+          class="btn btn-outline-primary" 
+          [disabled]="currentPage === 1"
+          (click)="goToPage(currentPage - 1)">
+          <i class="fas fa-chevron-left"></i> Previous
+        </button>
+
+        <div class="page-numbers">
+          <span class="page-info">
+            Page {{ currentPage }} of {{ totalPages }}
+          </span>
+        </div>
+
+        <button 
+          class="btn btn-outline-primary" 
+          [disabled]="currentPage === totalPages"
+          (click)="goToPage(currentPage + 1)">
+          Next <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

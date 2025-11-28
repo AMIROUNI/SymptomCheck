@@ -1,0 +1,311 @@
+<!-- user-profile.component.html -->
+<div class="user-profile-container">
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <div class="loading-spinner"></div>
+    <p>Loading profile...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !isLoading" class="error-state">
+    <div class="error-icon">⚠️</div>
+    <h3>Unable to Load Profile</h3>
+    <p>{{ error }}</p>
+    <button class="btn btn-primary" (click)="loadCurrentUserProfile()">
+      <i class="fas fa-redo"></i> Try Again
+    </button>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="user && !isLoading" class="profile-content">
+    <!-- Doctor Profile Completion Alert -->
+    <div *ngIf="isDoctor() && !isDoctorProfileComplete() && !isEditing" class="completion-alert">
+      <div class="alert-content">
+        <i class="fas fa-exclamation-triangle"></i>
+        <div class="alert-text">
+          <h4>Complete Your Doctor Profile</h4>
+          <p>Your profile is {{ getDoctorCompletionPercentage() }}% complete. Please add your speciality and diploma information.</p>
+        </div>
+        <button class="btn btn-warning" (click)="toggleEdit()">
+          <i class="fas fa-edit"></i> Complete Profile
+        </button>
+      </div>
+      <div class="completion-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="getDoctorCompletionPercentage()"></div>
+        </div>
+        <span>{{ getDoctorCompletionPercentage() }}% Complete</span>
+      </div>
+    </div>
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-avatar-section">
+        <div class="avatar-container">
+          <img 
+            [src]="getUserImage(currentUser?.profilePhotoUrl) || 'assets/images/user-placeholder.jpg'"
+            alt="{{ user.firstName }} {{ user.lastName }}"
+            class="profile-avatar">
+          
+          <!-- Upload Button (visible only for doctors and editable profiles) -->
+          <div *ngIf="canEditProfile() && !isEditing && isDoctor()" class="avatar-actions">
+            <label for="avatar-upload" class="btn-upload">
+              <i class="fas fa-camera"></i>
+              Change Photo
+            </label>
+            <input 
+              id="avatar-upload" 
+              type="file" 
+              accept="image/*" 
+              (change)="onFileSelected($event)"
+              style="display: none;">
+          </div>
+
+          <!-- Upload Progress -->
+          <div *ngIf="isUploading" class="upload-progress">
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+            </div>
+            <span>Uploading... {{ uploadProgress }}%</span>
+          </div>
+
+          <!-- Info for non-doctors -->
+          <div *ngIf="!isDoctor() && canEditProfile() && !isEditing" class="avatar-info">
+            <small class="text-muted">
+              <i class="fas fa-info-circle"></i> Photo upload available for doctors only
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-info-section">
+        <div class="profile-main-info">
+          <h1 class="profile-name">
+            {{ user.firstName }} {{ user.lastName }}
+            <span *ngIf="isCurrentUserProfile()" class="badge-you">You</span>
+          </h1>
+          <p class="profile-role">{{ getRoleDisplayName(user.roles) }}</p>
+          
+          <!-- Doctor Specific Info -->
+          <div *ngIf="isDoctor()" class="doctor-speciality">
+            <i class="fas fa-user-md"></i>
+            <strong>Speciality:</strong> {{ user.speciality || 'Not specified' }}
+          </div>
+
+          <!-- Clinic Info -->
+          <div *ngIf="isDoctor() && user.clinicId" class="clinic-info">
+            <i class="fas fa-clinic-medical"></i>
+            <strong>Clinic ID:</strong> {{ user.clinicId }}
+          </div>
+
+          <!-- Contact Info -->
+          <div class="contact-info">
+            <p><i class="fas fa-envelope"></i> {{ user.email }}</p>
+            <p *ngIf="user.phoneNumber"><i class="fas fa-phone"></i> {{ user.phoneNumber }}</p>
+          </div>
+
+          <!-- Keycloak Authentication Status -->
+          <div class="auth-status">
+            <span class="status-badge" [class.authenticated]="authService.isAuthenticated()">
+              <i class="fas" [class.fa-check-circle]="authService.isAuthenticated()" [class.fa-times-circle]="!authService.isAuthenticated()"></i>
+              {{ authService.isAuthenticated() ? 'Authenticated' : 'Not Authenticated' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="profile-actions" *ngIf="canEditProfile()">
+          <button 
+            *ngIf="!isEditing" 
+            class="btn btn-primary" 
+            (click)="toggleEdit()">
+            <i class="fas fa-edit"></i> {{ isDoctor() && !isDoctorProfileComplete() ? 'Complete Profile' : 'Edit Profile' }}
+          </button>
+          
+          <div *ngIf="isEditing" class="edit-actions">
+            <button class="btn btn-success" (click)="onSubmit()" [disabled]="profileForm.invalid">
+              <i class="fas fa-save"></i> Save Changes
+            </button>
+            <button class="btn btn-secondary" (click)="cancelEdit()">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Details -->
+    <div class="profile-details">
+      <!-- View Mode -->
+      <div *ngIf="!isEditing" class="view-mode">
+        <!-- Description -->
+        <div *ngIf="user.description" class="detail-section">
+          <h3><i class="fas fa-file-alt"></i> About</h3>
+          <p class="description-text">{{ user.description }}</p>
+        </div>
+
+        <!-- Doctor Specific Details -->
+        <div *ngIf="isDoctor()" class="doctor-details">
+          <div *ngIf="user.diploma" class="detail-section">
+            <h3><i class="fas fa-certificate"></i> Diploma</h3>
+            <p>{{ user.diploma }}</p>
+          </div>
+        </div>
+
+        <!-- Account Information -->
+        <div class="detail-section">
+          <h3><i class="fas fa-user-shield"></i> Account Information</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <strong>User ID:</strong>
+              <span class="user-id">{{ user.id }}</span>
+            </div>
+            <div class="info-item">
+              <strong>Authentication:</strong>
+              <span>Keycloak SSO</span>
+            </div>
+            <!-- Supprimer les champs createdAt et updatedAt qui n'existent pas dans User -->
+            <div class="info-item">
+              <strong>Status:</strong>
+              <span>Active</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Mode -->
+      <div *ngIf="isEditing" class="edit-mode">
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+          <!-- Personal Information (UserUpdateDto) -->
+          <div class="form-section">
+            <h3><i class="fas fa-user"></i> Personal Information</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="firstName">First Name *</label>
+                <input 
+                  id="firstName"
+                  type="text" 
+                  formControlName="firstName"
+                  class="form-control"
+                  [class.error]="firstNameError">
+                <div *ngIf="firstNameError" class="error-message">
+                  {{ firstNameError }}
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="lastName">Last Name *</label>
+                <input 
+                  id="lastName"
+                  type="text" 
+                  formControlName="lastName"
+                  class="form-control"
+                  [class.error]="lastNameError">
+                <div *ngIf="lastNameError" class="error-message">
+                  {{ lastNameError }}
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input 
+                  id="email"
+                  type="email" 
+                  formControlName="email"
+                  class="form-control"
+                  [class.error]="emailError"
+                  [attr.disabled]="true"
+                  style="background-color: #f8f9fa; color: #6c757d;">
+                <div *ngIf="emailError" class="error-message">
+                  {{ emailError }}
+                </div>
+                <small class="form-text text-muted">
+                  <i class="fas fa-info-circle"></i> Email is managed through Keycloak authentication
+                </small>
+              </div>
+
+              <div class="form-group">
+                <label for="phoneNumber">Phone Number</label>
+                <input 
+                  id="phoneNumber"
+                  type="tel" 
+                  formControlName="phoneNumber"
+                  class="form-control"
+                  placeholder="Optional phone number">
+              </div>
+            </div>
+          </div>
+
+          <!-- Professional Information (DoctorProfileDto - for doctors only) -->
+          <div *ngIf="isDoctor()" class="form-section">
+            <h3><i class="fas fa-briefcase-medical"></i> Professional Information</h3>
+            
+            <div class="form-group">
+              <label for="speciality">Speciality *</label>
+              <input 
+                id="speciality"
+                type="text" 
+                formControlName="speciality"
+                class="form-control"
+                [class.error]="specialityError"
+                placeholder="e.g., Cardiologist, Dentist, etc.">
+              <div *ngIf="specialityError" class="error-message">
+                {{ specialityError }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="diploma">Diploma/Certification *</label>
+              <input 
+                id="diploma"
+                type="text" 
+                formControlName="diploma"
+                class="form-control"
+                [class.error]="diplomaError"
+                placeholder="Your medical degrees and certifications">
+              <div *ngIf="diplomaError" class="error-message">
+                {{ diplomaError }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="clinicId">Clinic ID</label>
+              <input 
+                id="clinicId"
+                type="number" 
+                formControlName="clinicId"
+                class="form-control"
+                placeholder="Enter your clinic ID (optional)"
+                min="0">
+              <small class="form-text text-muted">
+                <i class="fas fa-info-circle"></i> Associate with a medical clinic (optional)
+              </small>
+            </div>
+          </div>
+
+          <!-- Description (DoctorProfileDto) -->
+          <div class="form-section">
+            <h3><i class="fas fa-file-alt"></i> About</h3>
+            
+            <div class="form-group">
+              <label for="description">Description/Bio</label>
+              <textarea 
+                id="description"
+                formControlName="description"
+                class="form-control"
+                rows="4"
+                placeholder="Tell us about yourself, your expertise, and your approach to patient care..."
+                maxlength="500"></textarea>
+              <div class="char-count">
+                {{ profileForm.get('description')?.value?.length || 0 }}/500
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
