@@ -14,8 +14,8 @@ export enum UserRole {
 export interface User {
   id: string
   username: string
- roles: UserRole[] | string[]  
-   firstName?: string
+  roles: UserRole[] | string[]  
+  firstName?: string
   lastName?: string
   phoneNumber?: string
   email?: string
@@ -34,8 +34,6 @@ export interface User {
   patientAppointments?: Appointment[]
   paymentTransactions?: PaymentTransaction[]
   role: UserRole 
-
-
   enabled?: boolean
 }
 
@@ -51,25 +49,17 @@ export interface DoctorDto {
   profilePhotoUrl?: string
   clinicId?: number
 }
-export interface DoctorDto {
-  username: string
-  firstName?: string
-  lastName?: string
-  phoneNumber?: string
-  email?: string
-  profilePhotoUrl?: string
-}
+
 export interface UserUpdateDto {
-  id: number
-  firstName?: string
-  lastName?: string
+  // ✅ SUPPRIMÉ : id n'est plus nécessaire ici
+  firstName: string
+  lastName: string
+  email: string
   phoneNumber?: string
-  email?: string
-  role: UserRole
 }
 
 export interface DoctorProfileDto {
-  id: number
+  // ✅ SUPPRIMÉ : id n'est plus nécessaire ici
   speciality: string
   description: string
   diploma: string

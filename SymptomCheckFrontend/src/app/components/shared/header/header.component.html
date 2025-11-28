@@ -1,4 +1,4 @@
-<header class="site-header"   *ngIf="!isAdmin()">
+<header class="site-header" *ngIf="!isAdmin()">
   <div class="container">
     <div class="header-content">
       <div class="logo">
@@ -37,61 +37,67 @@
           <a routerLink="/register" class="btn btn-primary">Register</a>
         </ng-container>
 
-        <div *ngIf="isLoggedIn" class="user-dropdown" style="z-index: 444;">
-          <button class="dropdown-toggle">
+        <div *ngIf="isLoggedIn" class="user-dropdown" [class.dropdown-open]="isDropdownOpen"
+             (mouseenter)="openDropdown()" (mouseleave)="closeDropdown()">
+          <button class="dropdown-toggle" (click)="toggleDropdown()">
             <img [src]="getUserImage(currentUser?.profilePhotoUrl)" alt="User" class="user-avatar">
             <span class="user-name">{{ currentUser?.firstName || 'User' }}</span>
             <i class="fas fa-chevron-down"></i>
-           
           </button>
-          <div class="dropdown-menu">
+          <div class="dropdown-menu" (click)="$event.stopPropagation()">
             <!-- Dynamic Dashboard Link -->
-            <a *ngIf="isDoctor()" routerLink="doctor-dashboard" class="dropdown-item">
+            <a *ngIf="isDoctor()" [routerLink]="getDashboardRoute()" class="dropdown-item" (click)="closeDropdown()">
               <i class="fas fa-tachometer-alt"></i> {{ getDashboardName() }}
             </a>
 
             <!-- Common Links for All Roles -->
-            <a routerLink="/dashboard/profile" class="dropdown-item">
+            <a routerLink="/dashboard/profile" class="dropdown-item" (click)="closeDropdown()">
               <i class="fas fa-user"></i> My Profile
             </a>
 
             <!-- Patient-specific Links -->
             <ng-container *ngIf="isPatient()">
-              <a routerLink="/dashboard/appointments" class="dropdown-item">
+              <a routerLink="/dashboard/appointments" class="dropdown-item" (click)="closeDropdown()">
                 <i class="fas fa-calendar-check"></i> My Appointments
               </a>
-              <a routerLink="/dashboard/medical-history" class="dropdown-item">
+              <a routerLink="/dashboard/medical-history" class="dropdown-item" (click)="closeDropdown()">
                 <i class="fas fa-file-medical"></i> Medical History
+              </a>
+              <!-- Lien vers les reviews pour les patients -->
+              <a routerLink="/dashboard/reviews" class="dropdown-item" (click)="closeDropdown()">
+                <i class="fas fa-star"></i> My Reviews
               </a>
             </ng-container>
 
             <!-- Doctor-specific Links -->
             <ng-container *ngIf="isDoctor()">
-              <a routerLink="/dashboard/appointments" class="dropdown-item">
+              <a routerLink="/dashboard/appointments" class="dropdown-item" (click)="closeDropdown()">
                 <i class="fas fa-calendar-alt"></i> Appointments
               </a>
-              <a routerLink="/doctor/patients" class="dropdown-item">
+              <a routerLink="/doctor/patients" class="dropdown-item" (click)="closeDropdown()">
                 <i class="fas fa-users"></i> My Patients
               </a>
-              <a routerLink="/doctor/availability" class="dropdown-item">
+              <a routerLink="/doctor/availability" class="dropdown-item" (click)="closeDropdown()">
                 <i class="fas fa-clock"></i> Availability
               </a>
-
-               <a routerLink="/calendar" class="dropdown-item">
-                <i class="fas fa-clock"></i> Calendar
+              <a routerLink="/calendar" class="dropdown-item" (click)="closeDropdown()">
+                <i class="fas fa-calendar"></i> Calendar
               </a>
-
+              <!-- Lien vers les reviews pour les docteurs -->
+              <a routerLink="/dashboard/reviews" class="dropdown-item" (click)="closeDropdown()">
+                <i class="fas fa-star"></i> My Reviews
+              </a>
             </ng-container>
 
             <!-- Admin-specific Links -->
             <ng-container *ngIf="isAdmin()">
-              <a routerLink="/admin/users" class="dropdown-item">
+              <a routerLink="/admin/users" class="dropdown-item" (click)="closeDropdown()">
                 <i class="fas fa-users-cog"></i> Manage Users
               </a>
-              <a routerLink="/admin/doctors" class="dropdown-item">
+              <a routerLink="/admin/doctors" class="dropdown-item" (click)="closeDropdown()">
                 <i class="fas fa-user-md"></i> Manage Doctors
               </a>
-              <a routerLink="/admin/appointments" class="dropdown-item">
+              <a routerLink="/admin/appointments" class="dropdown-item" (click)="closeDropdown()">
                 <i class="fas fa-calendar"></i> All Appointments
               </a>
             </ng-container>

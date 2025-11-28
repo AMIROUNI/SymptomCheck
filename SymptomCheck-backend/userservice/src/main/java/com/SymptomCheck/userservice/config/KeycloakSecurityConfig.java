@@ -45,6 +45,7 @@ public class KeycloakSecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
                                 "/webjars/**",
+                                "api/v1/users/**",
                                 "/api/v1/users/register",
                                 "/api/v1/users/public/**",
                                 "/api/v1/auth/**",

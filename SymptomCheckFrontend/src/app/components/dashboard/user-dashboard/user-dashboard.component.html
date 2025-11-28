@@ -19,10 +19,12 @@
               <i class="fas fa-calendar-check"></i>
               <span>My Appointments</span>
             </a>
-            <a routerLink="/dashboard/profile" routerLinkActive="active" class="menu-item">
+            
+            <a routerLink="/profile" routerLinkActive="active" class="menu-item">
               <i class="fas fa-user"></i>
-              <span>My Profile</span>
+              <span>My Profilee</span>
             </a>
+            
             <a routerLink="/appointment" class="menu-item">
               <i class="fas fa-plus-circle"></i>
               <span>Book Appointment</span>
@@ -34,6 +36,11 @@
             <a *ngIf="isDoctor()" routerLink="add-service" class="menu-item" routerLinkActive="active">
               <i class="fas fa-stethoscope"></i>
               <span>My Services</span>
+            </a>
+
+            <a routerLink="/dashboard/reviews" class="menu-item">
+              <i class="fas fa-plus-circle"></i>
+              <span>My review</span>
             </a>
 
             <a href="javascript:void(0)" (click)="logout()" class="menu-item">

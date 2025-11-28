@@ -1,39 +1,33 @@
 package com.SymptomCheck.userservice.services;
 
 import com.SymptomCheck.userservice.dtos.UserRegistrationRequest;
+import com.SymptomCheck.userservice.dtos.UserUpdateDto;
 import com.SymptomCheck.userservice.models.User;
 import com.SymptomCheck.userservice.models.UserData;
 import com.SymptomCheck.userservice.repositories.UserDataRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.RoleResource;
-import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.core.Response;
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class KeycloakService {
 
-    private static final Logger log = LoggerFactory.getLogger(KeycloakService.class);
-
-    private final UserDataRepository userDataRepository ;
-
-
+    private final UserDataRepository userDataRepository;
 
     @Value("${keycloak.admin.server-url}")
     private String serverUrl;
@@ -96,8 +90,6 @@ public class KeycloakService {
             // Assigner le rôle
             keycloakUser.setRealmRoles(Collections.singletonList(user.getRole().name()));
 
-            // ID de la base locale (si vous l'utilisez encore pour référence)
-
             // Création du mot de passe
             CredentialRepresentation credential = new CredentialRepresentation();
             credential.setTemporary(false);
@@ -157,7 +149,6 @@ public class KeycloakService {
         log.info("   - First Name: {}", user.getFirstName());
         log.info("   - Last Name: {}", user.getLastName());
         log.info("   - Role: {}", user.getRole());
-
     }
 
     /**
@@ -202,44 +193,46 @@ public class KeycloakService {
         }
     }
 
+    /**
+     * Désactiver/Activer un utilisateur
+     */
+    public void disableUser(String userId, boolean isEnabled) {
+        try {
+            Keycloak keycloak = KeycloakBuilder.builder()
+                    .serverUrl(serverUrl)
+                    .realm("master") // admin login always happens on master
+                    .clientId("admin-cli")
+                    .username("admin")
+                    .password("admin")
+                    .grantType("password")
+                    .build();
 
+            var users = keycloak.realm(appRealm).users();
+            UserRepresentation user = users.get(userId).toRepresentation();
+            user.setEnabled(isEnabled);
 
-
-
-
-    public void disableUser(String userId,boolean  isEnabled) {
-        Keycloak keycloak = KeycloakBuilder.builder()
-                .serverUrl(serverUrl)
-                .realm("master") // admin login always happens on master
-                .clientId("admin-cli")
-                .username("admin")
-                .password("admin")
-                .grantType("password")
-                .build();
-
-        UsersResource users = keycloak.realm(appRealm).users();
-        UserRepresentation user = users.get(userId).toRepresentation();
-        user.setEnabled(isEnabled);
-
-        users.get(userId).update(user);
+            users.get(userId).update(user);
+            log.info("✅ User {} {}", userId, isEnabled ? "enabled" : "disabled");
+        } catch (Exception e) {
+            log.error("❌ Error updating user status: {}", e.getMessage());
+            throw new RuntimeException("Failed to update user status: " + e.getMessage());
+        }
     }
 
-
-
+    /**
+     * Obtenir les utilisateurs par rôle
+     */
     public List<UserRegistrationRequest> getUsersByRole(String roleName) {
         List<UserRegistrationRequest> result = new ArrayList<>();
 
         try {
             // 1️⃣ Get Keycloak users with this role
-
             log.info(roleName);
             List<UserRepresentation> keycloakUsers = new ArrayList<>(keycloak.realm(appRealm)
                     .roles()
                     .get(roleName)
                     .getRoleUserMembers());
             log.info("keycloakUsers size: {}", keycloakUsers.size());
-
-
 
             // 2️⃣ Map each Keycloak user to your UserRegistrationRequest
             for (UserRepresentation kcUser : keycloakUsers) {
@@ -277,30 +270,171 @@ public class KeycloakService {
         return result;
     }
 
+    /**
+     * Obtenir un utilisateur par ID
+     */
     public UserRegistrationRequest getUserById(String userId) {
-        UsersResource users = keycloak.realm(appRealm).users();
-        UserRepresentation user = users.get(userId).toRepresentation();
+        try {
+            var users = keycloak.realm(appRealm).users();
+            UserRepresentation user = users.get(userId).toRepresentation();
 
+            Optional<UserData> userDataOpt = userDataRepository.findById(userId);
 
-        Optional<UserData> userDataOpt = userDataRepository.findById(userId);
+            UserRegistrationRequest ur = new UserRegistrationRequest();
+            ur.setId(user.getId());
+            ur.setUsername(user.getUsername());
+            ur.setEmail(user.getEmail());
+            ur.setFirstName(user.getFirstName());
+            ur.setLastName(user.getLastName());
+            ur.setEnabled(user.isEnabled());
 
-        UserRegistrationRequest ur = new UserRegistrationRequest();
-        ur.setId(user.getId());
-        ur.setUsername(user.getUsername());
-        ur.setEmail(user.getEmail());
-        ur.setFirstName(user.getFirstName());
-        ur.setLastName(user.getLastName());
-        ur.setEnabled(user.isEnabled());
+            // Fill additional fields if exists
+            userDataOpt.ifPresent(userData -> {
+                ur.setPhoneNumber(userData.getPhoneNumber());
+                ur.setProfilePhotoUrl(userData.getProfilePhotoUrl());
+                ur.setSpeciality(userData.getSpeciality());
+                ur.setClinicId(userData.getClinicId());
+                ur.setDescription(userData.getDescription());
+                ur.setDiploma(userData.getDiploma());
+            });
+            return ur;
+        } catch (Exception e) {
+            log.error("❌ Error getting user by ID {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Failed to get user by ID: " + e.getMessage());
+        }
+    }
 
-        // Fill additional fields if exists
-        userDataOpt.ifPresent(userData -> {
-            ur.setPhoneNumber(userData.getPhoneNumber());
-            ur.setProfilePhotoUrl(userData.getProfilePhotoUrl());
-            ur.setSpeciality(userData.getSpeciality());
-            ur.setClinicId(userData.getClinicId());
-            ur.setDescription(userData.getDescription());
-            ur.setDiploma(userData.getDiploma());
-        });
-        return ur;
+    /**
+     * Mettre à jour un utilisateur dans Keycloak
+     */
+    public UserRepresentation updateUser(String userId, UserUpdateDto userUpdateDto) {
+        try {
+            log.info("🔄 Updating user in Keycloak: {}", userId);
+
+            // Récupérer l'utilisateur existant
+            UserRepresentation user = keycloak.realm(appRealm)  // Utiliser appRealm au lieu de realm
+                    .users()
+                    .get(userId)
+                    .toRepresentation();
+
+            // Mettre à jour les attributs de base
+            user.setFirstName(userUpdateDto.getFirstName());
+            user.setLastName(userUpdateDto.getLastName());
+            user.setEmail(userUpdateDto.getEmail());
+
+            // Mettre à jour les attributs personnalisés
+            Map<String, List<String>> attributes = user.getAttributes();
+            if (attributes == null) {
+                attributes = new HashMap<>();
+            }
+
+            if (userUpdateDto.getPhoneNumber() != null) {
+                attributes.put("phoneNumber", List.of(userUpdateDto.getPhoneNumber()));
+            }
+
+            attributes.put("updatedAt", List.of(Instant.now().toString()));
+            user.setAttributes(attributes);
+
+            // Sauvegarder les modifications
+            keycloak.realm(appRealm)  // Utiliser appRealm au lieu de realm
+                    .users()
+                    .get(userId)
+                    .update(user);
+
+            log.info("✅ User updated successfully in Keycloak: {}", userId);
+            return user;
+
+        } catch (Exception e) {
+            log.error("❌ Error updating user in Keycloak: {}", e.getMessage());
+            throw new RuntimeException("Failed to update user in Keycloak: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Mettre à jour le rôle d'un utilisateur
+     */
+    public void updateUserRole(String userId, String newRole) {
+        try {
+            log.info("🔄 Updating role for user {} to {}", userId, newRole);
+
+            // Récupérer les rôles actuels de l'utilisateur
+            var currentRoles = keycloak.realm(appRealm)
+                    .users()
+                    .get(userId)
+                    .roles()
+                    .realmLevel()
+                    .listAll();
+
+            // Supprimer tous les rôles actuels
+            if (!currentRoles.isEmpty()) {
+                keycloak.realm(appRealm)
+                        .users()
+                        .get(userId)
+                        .roles()
+                        .realmLevel()
+                        .remove(currentRoles);
+            }
+
+            // Ajouter le nouveau rôle
+            var newRoleRepresentation = keycloak.realm(appRealm)
+                    .roles()
+                    .get(newRole)
+                    .toRepresentation();
+
+            keycloak.realm(appRealm)
+                    .users()
+                    .get(userId)
+                    .roles()
+                    .realmLevel()
+                    .add(Collections.singletonList(newRoleRepresentation));
+
+            log.info("✅ Role updated successfully for user {} to {}", userId, newRole);
+        } catch (Exception e) {
+            log.error("❌ Error updating role for user {}: {}", userId, e.getMessage());
+            throw new RuntimeException("Failed to update user role: " + e.getMessage());
+        }
+    }
+    public UserRepresentation updateUserBasicInfo(String userId, UserUpdateDto userUpdateDto) {
+        try {
+            log.info("🔄 Updating user basic info in Keycloak: {}", userId);
+
+            // Récupérer l'utilisateur existant
+            UserRepresentation user = keycloak.realm(appRealm)
+                    .users()
+                    .get(userId)
+                    .toRepresentation();
+
+            // Mettre à jour uniquement les informations basiques
+            user.setFirstName(userUpdateDto.getFirstName());
+            user.setLastName(userUpdateDto.getLastName());
+            user.setEmail(userUpdateDto.getEmail());
+
+            // Mettre à jour les attributs personnalisés
+            Map<String, List<String>> attributes = user.getAttributes();
+            if (attributes == null) {
+                attributes = new HashMap<>();
+            }
+
+            if (userUpdateDto.getPhoneNumber() != null) {
+                attributes.put("phoneNumber", List.of(userUpdateDto.getPhoneNumber()));
+            }
+
+            attributes.put("updatedAt", List.of(Instant.now().toString()));
+            // ✅ SUPPRIMÉ : Ne pas mettre à jour le rôle dans les attributs
+            user.setAttributes(attributes);
+
+            // Sauvegarder les modifications
+            keycloak.realm(appRealm)
+                    .users()
+                    .get(userId)
+                    .update(user);
+
+            log.info("✅ User basic info updated successfully in Keycloak: {}", userId);
+            return user;
+
+        } catch (Exception e) {
+            log.error("❌ Error updating user basic info in Keycloak: {}", e.getMessage());
+            throw new RuntimeException("Failed to update user basic info in Keycloak: " + e.getMessage());
+        }
     }
 }
