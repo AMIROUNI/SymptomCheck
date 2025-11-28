@@ -2,6 +2,8 @@ package com.symptomcheck.clinicservice.services;
 
 import com.symptomcheck.clinicservice.dtos.adminDashboardDto.AdminClinicDto;
 import com.symptomcheck.clinicservice.dtos.adminDashboardDto.ClinicStatsDto;
+import com.symptomcheck.clinicservice.exception.ClinicNotFoundException;
+import com.symptomcheck.clinicservice.exception.ClinicValidationException;
 import com.symptomcheck.clinicservice.models.MedicalClinic;
 import com.symptomcheck.clinicservice.repositories.MedicalClinicRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,10 @@ public class AdminDashboardService {
     }
 
     public AdminClinicDto createClinic(AdminClinicDto clinicDto) {
+
+        if (clinicDto.getName().isBlank()) {
+            throw new ClinicValidationException("Validation error");
+        }
         MedicalClinic clinic = new MedicalClinic();
         clinic.setName(clinicDto.getName());
         clinic.setAddress(clinicDto.getAddress());
@@ -58,7 +64,7 @@ public class AdminDashboardService {
 
     public AdminClinicDto updateClinic(Long clinicId, AdminClinicDto clinicDto) {
         MedicalClinic clinic = clinicRepository.findById(clinicId)
-                .orElseThrow(() -> new RuntimeException("Clinic not found"));
+                .orElseThrow(() -> {return   new ClinicNotFoundException("Clinic not found");});
 
         clinic.setName(clinicDto.getName());
         clinic.setAddress(clinicDto.getAddress());

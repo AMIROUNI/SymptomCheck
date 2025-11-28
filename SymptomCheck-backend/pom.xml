@@ -2,8 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- MODULE DECLARATION -->
     <modules>
         <module>userservice</module>
         <module>appointmentservice</module>
@@ -14,6 +16,7 @@
         <module>reviewservice</module>
     </modules>
 
+    <!-- SPRING BOOT PARENT -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -29,20 +32,19 @@
 
     <properties>
         <java.version>17</java.version>
-
-        <!-- Versions externes uniquement -->
         <springdoc.version>2.5.0</springdoc.version>
         <keycloak.version>24.0.5</keycloak.version>
 
-        <!-- Outils de test -->
+        <!-- Testing tools -->
         <jacoco.version>0.8.12</jacoco.version>
         <pitest.version>1.15.8</pitest.version>
-        <pitest-junit5.version>1.2.1</pitest-junit5.version>
+        <pitest-junit5.version>1.2.0</pitest-junit5.version>
     </properties>
 
-    <!-- SEULEMENT les dépendances qui ne sont PAS gérées par spring-boot-starter-parent -->
+    <!-- DEPENDENCY MANAGEMENT -->
     <dependencyManagement>
         <dependencies>
+
             <!-- SpringDoc OpenAPI -->
             <dependency>
                 <groupId>org.springdoc</groupId>
@@ -50,7 +52,7 @@
                 <version>${springdoc.version}</version>
             </dependency>
 
-            <!-- PostgreSQL driver -->
+            <!-- PostgreSQL -->
             <dependency>
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
@@ -70,11 +72,13 @@
                 <artifactId>keycloak-admin-client</artifactId>
                 <version>${keycloak.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.keycloak</groupId>
                 <artifactId>keycloak-spring-boot-starter</artifactId>
                 <version>${keycloak.version}</version>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -82,33 +86,41 @@
         <pluginManagement>
             <plugins>
 
-                <!-- JaCoCo – prêt pour les futurs tests d’intégration -->
+                <!-- JaCoCo -->
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${jacoco.version}</version>
                     <executions>
                         <execution>
-                            <goals><goal>prepare-agent</goal></goals>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
                         </execution>
                         <execution>
                             <id>report</id>
                             <phase>test</phase>
-                            <goals><goal>report</goal></goals>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
                         </execution>
                         <execution>
                             <id>report-aggregate</id>
                             <phase>verify</phase>
-                            <goals><goal>report-aggregate</goal></goals>
+                            <goals>
+                                <goal>report-aggregate</goal>
+                            </goals>
                         </execution>
                     </executions>
                 </plugin>
 
-                <!-- PITest – ton outil principal actuel (mutation testing) -->
+                <!-- PITest (Mutation Testing) -->
                 <plugin>
                     <groupId>org.pitest</groupId>
                     <artifactId>pitest-maven</artifactId>
                     <version>${pitest.version}</version>
+
+                    <!-- IMPORTANT: Fix for missing plugin -->
                     <dependencies>
                         <dependency>
                             <groupId>org.pitest</groupId>
@@ -116,6 +128,7 @@
                             <version>${pitest-junit5.version}</version>
                         </dependency>
                     </dependencies>
+
                     <configuration>
                         <threads>4</threads>
                         <outputFormats>
@@ -123,29 +136,19 @@
                             <outputFormat>XML</outputFormat>
                         </outputFormats>
                         <timestampedReports>false</timestampedReports>
-                        <!-- Seuil désactivé tant qu’on améliore les tests -->
-                        <!-- <mutationThreshold>75</mutationThreshold> -->
                     </configuration>
                 </plugin>
 
-                <!-- Spring Boot Maven Plugin -->
+                <!-- Spring Boot Plugin -->
                 <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
-                    <configuration>
-                        <excludes>
-                            <exclude>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok</artifactId>
-                            </exclude>
-                        </excludes>
-                    </configuration>
                 </plugin>
 
             </plugins>
         </pluginManagement>
 
-        <!-- Applique JaCoCo + PITest à tous les modules automatiquement -->
+        <!-- APPLY to all modules -->
         <plugins>
             <plugin>
                 <groupId>org.jacoco</groupId>
@@ -157,4 +160,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
