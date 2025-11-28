@@ -1,6 +1,7 @@
 package com.symptomcheck.appointmentservice.services;
 
 import com.symptomcheck.appointmentservice.dtos.AppointmentDto;
+import com.symptomcheck.appointmentservice.enums.AppointmentStatus;
 import com.symptomcheck.appointmentservice.models.Appointment;
 import com.symptomcheck.appointmentservice.repositories.AppointmentRepository;
 import jakarta.transaction.Transactional;
@@ -59,19 +60,6 @@ public class AppointmentService {
     }
 
     // méthode distante (si tu veux appeler un autre microservice)
-    public List<Appointment> getByDoctorFromDoctorService(UUID doctorId, String token) {
-        String doctorServiceUrl = "http://doctorservice:8082/api/doctors/" + doctorId + "/appointments";
-
-        return webClient.get()
-                .uri(doctorServiceUrl)
-                .header("Authorization", "Bearer " + token)
-                .retrieve()
-                .bodyToFlux(Appointment.class)
-                .collectList()
-                .block(); // pour simplifier en synchrone
-    }
-
-
 
     public  boolean isDoctorAvailable(UUID doctorId, LocalDateTime dateTime) {
         boolean exists= appointmentRepository.existsByDoctorIdAndDateTime(doctorId,dateTime);
@@ -97,5 +85,28 @@ public class AppointmentService {
                 .map(a -> a.getDateTime().toLocalTime().toString()) // extract time only
                 .sorted()
                 .collect(Collectors.toList());
+    }
+
+    public List<Appointment> getByPatientId(UUID userId) {
+        return appointmentRepository.findByPatientId(userId);
+    }
+
+    public boolean updateAppointmentStatus(Long id, int statusNumber) {
+
+
+        AppointmentStatus[] statuses = AppointmentStatus.values();
+
+        if (statusNumber < 0 || statusNumber >= statuses.length) {
+            throw new IllegalArgumentException("Invalid status number: " + statusNumber);
+        }
+
+        AppointmentStatus newStatus = statuses[statusNumber];
+
+        int updated = appointmentRepository.updateAppointmentStatus(id, newStatus);
+
+        if (updated == 0) {
+            throw new IllegalArgumentException("Appointment with ID " + id + " not found");
+        }
+        return  true ;
     }
 }

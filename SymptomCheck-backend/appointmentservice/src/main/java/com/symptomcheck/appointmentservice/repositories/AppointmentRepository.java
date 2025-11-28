@@ -3,6 +3,7 @@ package com.symptomcheck.appointmentservice.repositories;
 import com.symptomcheck.appointmentservice.enums.AppointmentStatus;
 import com.symptomcheck.appointmentservice.models.Appointment;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -77,5 +78,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findByDoctorIdAndDateTimeBetween(UUID doctorId,
                                                        LocalDateTime startOfDay,
                                                        LocalDateTime endOfDay);
+
+    @Modifying
+    @Query("UPDATE Appointment a SET a.status = :status, a.updatedAt = CURRENT_TIMESTAMP WHERE a.id = :id")
+    int updateAppointmentStatus(@Param("id") Long id,
+                                @Param("status") AppointmentStatus status);
+
+
 
 }

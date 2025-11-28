@@ -59,28 +59,9 @@ public class AppointmentController {
     }
 
     // version WebClient (appelle un autre microservice)
-    @GetMapping("/doctor/{doctorId}/remote")
-    @PreAuthorize("hasRole('Doctor')")
-    public ResponseEntity<List<Appointment>> getByDoctorRemote(
-            @PathVariable UUID doctorId,
-            @AuthenticationPrincipal Jwt jwt
-    ) {
-        String token = jwt.getTokenValue();
-        List<Appointment> appointments = appointmentService.getByDoctorFromDoctorService(doctorId, token);
-        return ResponseEntity.ok(appointments);
-    }
 
 
-    @GetMapping("available-date/{doctorId}")
-    public ResponseEntity<?> getAvailableDate(
-            @PathVariable UUID doctorId
-    ) {
-        try {
-            return ResponseEntity.ok().body(appointmentService.getAvailableDate(doctorId));
-        } catch (Exception ex) {
-            return ResponseEntity.internalServerError().body(List.of());
-        }
-    }
+
 
 
     @GetMapping("/taken-appointments/{doctorId}")
@@ -89,6 +70,33 @@ public class AppointmentController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return appointmentService.getTakenAppointments(doctorId, date);
     }
+
+    @GetMapping("{userId}")
+    public ResponseEntity<?> getByPatient(
+            @PathVariable UUID userId
+    ) {
+        try {
+            return ResponseEntity.ok().body(appointmentService.getByPatientId(userId));
+        } catch (Exception ex) {
+            return ResponseEntity.internalServerError().body(List.of());
+        }
+    }
+
+    @PutMapping("/{id}/status/{statusNumber}")
+    public ResponseEntity<Boolean> updateStatus(
+            @PathVariable Long id,
+            @PathVariable int statusNumber) {
+
+        try {
+            appointmentService.updateAppointmentStatus(id, statusNumber);
+            return ResponseEntity.ok(true);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.ok(false);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(false);
+        }
+    }
+
 
 
 }

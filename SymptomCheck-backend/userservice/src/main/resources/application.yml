@@ -17,6 +17,8 @@ spring:
     url: jdbc:postgresql://localhost:5432/user_service_db
     username: postgres
     password: 1234    #badrix bellahi chouf louta
+
+
     driver-class-name: org.postgresql.Driver
 
   jpa:
