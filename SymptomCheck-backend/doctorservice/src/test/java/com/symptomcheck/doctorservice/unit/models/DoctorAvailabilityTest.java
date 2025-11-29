@@ -1,5 +1,6 @@
-package com.symptomcheck.doctorservice.models;
+package com.symptomcheck.doctorservice.unit.models;
 
+import com.symptomcheck.doctorservice.models.DoctorAvailability;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

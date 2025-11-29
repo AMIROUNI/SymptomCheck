@@ -1,4 +1,4 @@
-package com.symptomcheck.doctorservice.services;
+package com.symptomcheck.doctorservice.unit.services;
 
 import com.symptomcheck.doctorservice.dtos.adminDashboardDto.AdminDoctorDto;
 import com.symptomcheck.doctorservice.dtos.adminDashboardDto.DoctorStatsDto;
@@ -7,6 +7,7 @@ import com.symptomcheck.doctorservice.models.DoctorAvailability;
 import com.symptomcheck.doctorservice.models.HealthcareService;
 import com.symptomcheck.doctorservice.repositories.DoctorAvailabilityRepository;
 import com.symptomcheck.doctorservice.repositories.HealthcareServiceRepository;
+import com.symptomcheck.doctorservice.services.AdminDashboardService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

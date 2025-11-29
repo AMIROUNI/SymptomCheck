@@ -1,5 +1,6 @@
-package com.symptomcheck.doctorservice.dtos;
+package com.symptomcheck.doctorservice.unit.dtos;
 
+import com.symptomcheck.doctorservice.dtos.DoctorProfileStatusDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

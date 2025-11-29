@@ -1,5 +1,6 @@
-package com.symptomcheck.doctorservice.controllers;
+package com.symptomcheck.doctorservice.unit.controllers;
 
+import com.symptomcheck.doctorservice.controllers.DoctorDashboardController;
 import com.symptomcheck.doctorservice.dtos.dashboardDto.DoctorDashboardDTO;
 import com.symptomcheck.doctorservice.dtos.dashboardDto.DoctorStatsDTO;
 import com.symptomcheck.doctorservice.dtos.dashboardDto.DoctorServiceDTO;

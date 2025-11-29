@@ -3,6 +3,7 @@ package com.symptomcheck.doctorservice.controllers;
 import com.symptomcheck.doctorservice.dtos.AvailabilityHealthDto;
 import com.symptomcheck.doctorservice.services.DoctorAvailabilityService;
 import com.symptomcheck.doctorservice.services.HealthcareServiceService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public class DoctorProfileController {
     }
 
     @PostMapping("/completeprofile")
-    public ResponseEntity<?> complete(@RequestBody AvailabilityHealthDto availabilityHealthDto){
+    public ResponseEntity<?> complete(@Valid @RequestBody AvailabilityHealthDto availabilityHealthDto){
         try {
             log.info("Recelived request to compete profile");
 

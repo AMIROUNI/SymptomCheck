@@ -1,5 +1,6 @@
-package com.symptomcheck.doctorservice.services;
+package com.symptomcheck.doctorservice.unit.services;
 
+import com.symptomcheck.doctorservice.services.LocalFileStorageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

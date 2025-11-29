@@ -1,10 +1,11 @@
-package com.symptomcheck.doctorservice.services;
+package com.symptomcheck.doctorservice.unit.services;
 
 import com.symptomcheck.doctorservice.dtos.AvailabilityHealthDto;
 import com.symptomcheck.doctorservice.models.DoctorAvailability;
 import com.symptomcheck.doctorservice.models.HealthcareService;
 import com.symptomcheck.doctorservice.repositories.DoctorAvailabilityRepository;
 import com.symptomcheck.doctorservice.repositories.HealthcareServiceRepository;
+import com.symptomcheck.doctorservice.services.DoctorAvailabilityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
@@ -33,8 +33,7 @@ class DoctorAvailabilityServiceTest {
     @Mock
     private HealthcareServiceRepository healthcareRepo;
 
-    @Mock
-    private WebClient webClient;
+
 
     @InjectMocks
     private DoctorAvailabilityService availabilityService;

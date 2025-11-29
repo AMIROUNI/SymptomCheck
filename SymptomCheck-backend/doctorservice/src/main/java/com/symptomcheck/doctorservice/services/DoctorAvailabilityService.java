@@ -1,6 +1,7 @@
 package com.symptomcheck.doctorservice.services;
 
 import com.symptomcheck.doctorservice.dtos.AvailabilityHealthDto;
+import com.symptomcheck.doctorservice.exception.ValidationException;
 import com.symptomcheck.doctorservice.models.DoctorAvailability;
 import com.symptomcheck.doctorservice.models.HealthcareService;
 import com.symptomcheck.doctorservice.repositories.DoctorAvailabilityRepository;
@@ -48,7 +49,14 @@ public class DoctorAvailabilityService {
         return availabilityRepository.existsByDoctorId(doctorId);
     }
 
-    public void createAvailabilityHealth(AvailabilityHealthDto availabilityHealthDto) {
+    public boolean createAvailabilityHealth(AvailabilityHealthDto availabilityHealthDto) {
+        if (availabilityHealthDto.getDaysOfWeek()==null
+             || availabilityHealthDto.getStartTime()==null
+            || availabilityHealthDto.getEndTime()==null )
+        {
+            new ValidationException("is not valid");
+            return false;
+        }
         // Créer une seule entrée de disponibilité avec la liste des jours
         DoctorAvailability da = new DoctorAvailability();
         da.setDoctorId(availabilityHealthDto.getDoctorId());
@@ -67,6 +75,7 @@ public class DoctorAvailabilityService {
         hc.setImageUrl(availabilityHealthDto.getImageUrl());
         hc.setDurationMinutes(availabilityHealthDto.getDurationMinutes());
         healthcareRepo.save(hc);
+        return true;
     }
 
     public List<DoctorAvailability> getAvailabilityByDoctorId(UUID doctorId) {

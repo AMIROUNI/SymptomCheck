@@ -1,5 +1,6 @@
-package com.symptomcheck.doctorservice.controllers;
+package com.symptomcheck.doctorservice.unit.controllers;
 
+import com.symptomcheck.doctorservice.controllers.DoctorProfileController;
 import com.symptomcheck.doctorservice.dtos.AvailabilityHealthDto;
 import com.symptomcheck.doctorservice.services.DoctorAvailabilityService;
 import com.symptomcheck.doctorservice.services.HealthcareServiceService;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,17 +54,18 @@ class DoctorProfileControllerTest {
         availabilityHealthDto.setPrice(50.0);
     }
 
+    // ------------------------------------------------------------
+    // TEST 1 : Profile status returns true
+    // ------------------------------------------------------------
     @Test
-    @DisplayName("GET /{doctorId}/profile-status - should return true when both availability and healthcare service exist")
+    @DisplayName("GET /{doctorId}/profile-status - returns true when both availability and healthcare service exist")
     void testGetProfileStatusTrue() {
-        // Arrange
+
         when(availabilityService.existsByDoctorId(doctorId)).thenReturn(true);
         when(healthcareServiceService.existsByDoctorId(doctorId.toString())).thenReturn(true);
 
-        // Act
         ResponseEntity<Boolean> response = controller.getProfileStatus(doctorId.toString());
 
-        // Assert
         assertEquals(200, response.getStatusCodeValue());
         assertTrue(response.getBody());
 
@@ -70,9 +73,13 @@ class DoctorProfileControllerTest {
         verify(healthcareServiceService).existsByDoctorId(doctorId.toString());
     }
 
+    // ------------------------------------------------------------
+    // TEST 2 : Profile status returns false
+    // ------------------------------------------------------------
     @Test
-    @DisplayName("GET /{doctorId}/profile-status - should return false when one service is missing")
+    @DisplayName("GET /{doctorId}/profile-status - returns false when one service is missing")
     void testGetProfileStatusFalse() {
+
         when(availabilityService.existsByDoctorId(doctorId)).thenReturn(true);
         when(healthcareServiceService.existsByDoctorId(doctorId.toString())).thenReturn(false);
 
@@ -85,33 +92,36 @@ class DoctorProfileControllerTest {
         verify(healthcareServiceService).existsByDoctorId(doctorId.toString());
     }
 
+    // ------------------------------------------------------------
+    // TEST 3 : POST complete profile success
+    // ------------------------------------------------------------
     @Test
-    @DisplayName("POST /completeprofile - should complete profile successfully")
+    @DisplayName("POST /completeprofile - completes profile successfully")
     void testCompleteProfileSuccess() {
-        // Arrange
-        doNothing().when(availabilityService).createAvailabilityHealth(availabilityHealthDto);
 
-        // Act
+        when(availabilityService.createAvailabilityHealth(any()))
+                .thenReturn(true); // or whatever your service returns
+
         ResponseEntity<?> response = controller.complete(availabilityHealthDto);
 
-        // Assert
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals(true, response.getBody());
+        assertTrue((Boolean) response.getBody());
 
         verify(availabilityService).createAvailabilityHealth(availabilityHealthDto);
     }
 
+    // ------------------------------------------------------------
+    // TEST 4 : POST complete profile exception
+    // ------------------------------------------------------------
     @Test
-    @DisplayName("POST /completeprofile - should handle exception")
+    @DisplayName("POST /completeprofile - handles exception and returns error message")
     void testCompleteProfileException() {
-        // Arrange
-        doThrow(new RuntimeException("Database error"))
-                .when(availabilityService).createAvailabilityHealth(availabilityHealthDto);
 
-        // Act
+        doThrow(new RuntimeException("Database error"))
+                .when(availabilityService).createAvailabilityHealth(any());
+
         ResponseEntity<?> response = controller.complete(availabilityHealthDto);
 
-        // Assert
         assertEquals(500, response.getStatusCodeValue());
         assertEquals("Database error", response.getBody());
 
