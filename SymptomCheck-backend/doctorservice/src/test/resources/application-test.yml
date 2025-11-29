@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:15:///testdb
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    username: test
+    password: test
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+  sql:
+    init:
+      mode: always
+
+security:
+  oauth2:
+    resourceserver:
+      jwt:
+        issuer-uri: https://mock-issuer
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.test: DEBUG
+    com.symptomcheck.doctorservice: DEBUG
+    org.hibernate.SQL: DEBUG
+
+server:
+  port: 0

@@ -1,0 +1,299 @@
+package com.symptomcheck.doctorservice.functional.api;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.symptomcheck.doctorservice.controllers.DoctorProfileController;
+import com.symptomcheck.doctorservice.dtos.AvailabilityHealthDto;
+import com.symptomcheck.doctorservice.services.DoctorAvailabilityService;
+import com.symptomcheck.doctorservice.services.HealthcareServiceService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(DoctorProfileController.class)
+class DoctorProfileControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
+    private DoctorAvailabilityService availabilityService;
+
+    @MockBean
+    private HealthcareServiceService healthcareServiceService;
+
+    private UUID doctorId;
+    private AvailabilityHealthDto availabilityHealthDto;
+
+    @BeforeEach
+    void setUp() {
+        doctorId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000");
+
+        // Create valid AvailabilityHealthDto
+        availabilityHealthDto = new AvailabilityHealthDto();
+        availabilityHealthDto.setDoctorId(doctorId);
+        availabilityHealthDto.setDaysOfWeek(Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY));
+        availabilityHealthDto.setStartTime(LocalTime.of(9, 0));
+        availabilityHealthDto.setEndTime(LocalTime.of(17, 0));
+        availabilityHealthDto.setName("Cardiology Consultation");
+        availabilityHealthDto.setDescription("Comprehensive heart health consultation");
+        availabilityHealthDto.setCategory("Cardiology");
+        availabilityHealthDto.setDurationMinutes(30);
+        availabilityHealthDto.setPrice(150.0);
+    }
+
+    @Nested
+    class GetProfileStatusTests {
+
+        @Test
+        @WithMockUser(roles = "DOCTOR")
+        void shouldReturnTrueWhenProfileIsComplete() throws Exception {
+            // Given
+            when(availabilityService.existsByDoctorId(doctorId)).thenReturn(true);
+            when(healthcareServiceService.existsByDoctorId(doctorId.toString())).thenReturn(true);
+
+            // When
+            ResultActions result = mockMvc.perform(get("/api/v1/doctor/profile/{doctorId}/profile-status", doctorId));
+
+            // Then
+            result.andExpect(status().isOk())
+                    .andExpect(content().string("true"));
+        }
+
+        @Test
+        @WithMockUser(roles = "DOCTOR")
+        void shouldReturnFalseWhenAvailabilityNotCompleted() throws Exception {
+            // Given
+            when(availabilityService.existsByDoctorId(doctorId)).thenReturn(false);
+            when(healthcareServiceService.existsByDoctorId(doctorId.toString())).thenReturn(true);
+
+            // When
+            ResultActions result = mockMvc.perform(get("/api/v1/doctor/profile/{doctorId}/profile-status", doctorId));
+
+            // Then
+            result.andExpect(status().isOk())
+                    .andExpect(content().string("false"));
+        }
+
+        @Test
+        @WithMockUser(roles = "DOCTOR")
+        void shouldReturnFalseWhenHealthcareServiceNotCompleted() throws Exception {
+            // Given
+            when(availabilityService.existsByDoctorId(doctorId)).thenReturn(true);
+            when(healthcareServiceService.existsByDoctorId(doctorId.toString())).thenReturn(false);
+
+            // When
+            ResultActions result = mockMvc.perform(get("/api/v1/doctor/profile/{doctorId}/profile-status", doctorId));
+
+            // Then
+            result.andExpect(status().isOk())
+                    .andExpect(content().string("false"));
+        }
+
+        @Test
+        @WithMockUser(roles = "DOCTOR")
+        void shouldReturnFalseWhenBothNotCompleted() throws Exception {
+            // Given
+            when(availabilityService.existsByDoctorId(doctorId)).thenReturn(false);
+            when(healthcareServiceService.existsByDoctorId(doctorId.toString())).thenReturn(false);
+
+            // When
+            ResultActions result = mockMvc.perform(get("/api/v1/doctor/profile/{doctorId}/profile-status", doctorId));
+
+            // Then
+            result.andExpect(status().isOk())
+                    .andExpect(content().string("false"));
+        }
+
+        @Test
+        void shouldReturnUnauthorizedWhenNoAuthentication() throws Exception {
+            // When
+            ResultActions result = mockMvc.perform(get("/api/v1/doctor/profile/{doctorId}/profile-status", doctorId));
+
+            // Then
+            result.andExpect(status().isUnauthorized());
+        }
+
+    }
+
+    @Nested
+    class CompleteProfileTests {
+
+        @Test
+        @WithMockUser(roles = "DOCTOR")
+        void shouldCompleteProfileSuccessfully() throws Exception {
+            // Given
+            when(availabilityService.createAvailabilityHealth(any(AvailabilityHealthDto.class)))
+                    .thenReturn(true);
+
+            // When
+            ResultActions result = mockMvc.perform(post("/api/v1/doctor/profile/completeprofile")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(availabilityHealthDto)));
+
+            // Then
+            result.andExpect(status().isOk())
+                    .andExpect(content().string("true"));
+        }
+
+        @Test
+        @WithMockUser(roles = "DOCTOR")
+        void shouldHandleCompleteAvailabilityHealthDtoSuccessfully() throws Exception {
+            // Given - Complete DTO with all fields
+            AvailabilityHealthDto completeDto = new AvailabilityHealthDto();
+            completeDto.setDoctorId(doctorId);
+            completeDto.setDaysOfWeek(Arrays.asList(
+                    DayOfWeek.MONDAY, DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY,
+                    DayOfWeek.THURSDAY, DayOfWeek.FRIDAY
+            ));
+            completeDto.setStartTime(LocalTime.of(8, 0));
+            completeDto.setEndTime(LocalTime.of(18, 0));
+            completeDto.setName("General Medicine Consultation");
+            completeDto.setDescription("Comprehensive health checkup");
+            completeDto.setCategory("General Medicine");
+            completeDto.setDurationMinutes(45);
+            completeDto.setPrice(120.0);
+
+            when(availabilityService.createAvailabilityHealth(any(AvailabilityHealthDto.class)))
+                    .thenReturn(true);
+
+            // When
+            ResultActions result = mockMvc.perform(post("/api/v1/doctor/profile/completeprofile")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(completeDto)));
+
+            // Then
+            result.andExpect(status().isOk())
+                    .andExpect(content().string("true"));
+        }
+
+        @Test
+        @WithMockUser(roles = "DOCTOR")
+        void shouldHandleWeekendAvailability() throws Exception {
+            // Given - Weekend availability
+            AvailabilityHealthDto weekendDto = new AvailabilityHealthDto();
+            weekendDto.setDoctorId(doctorId);
+            weekendDto.setDaysOfWeek(Arrays.asList(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY));
+            weekendDto.setStartTime(LocalTime.of(10, 0));
+            weekendDto.setEndTime(LocalTime.of(16, 0));
+            weekendDto.setName("Weekend Emergency Consultation");
+            weekendDto.setDescription("Emergency medical consultation available on weekends");
+            weekendDto.setCategory("Emergency Medicine");
+            weekendDto.setDurationMinutes(60);
+            weekendDto.setPrice(200.0);
+
+            when(availabilityService.createAvailabilityHealth(any(AvailabilityHealthDto.class)))
+                    .thenReturn(true);
+
+            // When
+            ResultActions result = mockMvc.perform(post("/api/v1/doctor/profile/completeprofile")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(weekendDto)));
+
+            // Then
+            result.andExpect(status().isOk())
+                    .andExpect(content().string("true"));
+        }
+
+        @Test
+        @WithMockUser(roles = "DOCTOR")
+        void shouldHandleEveningHours() throws Exception {
+            // Given - Evening availability
+            AvailabilityHealthDto eveningDto = new AvailabilityHealthDto();
+            eveningDto.setDoctorId(doctorId);
+            eveningDto.setDaysOfWeek(Arrays.asList(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY));
+            eveningDto.setStartTime(LocalTime.of(17, 0));
+            eveningDto.setEndTime(LocalTime.of(21, 0));
+            eveningDto.setName("Evening Consultation");
+            eveningDto.setDescription("After-hours consultation for working patients");
+            eveningDto.setCategory("General Medicine");
+            eveningDto.setDurationMinutes(30);
+            eveningDto.setPrice(180.0);
+
+            when(availabilityService.createAvailabilityHealth(any(AvailabilityHealthDto.class)))
+                    .thenReturn(true);
+
+            // When
+            ResultActions result = mockMvc.perform(post("/api/v1/doctor/profile/completeprofile")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(eveningDto)));
+
+            // Then
+            result.andExpect(status().isOk())
+                    .andExpect(content().string("true"));
+        }
+
+        @Test
+        @WithMockUser(roles = "DOCTOR")
+        void shouldReturnInternalServerErrorWhenServiceFails() throws Exception {
+            // Given
+            when(availabilityService.createAvailabilityHealth(any(AvailabilityHealthDto.class)))
+                    .thenThrow(new RuntimeException("Failed to create availability"));
+
+            // When
+            ResultActions result = mockMvc.perform(post("/api/v1/doctor/profile/completeprofile")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(availabilityHealthDto)));
+
+            // Then
+            result.andExpect(status().isInternalServerError());
+        }
+
+
+
+        @Test
+        void shouldReturnUnauthorizedWhenNoAuthentication() throws Exception {
+            // When
+            ResultActions result = mockMvc.perform(post("/api/v1/doctor/profile/completeprofile")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(availabilityHealthDto)));
+
+            // Then
+            result.andExpect(status().isUnauthorized());
+        }
+
+        @Test
+        @WithMockUser(roles = "DOCTOR")
+        void shouldHandleInvalidJson() throws Exception {
+            // Given - Invalid JSON content
+            String invalidJson = "{ invalid json }";
+
+            // When
+            ResultActions result = mockMvc.perform(post("/api/v1/doctor/profile/completeprofile")
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(invalidJson));
+
+            // Then
+            result.andExpect(status().isBadRequest());
+        }
+
+    }
+}

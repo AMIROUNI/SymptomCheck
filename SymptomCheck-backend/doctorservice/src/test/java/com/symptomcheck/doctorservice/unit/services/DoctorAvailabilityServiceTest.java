@@ -1,0 +1,96 @@
+package com.symptomcheck.doctorservice.unit.services;
+
+import com.symptomcheck.doctorservice.dtos.AvailabilityHealthDto;
+import com.symptomcheck.doctorservice.models.DoctorAvailability;
+import com.symptomcheck.doctorservice.models.HealthcareService;
+import com.symptomcheck.doctorservice.repositories.DoctorAvailabilityRepository;
+import com.symptomcheck.doctorservice.repositories.HealthcareServiceRepository;
+import com.symptomcheck.doctorservice.services.DoctorAvailabilityService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+class DoctorAvailabilityServiceTest {
+
+    @Mock
+    private DoctorAvailabilityRepository availabilityRepository;
+
+    @Mock
+    private HealthcareServiceRepository healthcareRepo;
+
+
+
+    @InjectMocks
+    private DoctorAvailabilityService availabilityService;
+
+    private UUID doctorId;
+    private LocalDateTime dateTime;
+
+    @BeforeEach
+    void setup() {
+        MockitoAnnotations.openMocks(this);
+        doctorId = UUID.randomUUID();
+        dateTime = LocalDateTime.of(2025, 11, 20, 10, 0);
+    }
+
+
+    @Nested
+    @DisplayName("existsByDoctorId method tests")
+    class ExistsByDoctorIdTests {
+
+        @Test
+        @DisplayName("should return true when doctor exists")
+        void testDoctorExists() {
+            when(availabilityRepository.existsByDoctorId(doctorId)).thenReturn(true);
+            assertTrue(availabilityService.existsByDoctorId(doctorId));
+        }
+
+        @Test
+        @DisplayName("should return false when doctor does not exist")
+        void testDoctorDoesNotExist() {
+            when(availabilityRepository.existsByDoctorId(doctorId)).thenReturn(false);
+            assertFalse(availabilityService.existsByDoctorId(doctorId));
+        }
+    }
+
+    @Nested
+    @DisplayName("createAvailabilityHealth method tests")
+    class CreateAvailabilityHealthTests {
+
+        @Test
+        @DisplayName("should create DoctorAvailability and HealthcareService")
+        void testCreateAvailabilityHealth() {
+            AvailabilityHealthDto dto = new AvailabilityHealthDto();
+            dto.setDoctorId(doctorId);
+            dto.setDaysOfWeek(List.of(DayOfWeek.MONDAY));
+            dto.setStartTime(LocalTime.of(9, 0));
+            dto.setEndTime(LocalTime.of(12, 0));
+            dto.setCategory("Heart");
+            dto.setDescription("Heart checkup");
+            dto.setName("Cardiology");
+            dto.setPrice(150.0);
+            dto.setImageUrl("image.png");
+            dto.setDurationMinutes(30);
+
+            availabilityService.createAvailabilityHealth(dto);
+
+            verify(availabilityRepository, times(1)).save(any(DoctorAvailability.class));
+            verify(healthcareRepo, times(1)).save(any(HealthcareService.class));
+        }
+    }
+}
