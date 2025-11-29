@@ -23,6 +23,7 @@ import { DoctorDashboardComponent } from "./components/doctors/doctor-dashboard/
 import { CalendarComponent } from "./components/doctors/calendar/calendar.component"
 import { DoctorReviewsComponent } from "./components/doctors/doctor-reviews/doctor-reviews.component"
 import { ProfileComponent } from "./components/profile/profile.component"
+import { AiserviceComponent } from "./components/aiservice/aiservice.component"
 
 
 const routes: Routes = [
@@ -33,6 +34,7 @@ const routes: Routes = [
   { path: "doctors/:id", component: DoctorDetailComponent },
 
   {path: "doctor-dashboard", component: DoctorDashboardComponent},
+  {path:"model",component:AiserviceComponent},
 
   { path: "services", component: ServiceListComponent },
   //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

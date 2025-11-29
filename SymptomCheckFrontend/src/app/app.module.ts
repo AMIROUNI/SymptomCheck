@@ -67,6 +67,7 @@ import { BarGrowthChartComponent } from "./components/shared/dashboard-component
 import { ReviewService } from "./services/review.service";
 import { DoctorReviewsComponent } from './components/doctors/doctor-reviews/doctor-reviews.component';
 import { ProfileComponent } from './components/profile/profile.component';
+import { AiserviceComponent } from './components/aiservice/aiservice.component';
 
 @NgModule({
   declarations: [
@@ -102,7 +103,8 @@ import { ProfileComponent } from './components/profile/profile.component';
     CompleteProfileComponent,
     DoctorDashboardComponent,
     DoctorReviewsComponent,
-    ProfileComponent
+    ProfileComponent,
+    AiserviceComponent
       ],
       imports: [
     BarGrowthChartComponent,
