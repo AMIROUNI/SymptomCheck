@@ -8,7 +8,6 @@ import { DoctorDetailComponent } from "./components/doctors/doctor-detail/doctor
 import { ServiceListComponent } from "./components/services/service-list/service-list.component"
 import { AppointmentComponent } from "./components/appointments/appointment/appointment.component"
 import { UserDashboardComponent } from "./components/dashboard/user-dashboard/user-dashboard.component"
-import { ProfileEditComponent } from "./components/dashboard/profile-edit/profile-edit.component"
 import { AppointmentHistoryComponent } from "./components/dashboard/appointment-history/appointment-history.component"
 import { AuthGuard } from "./guards/auth.guard"
 import { AddServiceComponent } from "./components/services/add-service/add-service.component"
@@ -22,6 +21,8 @@ import { DoctorManagementComponent } from "./components/admin/doctor-management/
 import { ClinicManagementComponent } from "./components/admin/clinic-management/clinic-management.component"
 import { DoctorDashboardComponent } from "./components/doctors/doctor-dashboard/doctor-dashboard.component"
 import { CalendarComponent } from "./components/doctors/calendar/calendar.component"
+import { DoctorReviewsComponent } from "./components/doctors/doctor-reviews/doctor-reviews.component"
+import { ProfileComponent } from "./components/profile/profile.component"
 
 
 const routes: Routes = [
@@ -41,6 +42,8 @@ const routes: Routes = [
    {path: "update-clinic/:id", component: UpdateMedicalClinicComponent},
    {path: "test", component: ClinicListComponent},
    {path:"addclinic",component:MedicalClinicFormComponent},
+         
+
   //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   {
     path: "appointment",
@@ -88,12 +91,25 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     children: [
       { path: "", redirectTo: "appointments", pathMatch: "full" },
-      { path: "profile", component: ProfileEditComponent },
       { path: "appointments", component: AppointmentHistoryComponent },
       {path:"add-service",component:AddServiceComponent},
-     { path: "services", component: ServiceListComponent }
+     { path: "services", component: ServiceListComponent },
+      {path:"reviews" , component: DoctorReviewsComponent},
+
+
     ],
   },
+
+  { 
+  path: "profile/:id", 
+  component: ProfileComponent,
+  canActivate: [AuthGuard]
+},
+{ 
+  path: "profile", 
+  component: ProfileComponent,
+  canActivate: [AuthGuard]
+},
   { path: "**", redirectTo: "" },
 ]
 

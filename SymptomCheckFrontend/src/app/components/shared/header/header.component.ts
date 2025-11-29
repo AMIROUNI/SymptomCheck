@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from "@angular/core"
+import { Component, OnInit, OnDestroy, HostListener } from "@angular/core"
 import { Router } from "@angular/router"
 import { AuthService } from "../../../services/auth.service"
 import { User, UserRole } from "../../../models/user.model"
@@ -16,6 +16,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   profileImageUrl: string = '';
   currentUser: User | null = null;
   isMenuOpen = false;
+  isDropdownOpen = false;
   private userSubscription: Subscription | undefined;
 
   // Make UserRole available in template
@@ -52,14 +53,40 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Fermer le dropdown en cliquant ailleurs
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.user-dropdown')) {
+      this.isDropdownOpen = false;
+    }
+  }
+
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  // Méthodes pour gérer le dropdown
+  toggleDropdown(): void {
+    this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
+  openDropdown(): void {
+    this.isDropdownOpen = true;
+  }
+
+  closeDropdown(): void {
+    // Petit délai pour permettre le clic sur les liens
+    setTimeout(() => {
+      this.isDropdownOpen = false;
+    }, 150);
   }
 
   logout(): void {
     this.authService.logout();
     this.router.navigate(["/"]);
     this.isMenuOpen = false;
+    this.isDropdownOpen = false;
   }
 
   get isLoggedIn(): boolean {
@@ -78,58 +105,63 @@ export class HeaderComponent implements OnInit, OnDestroy {
     return this.currentUser?.roles?.includes(UserRole.PATIENT) ?? false;
   }
 
-isDoctor(): boolean {
-  console.log('Current user roles:', this.currentUser?.roles);
-  return this.currentUser?.roles?.includes(UserRole.DOCTOR) ?? false;
-}
+  isDoctor(): boolean {
+    console.log('Current user roles:', this.currentUser?.roles);
+    return this.currentUser?.roles?.includes(UserRole.DOCTOR) ?? false;
+  }
 
   isAdmin(): boolean {
-    return this.currentUser?.roles.includes(UserRole.ADMIN) ?? false;
+    return this.currentUser?.roles?.includes(UserRole.ADMIN) ?? false;
   }
 
-  // Get appropriate dashboard route based on role
- getDashboardRoute(): string {
-  const roles = this.currentUser?.roles;
-
-  if (roles?.includes(UserRole.PATIENT)) {
-    return '/dashboard/patient';
-  }
-  if (roles?.includes(UserRole.DOCTOR)) {
-    return '/dashboard/doctor';
-  }
-  if (roles?.includes(UserRole.ADMIN)) {
-    return '/dashboard/admin';
-  }
-
-  return '/dashboard';
-}
-
-
-  // Get dashboard display name based on role
- getDashboardName(): string {
-  const roles = this.currentUser?.roles;
-
-  if (roles?.includes(UserRole.PATIENT)) {
-    return 'Patient Dashboard';
-  }
-  if (roles?.includes(UserRole.DOCTOR)) {
-    return 'Doctor Dashboard';
-  }
-  if (roles?.includes(UserRole.ADMIN)) {
-    return 'Admin Dashboard';
-  }
-
-  return 'Dashboard';
-}
-
-
-  // Check if user can book appointments
+  // AJOUT : Vérifier si l'utilisateur peut prendre des rendez-vous
   canBookAppointments(): boolean {
-    return this.isPatient() || !this.currentUser?.roles ; // Allow patients and users without specific role
+    return this.isPatient() || !this.currentUser?.roles; // Allow patients and users without specific role
   }
 
-  // Check if user can access admin features
+  // AJOUT : Obtenir le nom du dashboard selon le rôle
+  getDashboardName(): string {
+    const roles = this.currentUser?.roles;
+
+    if (roles?.includes(UserRole.PATIENT)) {
+      return 'Patient Dashboard';
+    }
+    if (roles?.includes(UserRole.DOCTOR)) {
+      return 'Doctor Dashboard';
+    }
+    if (roles?.includes(UserRole.ADMIN)) {
+      return 'Admin Dashboard';
+    }
+
+    return 'Dashboard';
+  }
+
+  // AJOUT : Obtenir la route du dashboard selon le rôle
+  getDashboardRoute(): string {
+    const roles = this.currentUser?.roles;
+
+    if (roles?.includes(UserRole.PATIENT)) {
+      return '/dashboard';
+    }
+    if (roles?.includes(UserRole.DOCTOR)) {
+      return '/doctor-dashboard';
+    }
+    if (roles?.includes(UserRole.ADMIN)) {
+      return '/admin';
+    }
+
+    return '/dashboard';
+  }
+
+  // AJOUT : Vérifier l'accès admin
   canAccessAdmin(): boolean {
     return this.isAdmin();
+  }
+
+  // Navigation methods with dropdown close
+  navigateTo(route: string): void {
+    this.router.navigate([route]);
+    this.closeDropdown();
+    this.isMenuOpen = false;
   }
 }

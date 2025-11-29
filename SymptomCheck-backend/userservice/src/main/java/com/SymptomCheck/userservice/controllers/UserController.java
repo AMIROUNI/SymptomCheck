@@ -1,11 +1,14 @@
 package com.SymptomCheck.userservice.controllers;
 
+import com.SymptomCheck.userservice.dtos.DoctorProfileDto;
 import com.SymptomCheck.userservice.dtos.UserRegistrationRequest;
+import com.SymptomCheck.userservice.dtos.UserUpdateDto;
 import com.SymptomCheck.userservice.models.User;
 import com.SymptomCheck.userservice.models.UserData;
 import com.SymptomCheck.userservice.services.UserDataService;
 import com.SymptomCheck.userservice.services.UserService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -168,6 +171,133 @@ public class UserController {
             log.info(e.getMessage());
             return ResponseEntity.internalServerError().body(false);
         }
+    }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<?> updateUser(
+            @PathVariable
+            @Pattern(regexp = "^[a-fA-F0-9-]{36}$", message = "Invalid user ID format")
+            String userId,
+            @Valid @RequestBody UserUpdateDto userUpdateDto,
+            @AuthenticationPrincipal Jwt jwt) {
+
+        // Reject "NaN" explicitly
+        if ("NaN".equals(userId)) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Invalid user ID",
+                    "message", "User ID cannot be NaN"
+            ));
+        }
+
+        try {
+            log.info("🔄 Updating user with ID: {}", userId);
+
+            // Vérifier que l'utilisateur peut modifier ce profil
+            if (!canUserModifyProfile(jwt, userId)) {
+                return ResponseEntity.status(403).body(Map.of(
+                        "error", "You don't have permission to update this profile"
+                ));
+            }
+
+            UserRegistrationRequest updatedUser = userService.updateUser(userId, userUpdateDto);
+
+            log.info("✅ User updated successfully: {}", updatedUser);
+            return ResponseEntity.ok(Map.of(
+                    "message", "User updated successfully",
+                    "user", updatedUser
+            ));
+        } catch (Exception e) {
+            log.error("❌ Error updating user: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", e.getMessage()
+            ));
+        }
+    }
+    /**
+     * Compléter/mettre à jour le profil docteur
+     */
+    @PutMapping("/{userId}/complete-profile")
+    public ResponseEntity<?> completeDoctorProfile(@PathVariable String userId,
+                                                   @Valid @RequestBody DoctorProfileDto doctorProfileDto,
+                                                   @AuthenticationPrincipal Jwt jwt) {
+        try {
+            log.info("🔄 Completing doctor profile for user ID: {}", userId);
+
+            // Vérifier que l'utilisateur peut modifier ce profil
+            if (!canUserModifyProfile(jwt, userId)) {
+                return ResponseEntity.status(403).body(Map.of(
+                        "error", "You don't have permission to update this profile"
+                ));
+            }
+
+            UserData updatedUserData = userService.completeDoctorProfile(userId, doctorProfileDto);
+
+            log.info("✅ Doctor profile completed successfully: {}", updatedUserData);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Doctor profile completed successfully",
+                    "userData", updatedUserData
+            ));
+        } catch (Exception e) {
+            log.error("❌ Error completing doctor profile: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * Upload de photo de profil
+     */
+    @PostMapping(value = "/{userId}/profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadProfilePhoto(@PathVariable String userId,
+                                                @RequestParam("file") MultipartFile file,
+                                                @AuthenticationPrincipal Jwt jwt) {
+        try {
+            log.info("📤 Uploading profile photo for user ID: {}", userId);
+
+            // Vérifier que l'utilisateur peut modifier ce profil
+            if (!canUserModifyProfile(jwt, userId)) {
+                return ResponseEntity.status(403).body(Map.of(
+                        "error", "You don't have permission to update this profile"
+                ));
+            }
+
+            String profilePhotoUrl = userService.uploadProfilePhoto(userId, file);
+
+            log.info("✅ Profile photo uploaded successfully: {}", profilePhotoUrl);
+            return ResponseEntity.ok(Map.of(
+                    "message", "Profile photo uploaded successfully",
+                    "profilePhotoUrl", profilePhotoUrl
+            ));
+        } catch (Exception e) {
+            log.error("❌ Error uploading profile photo: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", e.getMessage()
+            ));
+        }
+    }
+
+    /**
+     * Vérifier si l'utilisateur peut modifier le profil
+     */
+    private boolean canUserModifyProfile(Jwt jwt, String targetUserId) {
+        String currentUserId = jwt.getSubject();
+
+        // L'utilisateur peut modifier son propre profil
+        if (currentUserId.equals(targetUserId)) {
+            return true;
+        }
+
+        // Vérifier si l'utilisateur est admin
+        Map<String, Object> realmAccess = jwt.getClaim("realm_access");
+        if (realmAccess != null && realmAccess.get("roles") != null) {
+            List<String> roles = (List<String>) realmAccess.get("roles");
+            if (roles.contains("admin") || roles.contains("ADMIN")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 }

@@ -7,7 +7,6 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from "@angula
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from "@angular/material/dialog"
 import { MatSnackBar, MatSnackBarModule } from "@angular/material/snack-bar"
 
-
 @Component({
   selector: "app-doctor-dialog",
   templateUrl: "./doctor-dialog.component.html",
@@ -31,7 +30,7 @@ export class DoctorDialogComponent implements OnInit {
   ngOnInit(): void {
     this.loadClinics()
     this.doctorForm = this.fb.group({
-      id: [this.data.doctor.id],
+      // ✅ SUPPRIMÉ : id n'est plus nécessaire dans le formulaire
       speciality: [this.data.doctor.speciality || "", [Validators.required]],
       description: [this.data.doctor.description || "", [Validators.required]],
       diploma: [this.data.doctor.diploma || "", [Validators.required]],
@@ -54,22 +53,65 @@ export class DoctorDialogComponent implements OnInit {
   onSubmit(): void {
     if (this.doctorForm.valid) {
       this.loading = true
-      const profileData: DoctorProfileDto = this.doctorForm.value
+      
+      // ✅ CORRIGÉ : Créer le DTO sans l'ID
+      const profileData: DoctorProfileDto = {
+        speciality: this.doctorForm.value.speciality,
+        description: this.doctorForm.value.description,
+        diploma: this.doctorForm.value.diploma,
+        profilePhotoUrl: this.doctorForm.value.profilePhotoUrl,
+        clinicId: this.doctorForm.value.clinicId
+      }
 
-      this.userService.completeDoctorProfile(profileData).subscribe({
+      // ✅ CORRIGÉ : Passer l'ID de l'utilisateur comme premier paramètre
+      this.userService.completeDoctorProfile(this.data.doctor.id, profileData).subscribe({
         next: () => {
           this.snackBar.open("Doctor profile updated successfully", "Close", { duration: 3000 })
           this.dialogRef.close(true)
         },
         error: (error) => {
           this.loading = false
+          console.error('Error updating doctor profile:', error)
           this.snackBar.open("Error updating doctor profile", "Close", { duration: 3000 })
         },
+        complete: () => {
+          this.loading = false
+        }
       })
+    } else {
+      // Marquer tous les champs comme touchés pour afficher les erreurs de validation
+      this.markFormGroupTouched()
     }
   }
 
   onCancel(): void {
     this.dialogRef.close()
+  }
+
+  // Méthode pour marquer tous les champs comme touchés
+  private markFormGroupTouched(): void {
+    Object.keys(this.doctorForm.controls).forEach(key => {
+      const control = this.doctorForm.get(key)
+      control?.markAsTouched()
+    })
+  }
+
+  // Getters pour les erreurs de formulaire (utiles pour le template)
+  get specialityError(): string {
+    const control = this.doctorForm.get('speciality')
+    if (control?.errors?.['required'] && control.touched) return 'Speciality is required'
+    return ''
+  }
+
+  get descriptionError(): string {
+    const control = this.doctorForm.get('description')
+    if (control?.errors?.['required'] && control.touched) return 'Description is required'
+    return ''
+  }
+
+  get diplomaError(): string {
+    const control = this.doctorForm.get('diploma')
+    if (control?.errors?.['required'] && control.touched) return 'Diploma is required'
+    return ''
   }
 }

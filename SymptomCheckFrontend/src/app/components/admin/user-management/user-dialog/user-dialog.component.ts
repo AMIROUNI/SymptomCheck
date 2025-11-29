@@ -1,4 +1,5 @@
 import { User, UserRole, UserUpdateDto } from "@/app/models/user.model"
+import { AuthService } from "@/app/services/auth.service"
 import { UserService } from "@/app/services/user.service"
 import { Component, Inject,  OnInit } from "@angular/core"
 import {  FormBuilder,  FormGroup, Validators } from "@angular/forms"
@@ -16,16 +17,21 @@ export class UserDialogComponent implements OnInit {
   userForm!: FormGroup
   userRoles = Object.keys(UserRole).filter((key) => isNaN(Number(key)))
   loading = false;
+    currentUser: User | null = null
+
 
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
     private snackBar: MatSnackBar,
+    private authService:AuthService,
     @Inject(MAT_DIALOG_DATA) public data: { user: User; isEdit: boolean },
     public dialogRef: MatDialogRef<UserDialogComponent>
   ) {}
 
   ngOnInit(): void {
+    this.currentUser = this.authService.getCurrentUser()
+
     this.userForm = this.fb.group({
       id: [this.data.user.id],
       firstName: [this.data.user.firstName || "", [Validators.required]],
@@ -37,11 +43,11 @@ export class UserDialogComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.userForm.valid) {
+    if (this.userForm.valid && this.currentUser) {
       this.loading = true
       const userData: UserUpdateDto = this.userForm.value
 
-      this.userService.update(userData).subscribe({
+      this.userService.update(this.currentUser.id,userData).subscribe({
         next: () => {
           this.snackBar.open("User updated successfully", "Close", { duration: 3000 })
           this.dialogRef.close(true)

@@ -1,42 +1,43 @@
-<h2 mat-dialog-title>Edit Doctor Profile</h2>
+<h2 mat-dialog-title>
+  {{ data.isEdit ? 'Edit Doctor Profile' : 'Complete Doctor Profile' }}
+</h2>
 
 <mat-dialog-content>
-  <form [formGroup]="doctorForm">
+  <form [formGroup]="doctorForm" (ngSubmit)="onSubmit()">
+    <!-- Speciality Field -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Speciality</mat-label>
-      <input matInput formControlName="speciality" required>
-      <mat-error *ngIf="doctorForm.get('speciality')?.hasError('required')">
-        Speciality is required
-      </mat-error>
+      <input matInput formControlName="speciality" placeholder="Enter speciality">
+      <mat-error *ngIf="specialityError">{{ specialityError }}</mat-error>
     </mat-form-field>
 
+    <!-- Description Field -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Description</mat-label>
-      <textarea matInput formControlName="description" rows="3" required></textarea>
-      <mat-error *ngIf="doctorForm.get('description')?.hasError('required')">
-        Description is required
-      </mat-error>
+      <textarea matInput formControlName="description" placeholder="Enter description" rows="3"></textarea>
+      <mat-error *ngIf="descriptionError">{{ descriptionError }}</mat-error>
     </mat-form-field>
 
+    <!-- Diploma Field -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Diploma</mat-label>
-      <input matInput formControlName="diploma" required>
-      <mat-error *ngIf="doctorForm.get('diploma')?.hasError('required')">
-        Diploma is required
-      </mat-error>
+      <input matInput formControlName="diploma" placeholder="Enter diploma">
+      <mat-error *ngIf="diplomaError">{{ diplomaError }}</mat-error>
     </mat-form-field>
 
+    <!-- Profile Photo URL Field -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Profile Photo URL</mat-label>
-      <input matInput formControlName="profilePhotoUrl">
+      <input matInput formControlName="profilePhotoUrl" placeholder="Enter profile photo URL">
     </mat-form-field>
 
+    <!-- Clinic Selection -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Clinic</mat-label>
       <mat-select formControlName="clinicId">
         <mat-option [value]="null">No Clinic</mat-option>
         <mat-option *ngFor="let clinic of clinics" [value]="clinic.id">
-          {{clinic.name}}
+          {{ clinic.name }}
         </mat-option>
       </mat-select>
     </mat-form-field>
@@ -44,10 +45,12 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()">Cancel</button>
-  <button mat-raised-button color="primary" (click)="onSubmit()" 
-          [disabled]="!doctorForm.valid || loading">
-    <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
-    <span *ngIf="!loading">Save</span>
+  <button mat-button (click)="onCancel()" [disabled]="loading">Cancel</button>
+  <button 
+    mat-raised-button 
+    color="primary" 
+    (click)="onSubmit()" 
+    [disabled]="doctorForm.invalid || loading">
+    {{ loading ? 'Saving...' : (data.isEdit ? 'Update' : 'Save') }}
   </button>
 </mat-dialog-actions>

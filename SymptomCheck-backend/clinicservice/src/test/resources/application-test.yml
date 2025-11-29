@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+  sql:
+    init:
+      mode: always
+      platform: postgres
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.test: DEBUG
+    com.symptomcheck.clinicservice: DEBUG
+
+security:
+  oauth2:
+    resourceserver:
+      jwt:
+        issuer-uri: mock-issuer

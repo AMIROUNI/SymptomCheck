@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class MedicalClinicController {
 
     // CREATE
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createClinic(@RequestBody MedicalClinicDto clinic) {
         try {
             log.info("createClinic called");
@@ -49,6 +51,7 @@ public class MedicalClinicController {
 
     // UPDATE
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public MedicalClinic updateClinic(
             @PathVariable Long id,
             @RequestBody MedicalClinic clinic
@@ -58,6 +61,7 @@ public class MedicalClinicController {
 
     // DELETE
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteClinic(@PathVariable Long id) {
         clinicService.deleteClinic(id);
     }
