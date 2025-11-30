@@ -6,6 +6,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Parent project -->
     <parent>
         <groupId>com.example</groupId>
         <artifactId>SymptomCheck-backend</artifactId>
@@ -18,13 +19,12 @@
     <name>Appointment Service</name>
 
     <properties>
-        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
 
-        <!-- ========== SPRING BOOT STARTERS ========== -->
+        <!-- SPRING BOOT STARTERS -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -35,20 +35,12 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- Validation (Bean Validation + Hibernate Validator) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- Optional WebFlux (kept optional, not needed for MVC) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- ========== SECURITY ========== -->
+        <!-- SECURITY -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -64,27 +56,36 @@
             <artifactId>spring-security-oauth2-jose</artifactId>
         </dependency>
 
-        <!-- ========== API DOCUMENTATION ========== -->
+        <!-- OPENAPI -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
 
-        <!-- ========== DATABASE ========== -->
+        <!-- DATABASE -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
 
-        <!-- ========== LOMBOK ========== -->
+        <!-- DEV TOOLS -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
 
-        <!-- ========== TEST DEPENDENCIES ========== -->
+        <!-- OPTIONAL WEBFLUX -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- ========= TEST DEPENDENCIES ========= -->
+
+        <!-- Spring Boot Tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -97,13 +98,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Reactor tests -->
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
         </dependency>
 
-        <!-- Testcontainers for integration tests -->
+        <!-- TestContainers -->
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -116,7 +118,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- REST Assured (great for API contract testing) -->
+        <!-- REST-Assured -->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
@@ -129,7 +131,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- JAXB (needed in JDK 9+ for XML binding in tests) -->
+        <!-- JAXB for tests -->
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-xjc</artifactId>
@@ -141,7 +143,7 @@
     <build>
         <plugins>
 
-            <!-- Spring Boot Maven Plugin -->
+            <!-- SPRING BOOT PLUGIN -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -155,35 +157,41 @@
                 </configuration>
             </plugin>
 
-            <!-- Maven Surefire Plugin (Unit Tests) -->
+            <!-- UNIT TEST PLUGIN -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.5</version>
                 <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*Tests.java</include>
+                        <include>**/*TestCase.java</include>
+                        <include>**/unit/**/*Test.java</include>
+                        <include>**/functional/api/*Test.java</include>
+                    </includes>
+
                     <forkCount>1</forkCount>
                     <reuseForks>true</reuseForks>
                     <argLine>-Xmx1024m ${argLine}</argLine>
-                    <printSummary>true</printSummary>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <forkedProcessExitTimeoutInSeconds>120</forkedProcessExitTimeoutInSeconds>
-                    <shutdown>kill</shutdown>
                 </configuration>
             </plugin>
 
-            <!-- Maven Failsafe Plugin (Integration Tests - IT.java) -->
+            <!-- INTEGRATION TESTS -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.2.5</version>
                 <configuration>
+                    <includes>
+                        <include>**/*IT.java</include>
+                        <include>**/integration/**/*Test.java</include>
+                        <include>**/*ITCase.java</include>
+                    </includes>
+
                     <forkCount>1</forkCount>
                     <reuseForks>true</reuseForks>
                     <argLine>-Xmx1024m ${argLine}</argLine>
-                    <printSummary>true</printSummary>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <forkedProcessExitTimeoutInSeconds>120</forkedProcessExitTimeoutInSeconds>
-                    <shutdown>kill</shutdown>
                 </configuration>
                 <executions>
                     <execution>
@@ -193,6 +201,46 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- JACOCO CONFIG -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals><goal>prepare-agent</goal></goals>
+                        <configuration>
+                            <destFile>${project.build.directory}/jacoco.exec</destFile>
+                            <propertyName>argLine</propertyName>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals><goal>report</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- PITEST CONFIG -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <configuration>
+                    <targetClasses>
+                        <param>com.symptomcheck.appointmentservice.services.*</param>
+                        <param>com.symptomcheck.appointmentservice.controllers.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>com.symptomcheck.appointmentservice.unit.*</param>
+                        <param>com.symptomcheck.appointmentservice.functional.api.*</param>
+                    </targetTests>
+                    <mutationThreshold>75</mutationThreshold>
+                    <coverageThreshold>70</coverageThreshold>
+                </configuration>
             </plugin>
 
         </plugins>

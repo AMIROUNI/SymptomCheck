@@ -214,7 +214,6 @@ class AppointmentserviceApplicationTests {
         }
 
 
-
         @Test
         void whenAdminAccessesDoctorDashboard_shouldReturnOk() throws Exception {
             // Admin should have access to doctor dashboard
