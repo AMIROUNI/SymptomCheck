@@ -1,5 +1,6 @@
-package com.SymptomCheck.userservice.controllers;
+package com.SymptomCheck.userservice.unit.controllers;
 
+import com.SymptomCheck.userservice.controllers.AuthController;
 import com.SymptomCheck.userservice.dtos.LoginRequest;
 import com.SymptomCheck.userservice.dtos.LogoutRequest;
 import com.SymptomCheck.userservice.dtos.RefreshTokenRequest;
@@ -11,14 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("AuthController Unit Tests")

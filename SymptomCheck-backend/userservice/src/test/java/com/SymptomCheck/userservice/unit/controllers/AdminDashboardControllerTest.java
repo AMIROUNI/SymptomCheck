@@ -1,5 +1,6 @@
-package com.SymptomCheck.userservice.controllers;
+package com.SymptomCheck.userservice.unit.controllers;
 
+import com.SymptomCheck.userservice.controllers.AdminDashboardController;
 import com.SymptomCheck.userservice.dtos.adminDashboardDto.AdminUserDto;
 import com.SymptomCheck.userservice.dtos.adminDashboardDto.UserStatsDto;
 import com.SymptomCheck.userservice.services.AdminDashboardService;

@@ -1,6 +1,7 @@
-package com.SymptomCheck.userservice.models;
+package com.SymptomCheck.userservice.unit.models;
 
 import com.SymptomCheck.userservice.enums.UserRole;
+import com.SymptomCheck.userservice.models.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

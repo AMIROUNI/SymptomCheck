@@ -98,7 +98,7 @@ public class AuthService {
             log.info("✅ User logged out successfully");
 
         } catch (Exception e) {
-            log.error("❌ Logout error: {}", e.getMessage());
+            log.error(" Logout error: {}", e.getMessage());
             throw new RuntimeException("Logout failed: " + e.getMessage());
         }
     }
