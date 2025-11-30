@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AdminDashboardController.class)
-class AdminDashboardControllerFunctionalTest {
+class AdminDashboardControllerApiTest {
 
     @Autowired
     private MockMvc mockMvc;
