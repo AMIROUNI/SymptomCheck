@@ -13,6 +13,10 @@
           <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
           <li><a routerLink="/doctors" routerLinkActive="active">Doctors</a></li>
           <li><a routerLink="/services" routerLinkActive="active">Services</a></li>
+          <li> <a routerLink="/model" class="dropdown-item" (click)="closeDropdown()">
+                <i class="fas fa-calendar"></i> Prediction
+              </a>
+            </li>  
           
           <!-- Patient-specific navigation -->
           <li *ngIf="isLoggedIn && canBookAppointments()">
@@ -100,6 +104,7 @@
               <a routerLink="/admin/appointments" class="dropdown-item" (click)="closeDropdown()">
                 <i class="fas fa-calendar"></i> All Appointments
               </a>
+             
             </ng-container>
 
             <div class="dropdown-divider"></div>

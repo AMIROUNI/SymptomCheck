@@ -6,6 +6,7 @@ export const environment = {
   doctorserviceAdminApiUrl: 'http://localhost:8087/api/admin',
   appointmentAdminApiUrl: 'http://localhost:8089/api/admin',
   clinicAdminApiUrl: 'http://localhost:8085/api/admin',
+  aiApiUrl: 'http://localhost:8085/api/v1/predict/' ,
   
   // URLs des microservices API
   userserviceApiUrl: 'http://localhost:8082/api/v1',
@@ -13,7 +14,7 @@ export const environment = {
   appointmentApiUrl: 'http://localhost:8089/api/v1/appointments',
   clinicApiUrl: 'http://localhost:8085/api/v1',
   
-  // ✅ AJOUT: Service de reviews
+  //  AJOUT: Service de reviews
   reviewApiUrl: 'http://localhost:8078/api/v1/reviews',
   
   // Configuration Keycloak
