@@ -18,3 +18,6 @@ docker-compose up --build
 
 unit test by this command  you should chage the name of the service appointmentservice :
 mvnw.cmd pitest:mutationCoverage -DtargetTests=com.symptomcheck.appointmentservice.unit.*
+
+commande to generate jacoco report
+mvnw.cmd test jacoco:report
