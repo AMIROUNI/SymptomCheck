@@ -23,6 +23,8 @@ public class DoctorReviewService {
     private final DoctorReviewRepository doctorReviewRepository;
 
     public DoctorReviewResponse createReview(String patientId, DoctorReviewRequest request) {
+
+
         // Vérifier si le patient a déjà review ce docteur
         if (doctorReviewRepository.existsByPatientIdAndDoctorId(patientId, request.getDoctorId())) {
             throw new ReviewAlreadyExistsException(
