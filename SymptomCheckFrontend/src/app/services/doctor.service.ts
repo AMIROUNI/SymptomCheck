@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core"
-import { HttpClient, HttpHeaders } from "@angular/common/http"
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http"
 import { Observable } from "rxjs"
 import { User } from "../models/user.model"
 import { DoctorReview } from "../models/doctor-review.model"
@@ -16,14 +16,16 @@ import { AvailabilityHealthDto } from "../models/availability-health-dto"
   providedIn: "root",
 })
 export class DoctorService {
-  apiurl = "http://localhost:5190"
+  apiurl = "http://localhost:8087"
+  apiurll = "http://localhost:8082/api/v1"
   private doctorApiUrl = `${environment.doctorserviceApiUrl}`;
 
 
   constructor(private http: HttpClient,private authService: AuthService, private router: Router) {}
 
   getDoctors(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiurl}`);
+    const params = new HttpParams().set("role","DOCTOR")
+    return this.http.get<User[]>(`${this.apiurll}/by-role`,{params});
   }
 
   getDoctorById(id: string): Observable<User> {

@@ -27,6 +27,7 @@ export class HomeComponent implements OnInit {
       next: (doctors) => {
         // Get first 3 doctors for featured section
         this.featuredDoctors = doctors.slice(0, 3)
+        console.log("doctor detected")
         this.isLoading = false
       },
       error: () => {
