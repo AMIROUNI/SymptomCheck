@@ -11,7 +11,6 @@
         <module>appointmentservice</module>
         <module>medicalrecordservice</module>
         <module>doctorservice</module>
-        <module>aiservice</module>
         <module>clinicservice</module>
         <module>reviewservice</module>
     </modules>

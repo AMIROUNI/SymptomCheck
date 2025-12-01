@@ -1,11 +1,14 @@
 package com.SymptomCheck.userservice;
 
+import com.SymptomCheck.userservice.config.KeycloakSecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+
 
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -24,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Testcontainers
 @ActiveProfiles("test")
+@Import(KeycloakSecurityConfig.class)
 class UserServiceApplicationTests {
 
     @Autowired

@@ -2,8 +2,9 @@ package com.SymptomCheck.userservice.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Data
+@Data @NoArgsConstructor
 public class DoctorProfileDto {
     @NotBlank(message = "ID is required")
     private String id;

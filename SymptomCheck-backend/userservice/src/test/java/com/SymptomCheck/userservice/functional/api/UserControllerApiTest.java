@@ -1,5 +1,6 @@
 package com.SymptomCheck.userservice.functional.api;
 
+import com.SymptomCheck.userservice.config.KeycloakSecurityConfig;
 import com.SymptomCheck.userservice.controllers.UserController;
 import com.SymptomCheck.userservice.dtos.DoctorProfileDto;
 import com.SymptomCheck.userservice.dtos.UserRegistrationRequest;
@@ -11,44 +12,43 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.test.web.servlet.MvcResult;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.Instant;
 import java.util.*;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
 @WebMvcTest(UserController.class)
+@ActiveProfiles("test")
+@Import(KeycloakSecurityConfig.class)
 class UserControllerApiTest {
 
     @Autowired
-    private WebApplicationContext webApplicationContext;
+    private MockMvc mockMvc;
 
     @Autowired
-    private MockMvc mockMvc;
+    private ObjectMapper objectMapper;
 
     @MockBean
     private UserService userService;
@@ -56,540 +56,481 @@ class UserControllerApiTest {
     @MockBean
     private UserDataService userDataService;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    private UserRegistrationRequest userRegistrationRequest;
-    private UserUpdateDto userUpdateDto;
-    private DoctorProfileDto doctorProfileDto;
+    private UserRegistrationRequest regRequest;
+    private UserUpdateDto updateDto;
+    private DoctorProfileDto doctorDto;
     private UserData userData;
+
+    private static final String CURRENT_USER_ID = "gc6274gg-730g-44g0-9245-17gdg9054fe8";
+    private static final String CURRENT_USERNAME = "testuser";
+    private static final String OTHER_USER_ID = "auth0|other-user";
+
+    private static final String CURRENT_USER_ID2 = "fc6274ff-730a-44f0-9245-17ada9054fe8";
+    private     Jwt jwt ;
+
+    private String patientId;
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(webApplicationContext)
-                .apply(springSecurity())
-                .build();
+        patientId = "patient-123";
 
-        // Setup test data for UserRegistrationRequest
-        userRegistrationRequest = new UserRegistrationRequest();
-        userRegistrationRequest.setId("123e4567-e89b-12d3-a456-426614174000");
-        userRegistrationRequest.setUsername("testuser");
-        userRegistrationRequest.setPassword("password123");
-        userRegistrationRequest.setEmail("test@example.com");
-        userRegistrationRequest.setFirstName("John");
-        userRegistrationRequest.setLastName("Doe");
-        userRegistrationRequest.setPhoneNumber("+1234567890");
-        userRegistrationRequest.setRole("PATIENT");
-        userRegistrationRequest.setEnabled(true);
-        userRegistrationRequest.setProfileComplete(false);
+        jwt =  Jwt.withTokenValue("mock-jwt-token")
+                        .header("alg", "none")
+                        .claim("sub", patientId)
+                        .claim("realm_access", Map.of("roles", List.of("PATIENT")))
+                        .build();
 
-        // Setup test data for UserUpdateDto
-        userUpdateDto = new UserUpdateDto();
-        userUpdateDto.setFirstName("UpdatedJohn");
-        userUpdateDto.setLastName("UpdatedDoe");
-        userUpdateDto.setEmail("updated@example.com");
-        userUpdateDto.setPhoneNumber("+0987654321");
+        //  Valid UserRegistrationRequest with all required fields
+        regRequest = new UserRegistrationRequest();
+        regRequest.setUsername("newuser");
+        regRequest.setEmail("new@example.com");
+        regRequest.setPassword("pass123");
+        regRequest.setFirstName("New");
+        regRequest.setLastName("User");
+        regRequest.setPhoneNumber("+1234567890");
+        regRequest.setRole("PATIENT");
 
-        // Setup test data for DoctorProfileDto
-        doctorProfileDto = new DoctorProfileDto();
-        doctorProfileDto.setId("123e4567-e89b-12d3-a456-426614174000");
-        doctorProfileDto.setSpeciality("Cardiology");
-        doctorProfileDto.setDescription("Experienced cardiologist");
-        doctorProfileDto.setDiploma("MD Cardiology");
-        doctorProfileDto.setClinicId(1L);
+        //  Valid UserUpdateDto with all required fields
+        updateDto = new UserUpdateDto();
+        updateDto.setFirstName("Updated");
+        updateDto.setLastName("UpdatedLastName");  //
+        updateDto.setEmail("updated@example.com");
+        updateDto.setPhoneNumber("+9876543210");
 
-        // Setup test data for UserData
+        //  Valid DoctorProfileDto with all required fields
+        doctorDto = new DoctorProfileDto();
+        doctorDto.setId("auth0|doc123");  // REQUIRED
+        doctorDto.setSpeciality("Cardiology");
+        doctorDto.setDiploma("MD");
+        doctorDto.setClinicId(1L);
+        doctorDto.setDescription("Experienced cardiologist");
+
+        //  Valid UserData for mocking
         userData = new UserData();
-        userData.setId("123e4567-e89b-12d3-a456-426614174000");
+        userData.setId(CURRENT_USER_ID);
         userData.setPhoneNumber("+1234567890");
-        userData.setProfilePhotoUrl("http://example.com/photo.jpg");
+        userData.setProfilePhotoUrl("https://photo.com/me.jpg");
         userData.setProfileComplete(true);
-        userData.setClinicId(1L);
         userData.setSpeciality("Cardiology");
-        userData.setDescription("Experienced cardiologist");
-        userData.setDiploma("MD Cardiology");
-        userData.setCreatedAt(
-                LocalDateTime.now().minusDays(1).toInstant(ZoneOffset.UTC)
-        );
-        userData.setUpdatedAt(
-                LocalDateTime.now().toInstant(ZoneOffset.UTC)
-        );
+        userData.setDescription("Heart specialist");
+        userData.setDiploma("MD");
+        userData.setClinicId(1L);
+        userData.setCreatedAt(Instant.now().minusSeconds(86400));
+        userData.setUpdatedAt(Instant.now());
     }
 
+    // ──────────────────────────────────────────────────────────────
+    // REGISTER USER
+    // ──────────────────────────────────────────────────────────────
     @Nested
-    @WithMockUser(username = "user", roles = {"USER"})
     class RegisterUser {
-
         @Test
-        void shouldRegisterUserSuccessfully() throws Exception {
-            // Given
-            String expectedUserId = "keycloak-user-id-123";
-            given(userService.registerMyUser(any(UserRegistrationRequest.class), any()))
-                    .willReturn(expectedUserId);
+        void shouldRegisterSuccessfully() throws Exception {
+            given(userService.registerMyUser(any(), any())).willReturn("kc-123");
 
-            MockMultipartFile userPart = new MockMultipartFile(
-                    "user",
-                    "",
-                    "application/json",
-                    objectMapper.writeValueAsBytes(userRegistrationRequest)
-            );
+            MockMultipartFile userJson = new MockMultipartFile("user", "", "application/json",
+                    objectMapper.writeValueAsBytes(regRequest));
+            MockMultipartFile file = new MockMultipartFile("file", "photo.jpg", "image/jpeg", "data".getBytes());
 
-            MockMultipartFile filePart = new MockMultipartFile(
-                    "file",
-                    "profile.jpg",
-                    "image/jpeg",
-                    "test image content".getBytes()
-            );
-
-            // When & Then
             mockMvc.perform(multipart("/api/v1/users/register")
-                            .file(userPart)
-                            .file(filePart)
-                            .with(csrf())
-                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+                            .file(userJson)
+                            .file(file)
+                            .with(csrf()))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message", is("User registered successfully in Keycloak with ALL attributes")))
-                    .andExpect(jsonPath("$.keycloakUserId", is(expectedUserId)))
-                    .andExpect(jsonPath("$.username", is(userRegistrationRequest.getUsername())));
+                    .andExpect(jsonPath("$.message").value("User registered successfully in Keycloak with ALL attributes"))
+                    .andExpect(jsonPath("$.keycloakUserId").value("kc-123"))
+                    .andExpect(jsonPath("$.username").value("newuser"));
         }
 
         @Test
-        void whenRegistrationFails_shouldReturnBadRequest() throws Exception {
-            // Given
-            given(userService.registerMyUser(any(UserRegistrationRequest.class), any()))
-                    .willThrow(new RuntimeException("Registration failed"));
+        void shouldReturnBadRequestOnFailure() throws Exception {
+            given(userService.registerMyUser(any(), any())).willThrow(new RuntimeException("Keycloak error"));
 
-            MockMultipartFile userPart = new MockMultipartFile(
-                    "user",
-                    "",
-                    "application/json",
-                    objectMapper.writeValueAsBytes(userRegistrationRequest)
-            );
+            MockMultipartFile userJson = new MockMultipartFile("user", "", "application/json",
+                    objectMapper.writeValueAsBytes(regRequest));
 
-            // When & Then
             mockMvc.perform(multipart("/api/v1/users/register")
-                            .file(userPart)
+                            .file(userJson)
+                            .with(csrf()))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error").value("Keycloak error"));
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // GET CURRENT USER (/me)
+    // ──────────────────────────────────────────────────────────────
+    @Nested
+    class GetCurrentUser {
+        @Test
+        void shouldReturnFullProfile() throws Exception {
+            given(userDataService.getUserDataById(CURRENT_USER_ID)).willReturn(Optional.of(userData));
+
+            mockMvc.perform(get("/api/v1/users/me")
+                            .with(jwt()
+                                    .jwt(j -> j
+                                            .subject(CURRENT_USER_ID)
+                                            .claim("preferred_username", CURRENT_USERNAME)
+                                            .claim("email", "test@example.com")
+                                            .claim("given_name", "Test")
+                                            .claim("family_name", "User")
+                                            .claim("email_verified", true)
+                                            .claim("realm_access", Map.of("roles", List.of("USER")))
+                                    )))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value(CURRENT_USER_ID))
+                    .andExpect(jsonPath("$.username").value(CURRENT_USERNAME))
+                    .andExpect(jsonPath("$.email").value("test@example.com"))
+                    .andExpect(jsonPath("$.firstName").value("Test"))
+                    .andExpect(jsonPath("$.lastName").value("User"))
+                    .andExpect(jsonPath("$.phoneNumber").value("+1234567890"))
+                    .andExpect(jsonPath("$.profilePhotoUrl").value("https://photo.com/me.jpg"))
+                    .andExpect(jsonPath("$.isProfileComplete").value(true))
+                    .andExpect(jsonPath("$.speciality").value("Cardiology"))
+                    .andExpect(jsonPath("$.diploma").value("MD"))
+                    .andExpect(jsonPath("$.clinicId").value(1))
+                    .andExpect(jsonPath("$.description").value("Heart specialist"));
+        }
+
+        @Test
+        void shouldReturnBasicInfoWhenNoUserData() throws Exception {
+            given(userDataService.getUserDataById(CURRENT_USER_ID)).willReturn(Optional.empty());
+
+            mockMvc.perform(get("/api/v1/users/me")
+                            .with(jwt()
+                                    .jwt(j -> j
+                                            .subject(CURRENT_USER_ID)
+                                            .claim("preferred_username", CURRENT_USERNAME)
+                                            .claim("email", "test@example.com")
+                                            .claim("given_name", "Test")
+                                            .claim("family_name", "User")
+                                            .claim("email_verified", false)
+                                    )))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value(CURRENT_USER_ID))
+                    .andExpect(jsonPath("$.username").value(CURRENT_USERNAME))
+                    .andExpect(jsonPath("$.isProfileComplete").value(false))
+                    .andExpect(jsonPath("$.phoneNumber").value((String) null))
+                    .andExpect(jsonPath("$.profilePhotoUrl").value((String) null))
+                    .andExpect(jsonPath("$.speciality").value((String) null))
+                    .andExpect(jsonPath("$.diploma").value((String) null))
+                    .andExpect(jsonPath("$.clinicId").value((Integer) null));
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // UPDATE USER
+    // ──────────────────────────────────────────────────────────────
+    @Nested
+    class UpdateUser {
+
+        private UserUpdateDto validUpdateDto;
+
+        @BeforeEach
+        void setUp() {
+            // Create valid test data that passes all validation constraints
+            validUpdateDto = new UserUpdateDto();
+            validUpdateDto.setFirstName("UpdatedName"); // More than 1 character
+            validUpdateDto.setLastName("UpdatedLastName"); // More than 1 character
+            validUpdateDto.setEmail("valid.email@example.com"); // Valid email format
+            validUpdateDto.setPhoneNumber("+1234567890"); // Valid phone format
+        }
+
+        @Test
+        void shouldUpdateOwnProfile() throws Exception {
+            UserRegistrationRequest updatedUser = new UserRegistrationRequest();
+            updatedUser.setId(CURRENT_USER_ID2);
+            updatedUser.setFirstName("UpdatedName");
+            updatedUser.setLastName("UpdatedLastName");
+            updatedUser.setEmail("valid.email@example.com");
+            updatedUser.setPhoneNumber("+1234567890");
+
+            given(userService.updateUser(eq(CURRENT_USER_ID2), any(UserUpdateDto.class)))
+                    .willReturn(updatedUser);
+
+            mockMvc.perform(put("/api/v1/users/{id}", CURRENT_USER_ID2)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(validUpdateDto)) // Use the valid DTO
                             .with(csrf())
-                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+                            .with(jwt().jwt(j -> j.subject(CURRENT_USER_ID2))))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("User updated successfully"))
+                    .andExpect(jsonPath("$.user.firstName").value("UpdatedName"))
+                    .andExpect(jsonPath("$.user.email").value("valid.email@example.com"));
+        }
+
+        @Test
+        void shouldReturnForbiddenWhenUpdatingOtherUser() throws Exception {
+            mockMvc.perform(put("/api/v1/users/{id}", OTHER_USER_ID)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(validUpdateDto)) // Use the valid DTO
+                            .with(csrf())
+                            .with(jwt().jwt(j -> j.subject(CURRENT_USER_ID2))))
+                    .andDo(print())
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.error").value("You don't have permission to update this profile"));
+        }
+
+        @Test
+        void shouldRejectNaNUserId() throws Exception {
+            mockMvc.perform(put("/api/v1/users/NaN")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(validUpdateDto)) // Use the valid DTO
+                            .with(csrf())
+                            .with(jwt().jwt(j -> j.subject(CURRENT_USER_ID2))))
                     .andDo(print())
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error", is("Registration failed")));
-        }
-    }
-
-    @Nested
-    @WithMockUser(username = "user", roles = {"USER"})
-    class GetUserDetails {
-
-        @Test
-        void shouldReturnUserDetails() throws Exception {
-            // Given
-            String username = "testuser";
-            Map<String, Object> mockUserDetails = Map.of(
-                    "id", "123456",
-                    "username", "testuser",
-                    "email", "test@example.com",
-                    "firstName", "John",
-                    "lastName", "Doe",
-                    "enabled", true,
-                    "emailVerified", false,
-                    "attributes", Map.of(
-                            "phoneNumber", List.of("12345678"),
-                            "speciality", List.of("Cardiology")
-                    ),
-                    "realmRoles", List.of("ROLE_USER", "ROLE_ADMIN")
-            );
-
-
-            given(userService.getUserDetails(username)).willReturn(mockUserDetails);
-
-            // When & Then
-            mockMvc.perform(get("/api/v1/users/details/{username}", username)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.username", is(userRegistrationRequest.getUsername())))
-                    .andExpect(jsonPath("$.email", is(userRegistrationRequest.getEmail())))
-                    .andExpect(jsonPath("$.firstName", is(userRegistrationRequest.getFirstName())));
+                    .andExpect(jsonPath("$.error").value("Invalid user ID"))
+                    .andExpect(jsonPath("$.message").value("User ID cannot be NaN"));
         }
 
         @Test
-        void whenUserNotFound_shouldReturnNotFound() throws Exception {
-            // Given
-            String username = "nonexistent";
-            given(userService.getUserDetails(username)).willReturn(null);
+        void shouldAllowAdminToUpdateOtherUser() throws Exception {
+            UserRegistrationRequest updatedUser = new UserRegistrationRequest();
+            updatedUser.setId(OTHER_USER_ID);
+            updatedUser.setFirstName("UpdatedName");
 
-            // When & Then
-            mockMvc.perform(get("/api/v1/users/details/{username}", username)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    .andDo(print())
-                    .andExpect(status().isNotFound());
-        }
-    }
+            given(userService.updateUser(eq(OTHER_USER_ID), any(UserUpdateDto.class)))
+                    .willReturn(updatedUser);
 
-    @Nested
-    @WithMockUser(username = "testuser", roles = {"USER"})
-    class GetCurrentUser {
-
-        @Test
-        void shouldReturnCurrentUserWithDatabaseData() throws Exception {
-            // Given
-            given(userDataService.getUserDataById("testuser")).willReturn(Optional.of(userData));
-
-            // When & Then
-            mockMvc.perform(get("/api/v1/users/me")
-                            .contentType(MediaType.APPLICATION_JSON))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id", is("testuser")))
-                    .andExpect(jsonPath("$.phoneNumber", is(userData.getPhoneNumber())))
-                    .andExpect(jsonPath("$.profilePhotoUrl", is(userData.getProfilePhotoUrl())))
-                    .andExpect(jsonPath("$.isProfileComplete", is(true)))
-                    .andExpect(jsonPath("$.clinicId", is(1)))
-                    .andExpect(jsonPath("$.speciality", is(userData.getSpeciality())));
-        }
-
-        @Test
-        void whenUserDataNotFound_shouldReturnBasicInfo() throws Exception {
-            // Given
-            given(userDataService.getUserDataById("testuser")).willReturn(Optional.empty());
-
-            // When & Then
-            mockMvc.perform(get("/api/v1/users/me")
-                            .contentType(MediaType.APPLICATION_JSON))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id", is("testuser")))
-                    .andExpect(jsonPath("$.isProfileComplete", is(false)))
-                    .andExpect(jsonPath("$.phoneNumber").doesNotExist());
-        }
-    }
-
-    @Nested
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
-    class DisableUser {
-
-        @Test
-        void shouldDisableUserSuccessfully() throws Exception {
-            // Given
-            String userId = "user-123";
-            doNothing().when(userService).disableUser(userId, false);
-
-            // When & Then
-            mockMvc.perform(patch("/api/v1/users/disable/{userId}", userId)
-                            .param("isEnable", "false")
+            mockMvc.perform(put("/api/v1/users/{id}", OTHER_USER_ID)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(validUpdateDto)) // Use the valid DTO
                             .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON))
+                            .with(jwt().jwt(j -> j
+                                    .subject(CURRENT_USER_ID)
+                                    .claim("realm_access", Map.of("roles", List.of("admin")))
+                                    .claim("scope", "openid profile email"))))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("User updated successfully"));
+        }
+    }
+    // ──────────────────────────────────────────────────────────────
+    // UPLOAD PROFILE PHOTO
+    // ──────────────────────────────────────────────────────────────
+    @Nested
+    class UploadProfilePhoto {
+        @Test
+        void shouldUploadSuccessfully() throws Exception {
+            given(userService.uploadProfilePhoto(eq(CURRENT_USER_ID), any()))
+                    .willReturn("https://newphoto.com/me.jpg");
+
+            MockMultipartFile file = new MockMultipartFile("file", "img.jpg", "image/jpeg", "data".getBytes());
+
+            mockMvc.perform(multipart("/api/v1/users/{id}/profile-photo", CURRENT_USER_ID)
+                            .file(file)
+                            .with(csrf())
+                            .with(jwt().jwt(j -> j.subject(CURRENT_USER_ID))))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("Profile photo uploaded successfully"))
+                    .andExpect(jsonPath("$.profilePhotoUrl").value("https://newphoto.com/me.jpg"));
+        }
+
+        @Test
+        void shouldReturnForbiddenForOtherUser() throws Exception {
+            MockMultipartFile file = new MockMultipartFile("file", "img.jpg", "image/jpeg", "data".getBytes());
+
+            mockMvc.perform(multipart("/api/v1/users/{id}/profile-photo", OTHER_USER_ID)
+                            .file(file)
+                            .with(csrf())
+                            .with(jwt().jwt(j -> j.subject(CURRENT_USER_ID))))
+                    .andDo(print())
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.error").value("You don't have permission to update this profile"));
+        }
+
+        @Test
+        void shouldReturnBadRequestOnError() throws Exception {
+            given(userService.uploadProfilePhoto(eq(CURRENT_USER_ID), any()))
+                    .willThrow(new RuntimeException("Storage error"));
+
+            MockMultipartFile file = new MockMultipartFile("file", "img.jpg", "image/jpeg", "data".getBytes());
+
+            mockMvc.perform(multipart("/api/v1/users/{id}/profile-photo", CURRENT_USER_ID)
+                            .file(file)
+                            .with(csrf())
+                            .with(jwt().jwt(j -> j.subject(CURRENT_USER_ID))))
+                    .andDo(print())
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.error").value("Storage error"));
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // COMPLETE DOCTOR PROFILE
+    // ──────────────────────────────────────────────────────────────
+    @Nested
+    class CompleteDoctorProfile {
+        private static final String DOCTOR_ID = "auth0|doc123";
+
+        @Test
+        void shouldCompleteProfile() throws Exception {
+            UserData completedData = new UserData();
+            completedData.setId(DOCTOR_ID);
+            completedData.setSpeciality("Cardiology");
+            completedData.setDiploma("MD");
+            completedData.setClinicId(1L);
+            completedData.setDescription("Experienced cardiologist");
+            completedData.setProfileComplete(true);
+
+            given(userService.completeDoctorProfile(eq(DOCTOR_ID), any(DoctorProfileDto.class)))
+                    .willReturn(completedData);
+
+            mockMvc.perform(put("/api/v1/users/{id}/complete-profile", DOCTOR_ID)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(doctorDto))
+                            .with(csrf())
+                            .with(jwt().jwt(j -> j.subject(DOCTOR_ID))))
+                    .andDo(print())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("Doctor profile completed successfully"))
+                    .andExpect(jsonPath("$.userData.speciality").value("Cardiology"))
+                    .andExpect(jsonPath("$.userData.diploma").value("MD"))
+                    .andExpect(jsonPath("$.userData.profileComplete").value(true));
+        }
+
+        @Test
+        void shouldReturnForbiddenForOtherDoctor() throws Exception {
+            // ✅ Create a separate doctorDto for this test with OTHER_USER_ID
+            DoctorProfileDto otherDoctorDto = new DoctorProfileDto();
+            otherDoctorDto.setId(OTHER_USER_ID);  // ✅ Set the correct ID
+            otherDoctorDto.setSpeciality("Cardiology");
+            otherDoctorDto.setDiploma("MD");
+            otherDoctorDto.setClinicId(1L);
+            otherDoctorDto.setDescription("Experienced cardiologist");
+
+            mockMvc.perform(put("/api/v1/users/{id}/complete-profile", OTHER_USER_ID)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(otherDoctorDto))
+                            .with(csrf())
+                            .with(jwt().jwt(j -> j.subject(CURRENT_USER_ID))))
+                    .andDo(print())
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.error").value("You don't have permission to update this profile"));
+        }
+
+        @Test
+        void shouldReturnErrorOnServiceFailure() throws Exception {
+            //  Create a doctorDto with CURRENT_USER_ID
+            DoctorProfileDto currentUserDoctorDto = new DoctorProfileDto();
+            currentUserDoctorDto.setId(CURRENT_USER_ID);  //  Set the correct ID
+            currentUserDoctorDto.setSpeciality("Cardiology");
+            currentUserDoctorDto.setDiploma("MD");
+            currentUserDoctorDto.setClinicId(1L);
+            currentUserDoctorDto.setDescription("Experienced cardiologist");
+
+            given(userService.completeDoctorProfile(eq(CURRENT_USER_ID), any(DoctorProfileDto.class)))
+                    .willThrow(new RuntimeException("Database error"));
+
+            mockMvc.perform(put("/api/v1/users/{id}/complete-profile", CURRENT_USER_ID)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(currentUserDoctorDto))
+                            .with(csrf())
+                            .with(jwt().jwt(j -> j.subject(CURRENT_USER_ID))))
+                    .andDo(print())
+                    .andExpect(status().isInternalServerError())
+                    .andExpect(jsonPath("$.error").value("Database error"));
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // ADMIN ENDPOINTS
+    // ──────────────────────────────────────────────────────────────
+    @Nested
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    class AdminEndpoints {
+        @Test
+        void shouldDisableUser() throws Exception {
+            doNothing().when(userService).disableUser("user-123", false);
+
+            mockMvc.perform(patch("/api/v1/users/disable/user-123")
+                            .param("isEnable", "false")
+                            .with(csrf()))
                     .andDo(print())
                     .andExpect(status().isOk())
                     .andExpect(content().string("true"));
         }
 
         @Test
-        void whenDisableUserFails_shouldReturnInternalServerError() throws Exception {
-            // Given
-            String userId = "user-123";
+        void shouldEnableUser() throws Exception {
+            doNothing().when(userService).disableUser("user-123", true);
 
-            doThrow(new RuntimeException("Disable failed"))
-                    .when(userService)
-                    .disableUser(userId, true);
-
-            // When & Then
-            mockMvc.perform(patch("/api/v1/users/disable/{userId}", userId)
+            mockMvc.perform(patch("/api/v1/users/disable/user-123")
                             .param("isEnable", "true")
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON))
-                    .andDo(print())
-                    .andExpect(status().isInternalServerError())
-                    .andExpect(content().string("false"));
+                            .with(csrf()))
+                    .andExpect(status().isOk())
+                    .andExpect(content().string("true"));
         }
-    }
-
-    @Nested
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
-    class GetUsersByRole {
 
         @Test
-        void shouldReturnUsersByRole() throws Exception {
-            // Given
-            String role = "DOCTOR";
+        void shouldGetUsersByRole() throws Exception {
             UserRegistrationRequest doctor1 = new UserRegistrationRequest();
             doctor1.setUsername("doctor1");
-            doctor1.setEmail("doctor1@example.com");
-            doctor1.setRole("DOCTOR");
-
             UserRegistrationRequest doctor2 = new UserRegistrationRequest();
             doctor2.setUsername("doctor2");
-            doctor2.setEmail("doctor2@example.com");
-            doctor2.setRole("DOCTOR");
 
-            List<UserRegistrationRequest> doctors = Arrays.asList(doctor1, doctor2);
-            given(userService.getUsersByRole("DOCTOR")).willReturn(doctors);
+            given(userService.getUsersByRole("DOCTOR"))
+                    .willReturn(List.of(doctor1, doctor2));
 
-            // When & Then
-            mockMvc.perform(get("/api/v1/users/by-role")
-                            .param("role", role)
-                            .contentType(MediaType.APPLICATION_JSON))
+            mockMvc.perform(get("/api/v1/users/by-role").param("role", "DOCTOR"))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$", hasSize(2)))
-                    .andExpect(jsonPath("$[0].username", is("doctor1")))
-                    .andExpect(jsonPath("$[0].role", is("DOCTOR")))
-                    .andExpect(jsonPath("$[1].username", is("doctor2")));
+                    .andExpect(jsonPath("$").isArray())
+                    .andExpect(jsonPath("$", hasSize(2)));
         }
 
         @Test
-        void whenNoUsersFound_shouldReturnEmptyList() throws Exception {
-            // Given
-            String role = "ADMIN";
-            given(userService.getUsersByRole("ADMIN")).willReturn(Arrays.asList());
+        void shouldGetUserById() throws Exception {
+            UserRegistrationRequest user = new UserRegistrationRequest();
+            user.setId("user-123");
+            user.setUsername("testuser");
 
-            // When & Then
-            mockMvc.perform(get("/api/v1/users/by-role")
-                            .param("role", role)
-                            .contentType(MediaType.APPLICATION_JSON))
+            given(userService.getUserById("user-123")).willReturn(user);
+
+            mockMvc.perform(get("/api/v1/users/user-123"))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$", hasSize(0)));
+                    .andExpect(jsonPath("$.id").value("user-123"))
+                    .andExpect(jsonPath("$.username").value("testuser"));
         }
     }
 
+    // ──────────────────────────────────────────────────────────────
+    // GET USER DETAILS
+    // ──────────────────────────────────────────────────────────────
     @Nested
-    @WithMockUser(username = "user", roles = {"USER"})
-    class GetUserById {
-
+    class GetUserDetails {
         @Test
-        void shouldReturnUserById() throws Exception {
-            // Given
-            String userId = "user-123";
-            given(userService.getUserById(userId)).willReturn(userRegistrationRequest);
-
-            // When & Then
-            mockMvc.perform(get("/api/v1/users/{userId}", userId)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.username", is(userRegistrationRequest.getUsername())))
-                    .andExpect(jsonPath("$.email", is(userRegistrationRequest.getEmail())));
-        }
-
-        @Test
-        void whenUserNotFound_shouldReturnInternalServerError() throws Exception {
-            // Given
-            String userId = "nonexistent";
-            given(userService.getUserById(userId))
-                    .willThrow(new RuntimeException("User not found"));
-
-            // When & Then
-            mockMvc.perform(get("/api/v1/users/{userId}", userId)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    .andDo(print())
-                    .andExpect(status().isInternalServerError())
-                    .andExpect(content().string("false"));
-        }
-    }
-
-    @Nested
-    @WithMockUser(username = "testuser", roles = {"USER"})
-    class UpdateUser {
-
-        @Test
-        void shouldUpdateUserSuccessfully() throws Exception {
-            // Given
-            String userId = "123e4567-e89b-12d3-a456-426614174000";
-            given(userService.updateUser(eq(userId), any(UserUpdateDto.class)))
-                    .willReturn(userRegistrationRequest);
-
-            // When & Then
-            mockMvc.perform(put("/api/v1/users/{userId}", userId)
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(userUpdateDto)))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message", is("User updated successfully")))
-                    .andExpect(jsonPath("$.user.username", is(userRegistrationRequest.getUsername())));
-        }
-
-        @Test
-        void whenInvalidUserIdFormat_shouldReturnBadRequest() throws Exception {
-            // Given
-            String invalidUserId = "invalid-id";
-
-            // When & Then
-            mockMvc.perform(put("/api/v1/users/{userId}", invalidUserId)
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(userUpdateDto)))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        void whenUserIdIsNaN_shouldReturnBadRequest() throws Exception {
-            // Given
-            String nanUserId = "NaN";
-
-            // When & Then
-            mockMvc.perform(put("/api/v1/users/{userId}", nanUserId)
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(userUpdateDto)))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error", is("Invalid user ID")))
-                    .andExpect(jsonPath("$.message", is("User ID cannot be NaN")));
-        }
-
-        @Test
-        void whenUnauthorizedUser_shouldReturnForbidden() throws Exception {
-            // Given
-            String differentUserId = "different-user-id";
-
-            // When & Then
-            mockMvc.perform(put("/api/v1/users/{userId}", differentUserId)
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(userUpdateDto)))
-                    .andDo(print())
-                    .andExpect(status().isForbidden())
-                    .andExpect(jsonPath("$.error", is("You don't have permission to update this profile")));
-        }
-    }
-
-    @Nested
-    @WithMockUser(username = "doctor", roles = {"DOCTOR"})
-    class CompleteDoctorProfile {
-
-        @Test
-        void shouldCompleteDoctorProfileSuccessfully() throws Exception {
-            // Given
-            String userId = "doctor-user-id";
-            given(userService.completeDoctorProfile(eq(userId), any(DoctorProfileDto.class)))
-                    .willReturn(userData);
-
-            // When & Then
-            mockMvc.perform(put("/api/v1/users/{userId}/complete-profile", userId)
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(doctorProfileDto)))
-                    .andDo(print())
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message", is("Doctor profile completed successfully")))
-                    .andExpect(jsonPath("$.userData.speciality", is(userData.getSpeciality())))
-                    .andExpect(jsonPath("$.userData.diploma", is(userData.getDiploma())));
-        }
-
-        @Test
-        void whenUnauthorizedUser_shouldReturnForbidden() throws Exception {
-            // Given
-            String differentUserId = "different-doctor-id";
-
-            // When & Then
-            mockMvc.perform(put("/api/v1/users/{userId}/complete-profile", differentUserId)
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(doctorProfileDto)))
-                    .andDo(print())
-                    .andExpect(status().isForbidden())
-                    .andExpect(jsonPath("$.error", is("You don't have permission to update this profile")));
-        }
-
-        @Test
-        void whenInvalidData_shouldReturnBadRequest() throws Exception {
-            // Given
-            String userId = "doctor-user-id";
-            DoctorProfileDto invalidDto = new DoctorProfileDto(); // Missing required fields
-            given(userService.completeDoctorProfile(eq(userId), any(DoctorProfileDto.class)))
-                    .willThrow(new RuntimeException("Validation error"));
-
-            // When & Then
-            mockMvc.perform(put("/api/v1/users/{userId}/complete-profile", userId)
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(invalidDto)))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error", is("Validation error")));
-        }
-    }
-
-    @Nested
-    @WithMockUser(username = "user", roles = {"USER"})
-    class UploadProfilePhoto {
-
-        @Test
-        void shouldUploadProfilePhotoSuccessfully() throws Exception {
-            // Given
-            String userId = "user-123";
-            String expectedPhotoUrl = "http://example.com/photos/profile.jpg";
-            given(userService.uploadProfilePhoto(eq(userId), any()))
-                    .willReturn(expectedPhotoUrl);
-
-            MockMultipartFile file = new MockMultipartFile(
-                    "file",
-                    "profile.jpg",
-                    "image/jpeg",
-                    "test image content".getBytes()
+        void shouldGetUserDetails() throws Exception {
+            Map<String, Object> details = Map.of(
+                    "username", "testuser",
+                    "email", "test@example.com",
+                    "firstName", "Test",
+                    "lastName", "User"
             );
 
-            // When & Then
-            mockMvc.perform(multipart("/api/v1/users/{userId}/profile-photo", userId)
-                            .file(file)
-                            .with(csrf())
-                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+            given(userService.getUserDetails("testuser")).willReturn(details);
+
+            mockMvc.perform(get("/api/v1/users/details/testuser"))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.message", is("Profile photo uploaded successfully")))
-                    .andExpect(jsonPath("$.profilePhotoUrl", is(expectedPhotoUrl)));
+                    .andExpect(jsonPath("$.username").value("testuser"))
+                    .andExpect(jsonPath("$.email").value("test@example.com"));
         }
 
         @Test
-        void whenUnauthorizedUser_shouldReturnForbidden() throws Exception {
-            // Given
-            String differentUserId = "different-user-id";
+        void shouldReturnNotFoundWhenUserDoesNotExist() throws Exception {
+            given(userService.getUserDetails("nonexistent")).willReturn(null);
 
-            MockMultipartFile file = new MockMultipartFile(
-                    "file",
-                    "profile.jpg",
-                    "image/jpeg",
-                    "test image content".getBytes()
-            );
-
-            // When & Then
-            mockMvc.perform(multipart("/api/v1/users/{userId}/profile-photo", differentUserId)
-                            .file(file)
-                            .with(csrf())
-                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
+            mockMvc.perform(get("/api/v1/users/details/nonexistent"))
                     .andDo(print())
-                    .andExpect(status().isForbidden())
-                    .andExpect(jsonPath("$.error", is("You don't have permission to update this profile")));
-        }
-
-        @Test
-        void whenUploadFails_shouldReturnBadRequest() throws Exception {
-            // Given
-            String userId = "user-123";
-            given(userService.uploadProfilePhoto(eq(userId), any()))
-                    .willThrow(new RuntimeException("Upload failed"));
-
-            MockMultipartFile file = new MockMultipartFile(
-                    "file",
-                    "profile.jpg",
-                    "image/jpeg",
-                    "test image content".getBytes()
-            );
-
-            // When & Then
-            mockMvc.perform(multipart("/api/v1/users/{userId}/profile-photo", userId)
-                            .file(file)
-                            .with(csrf())
-                            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.error", is("Upload failed")));
+                    .andExpect(status().isNotFound());
         }
     }
 }

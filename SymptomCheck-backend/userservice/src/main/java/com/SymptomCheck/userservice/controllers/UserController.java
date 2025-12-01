@@ -169,14 +169,19 @@ public class UserController {
             return ResponseEntity.internalServerError().body(false);
         }
     }
-
     @PutMapping("/{userId}")
     public ResponseEntity<?> updateUser(
-            @PathVariable
-            @Pattern(regexp = "^[a-fA-F0-9-]{36}$", message = "Invalid user ID format")
-            String userId,
+            @PathVariable String userId,
             @Valid @RequestBody UserUpdateDto userUpdateDto,
             @AuthenticationPrincipal Jwt jwt) {
+
+        // Remove the @Pattern annotation and handle validation manually
+        if (userId == null || userId.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Invalid user ID",
+                    "message", "User ID cannot be empty"
+            ));
+        }
 
         // Reject "NaN" explicitly
         if ("NaN".equals(userId)) {
@@ -188,6 +193,13 @@ public class UserController {
 
         try {
             log.info("🔄 Updating user with ID: {}", userId);
+
+            // Check if JWT is present
+            if (jwt == null) {
+                return ResponseEntity.status(401).body(Map.of(
+                        "error", "Authentication required"
+                ));
+            }
 
             // Vérifier que l'utilisateur peut modifier ce profil
             if (!canUserModifyProfile(jwt, userId)) {
@@ -218,7 +230,7 @@ public class UserController {
                                                    @Valid @RequestBody DoctorProfileDto doctorProfileDto,
                                                    @AuthenticationPrincipal Jwt jwt) {
         try {
-            log.info("🔄 Completing doctor profile for user ID: {}", userId);
+            log.info(" Completing doctor profile for user ID: {}", userId);
 
             // Vérifier que l'utilisateur peut modifier ce profil
             if (!canUserModifyProfile(jwt, userId)) {
@@ -229,14 +241,14 @@ public class UserController {
 
             UserData updatedUserData = userService.completeDoctorProfile(userId, doctorProfileDto);
 
-            log.info("✅ Doctor profile completed successfully: {}", updatedUserData);
+            log.info(" Doctor profile completed successfully: {}", updatedUserData);
             return ResponseEntity.ok(Map.of(
                     "message", "Doctor profile completed successfully",
                     "userData", updatedUserData
             ));
         } catch (Exception e) {
-            log.error("❌ Error completing doctor profile: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(Map.of(
+            log.error(" Error completing doctor profile: {}", e.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of(
                     "error", e.getMessage()
             ));
         }

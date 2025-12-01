@@ -16,18 +16,14 @@ public class UserDataService {
 
 
     public Optional<UserData> getUserDataById(String keycloakUserId) {
-        log.info("🔍 Searching for user data with ID: {}", keycloakUserId);
 
         Optional<UserData> result = userDataRepository.findById(keycloakUserId);
 
         if (result.isPresent()) {
-            log.info("✅ User data found: {}", result.get());
         } else {
-            log.warn("❌ User data NOT found for ID: {}", keycloakUserId);
 
             // Debug: Check if any data exists in the table
             long count = userDataRepository.count();
-            log.info("📊 Total user_data records in database: {}", count);
 
             // Debug: Show all IDs in the database (remove in production!)
             userDataRepository.findAll().forEach(ud ->

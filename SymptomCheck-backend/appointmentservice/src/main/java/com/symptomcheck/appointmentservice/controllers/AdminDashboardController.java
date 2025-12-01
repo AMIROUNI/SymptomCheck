@@ -32,6 +32,7 @@ public class AdminDashboardController {
     }
 
     @GetMapping("/appointments/status/{status}")
+
     public ResponseEntity<List<AdminAppointmentDto>> getAppointmentsByStatus(@PathVariable String status) {
         return ResponseEntity.ok(adminDashboardService.getAppointmentsByStatus(status));
     }

@@ -19,6 +19,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "APIs pour l'authentification des utilisateurs")
 public class AuthController {
+    /*
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -128,4 +129,6 @@ public class AuthController {
                     .body(Map.of("error", "Logout failed: " + e.getMessage()));
         }
     }
+
+    */
 }

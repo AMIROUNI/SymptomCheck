@@ -427,11 +427,9 @@ public class KeycloakService {
                     .get(userId)
                     .update(user);
 
-            log.info("✅ User basic info updated successfully in Keycloak: {}", userId);
             return user;
 
         } catch (Exception e) {
-            log.error("❌ Error updating user basic info in Keycloak: {}", e.getMessage());
             throw new RuntimeException("Failed to update user basic info in Keycloak: " + e.getMessage());
         }
     }

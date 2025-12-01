@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.List;
 
 @Repository
-public interface UserDataRepository extends JpaRepository<UserData,String> {
+public interface UserDataRepository extends JpaRepository<UserData, String> {
 
     // Find doctors (users with clinicId)
     List<UserData> findByClinicIdIsNotNull();

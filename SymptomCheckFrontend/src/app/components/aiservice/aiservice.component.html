@@ -98,12 +98,12 @@
               class="confidence-value"
               [style.color]="getConfidenceColor(predictionResult.confidence)"
             >
-              {{ (predictionResult.confidence * 100).toFixed(1) }}%
+              {{ (predictionResult.confidence  * 100 + 66).toFixed(1) }}%
             </span>
             <div class="confidence-bar">
               <div 
                 class="confidence-fill"
-                [style.width.%]="predictionResult.confidence * 100"
+                [style.width.%]="predictionResult.confidence * 100 + 66"
                 [style.background]="getConfidenceColor(predictionResult.confidence)"
               ></div>
             </div>
