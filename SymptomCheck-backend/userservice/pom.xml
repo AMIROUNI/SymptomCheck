@@ -225,10 +225,9 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/dtos/**</exclude>
-                        <exclude>**/config/**</exclude>
-                        <exclude>**/exception/**</exclude>
-                        <exclude>**/models/**</exclude>
+                        <include>**/*IT.java</include>
+                        <include>**/integration/**/*Test.java</include>
+                        <include>**/*ITCase.java</include>
                     </excludes>
                     <destFile>${project.build.directory}/jacoco.exec</destFile>
                     <append>true</append>
