@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
@@ -65,21 +66,22 @@ public class UserController {
         }
     }
     @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getCurrentUser(@AuthenticationPrincipal Jwt jwt) {
         log.info("=== /me endpoint called ===");
         log.info("JWT Subject (Keycloak ID): {}", jwt.getSubject());
         log.info("JWT Claims: {}", jwt.getClaims());
 
         String keycloakUserId = jwt.getSubject();
-        log.info("🔍 Looking up user data for Keycloak ID: '{}'", keycloakUserId);
+        log.info(" Looking up user data for Keycloak ID: '{}'", keycloakUserId);
 
         // Get UserData from database
         Optional<UserData> optionalData = userDataService.getUserDataById(keycloakUserId);
 
         if (optionalData.isEmpty()) {
-            log.warn("⚠️ UserData not found for Keycloak ID: '{}'", keycloakUserId);
+            log.warn(" UserData not found for Keycloak ID: '{}'", keycloakUserId);
         } else {
-            log.info("✅ UserData found: {}", optionalData.get());
+            log.info(" UserData found: {}", optionalData.get());
         }
 
         UserData userData = optionalData.orElse(null);
@@ -136,6 +138,7 @@ public class UserController {
 
 
     @PatchMapping("disable/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Boolean> disableUser(@PathVariable("userId") String userId,
                                                @RequestParam boolean isEnable) {
         try {
@@ -150,6 +153,7 @@ public class UserController {
 
 
     @GetMapping("/by-role")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<UserRegistrationRequest>> getUsersByRole(@RequestParam String role) {
         try {
             List<UserRegistrationRequest> users = userService.getUsersByRole(role.toUpperCase());
@@ -160,6 +164,7 @@ public class UserController {
     }
 
     @GetMapping("{userId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getUserById(@PathVariable("userId") String userId) {
         try {
             return ResponseEntity.ok( userService.getUserById(userId));
@@ -262,7 +267,7 @@ public class UserController {
                                                 @RequestParam("file") MultipartFile file,
                                                 @AuthenticationPrincipal Jwt jwt) {
         try {
-            log.info("📤 Uploading profile photo for user ID: {}", userId);
+            log.info(" Uploading profile photo for user ID: {}", userId);
 
             // Vérifier que l'utilisateur peut modifier ce profil
             if (!canUserModifyProfile(jwt, userId)) {
@@ -273,13 +278,13 @@ public class UserController {
 
             String profilePhotoUrl = userService.uploadProfilePhoto(userId, file);
 
-            log.info("✅ Profile photo uploaded successfully: {}", profilePhotoUrl);
+            log.info(" Profile photo uploaded successfully: {}", profilePhotoUrl);
             return ResponseEntity.ok(Map.of(
                     "message", "Profile photo uploaded successfully",
                     "profilePhotoUrl", profilePhotoUrl
             ));
         } catch (Exception e) {
-            log.error("❌ Error uploading profile photo: {}", e.getMessage());
+            log.error(" Error uploading profile photo: {}", e.getMessage());
             return ResponseEntity.badRequest().body(Map.of(
                     "error", e.getMessage()
             ));

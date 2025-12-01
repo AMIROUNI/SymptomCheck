@@ -2,6 +2,7 @@ package com.SymptomCheck.userservice.controllers;
 
 import com.SymptomCheck.userservice.dtos.adminDashboardDto.AdminUserDto;
 import com.SymptomCheck.userservice.dtos.adminDashboardDto.UserStatsDto;
+import com.SymptomCheck.userservice.exceptions.UserNotFountException;
 import com.SymptomCheck.userservice.services.AdminDashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,14 +28,25 @@ public class AdminDashboardController {
     @PreAuthorize("hasRole('ADMIN')")
 
     public ResponseEntity<List<AdminUserDto>> getAllUsers() {
-        return ResponseEntity.ok(adminDashboardService.getAllUsers());
+        try {
+            return ResponseEntity.ok(adminDashboardService.getAllUsers());
+        }
+        catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @GetMapping("/users/role/{role}")
     @PreAuthorize("hasRole('ADMIN')")
 
     public ResponseEntity<List<AdminUserDto>> getUsersByRole(@PathVariable String role) {
-        return ResponseEntity.ok(adminDashboardService.getUsersByRole(role));
+        try {
+            return ResponseEntity.ok(adminDashboardService.getUsersByRole(role));
+        }
+        catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+
     }
 
     @PutMapping("/users/{userId}/status")
@@ -43,6 +55,16 @@ public class AdminDashboardController {
     public ResponseEntity<AdminUserDto> updateUserProfileStatus(
             @PathVariable String userId,
             @RequestParam boolean profileComplete) {
-        return ResponseEntity.ok(adminDashboardService.updateUserProfileStatus(userId, profileComplete));
+        try {
+            return ResponseEntity.ok(adminDashboardService.updateUserProfileStatus(userId, profileComplete));
+
+
+        }
+        catch (UserNotFountException e) {
+            return ResponseEntity.notFound().build();
+        }
+        catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
