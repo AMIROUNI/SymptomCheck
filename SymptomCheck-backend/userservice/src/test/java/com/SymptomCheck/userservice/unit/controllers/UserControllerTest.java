@@ -1,5 +1,6 @@
-package com.SymptomCheck.userservice.controllers;
+package com.SymptomCheck.userservice.unit.controllers;
 
+import com.SymptomCheck.userservice.controllers.UserController;
 import com.SymptomCheck.userservice.dtos.UserRegistrationRequest;
 import com.SymptomCheck.userservice.models.UserData;
 import com.SymptomCheck.userservice.services.UserDataService;

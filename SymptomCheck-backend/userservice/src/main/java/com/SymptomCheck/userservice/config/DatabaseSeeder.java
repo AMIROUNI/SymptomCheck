@@ -1,14 +1,10 @@
 package com.SymptomCheck.userservice.config;
 
 import com.SymptomCheck.userservice.dtos.UserRegistrationRequest;
-import com.SymptomCheck.userservice.enums.UserRole;
-import com.SymptomCheck.userservice.models.User;
 import com.SymptomCheck.userservice.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
-import java.time.Instant;
 
 @Component
 @RequiredArgsConstructor

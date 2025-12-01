@@ -12,8 +12,6 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -429,11 +427,9 @@ public class KeycloakService {
                     .get(userId)
                     .update(user);
 
-            log.info("✅ User basic info updated successfully in Keycloak: {}", userId);
             return user;
 
         } catch (Exception e) {
-            log.error("❌ Error updating user basic info in Keycloak: {}", e.getMessage());
             throw new RuntimeException("Failed to update user basic info in Keycloak: " + e.getMessage());
         }
     }

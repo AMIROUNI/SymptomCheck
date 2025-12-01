@@ -3,7 +3,6 @@ package com.SymptomCheck.userservice.controllers;
 import com.SymptomCheck.userservice.dtos.DoctorProfileDto;
 import com.SymptomCheck.userservice.dtos.UserRegistrationRequest;
 import com.SymptomCheck.userservice.dtos.UserUpdateDto;
-import com.SymptomCheck.userservice.models.User;
 import com.SymptomCheck.userservice.models.UserData;
 import com.SymptomCheck.userservice.services.UserDataService;
 import com.SymptomCheck.userservice.services.UserService;
@@ -12,14 +11,12 @@ import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -172,14 +169,19 @@ public class UserController {
             return ResponseEntity.internalServerError().body(false);
         }
     }
-
     @PutMapping("/{userId}")
     public ResponseEntity<?> updateUser(
-            @PathVariable
-            @Pattern(regexp = "^[a-fA-F0-9-]{36}$", message = "Invalid user ID format")
-            String userId,
+            @PathVariable String userId,
             @Valid @RequestBody UserUpdateDto userUpdateDto,
             @AuthenticationPrincipal Jwt jwt) {
+
+        // Remove the @Pattern annotation and handle validation manually
+        if (userId == null || userId.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "Invalid user ID",
+                    "message", "User ID cannot be empty"
+            ));
+        }
 
         // Reject "NaN" explicitly
         if ("NaN".equals(userId)) {
@@ -191,6 +193,13 @@ public class UserController {
 
         try {
             log.info("🔄 Updating user with ID: {}", userId);
+
+            // Check if JWT is present
+            if (jwt == null) {
+                return ResponseEntity.status(401).body(Map.of(
+                        "error", "Authentication required"
+                ));
+            }
 
             // Vérifier que l'utilisateur peut modifier ce profil
             if (!canUserModifyProfile(jwt, userId)) {
@@ -221,7 +230,7 @@ public class UserController {
                                                    @Valid @RequestBody DoctorProfileDto doctorProfileDto,
                                                    @AuthenticationPrincipal Jwt jwt) {
         try {
-            log.info("🔄 Completing doctor profile for user ID: {}", userId);
+            log.info(" Completing doctor profile for user ID: {}", userId);
 
             // Vérifier que l'utilisateur peut modifier ce profil
             if (!canUserModifyProfile(jwt, userId)) {
@@ -232,14 +241,14 @@ public class UserController {
 
             UserData updatedUserData = userService.completeDoctorProfile(userId, doctorProfileDto);
 
-            log.info("✅ Doctor profile completed successfully: {}", updatedUserData);
+            log.info(" Doctor profile completed successfully: {}", updatedUserData);
             return ResponseEntity.ok(Map.of(
                     "message", "Doctor profile completed successfully",
                     "userData", updatedUserData
             ));
         } catch (Exception e) {
-            log.error("❌ Error completing doctor profile: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(Map.of(
+            log.error(" Error completing doctor profile: {}", e.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of(
                     "error", e.getMessage()
             ));
         }

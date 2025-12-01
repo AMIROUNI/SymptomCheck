@@ -38,15 +38,12 @@ public class AuthService {
             ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
-                log.info("✅ User logged in successfully: {}", username);
                 return response.getBody();
             } else {
-                log.error("❌ Login failed for user: {}", username);
                 throw new RuntimeException("Invalid credentials");
             }
 
         } catch (Exception e) {
-            log.error("❌ Login error for user {}: {}", username, e.getMessage());
             throw new RuntimeException("Login failed: " + e.getMessage());
         }
     }
@@ -68,14 +65,12 @@ public class AuthService {
             ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
 
             if (response.getStatusCode().is2xxSuccessful()) {
-                log.info("✅ Token refreshed successfully");
                 return response.getBody();
             } else {
                 throw new RuntimeException("Token refresh failed");
             }
 
         } catch (Exception e) {
-            log.error("❌ Token refresh error: {}", e.getMessage());
             throw new RuntimeException("Token refresh failed: " + e.getMessage());
         }
     }
@@ -95,10 +90,8 @@ public class AuthService {
             String logoutUrl = keycloakUrl + "/realms/" + realm + "/protocol/openid-connect/logout";
             restTemplate.postForEntity(logoutUrl, request, String.class);
 
-            log.info("✅ User logged out successfully");
 
         } catch (Exception e) {
-            log.error("❌ Logout error: {}", e.getMessage());
             throw new RuntimeException("Logout failed: " + e.getMessage());
         }
     }

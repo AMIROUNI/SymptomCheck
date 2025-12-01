@@ -2,6 +2,7 @@ package com.SymptomCheck.userservice.services;
 
 import com.SymptomCheck.userservice.dtos.adminDashboardDto.AdminUserDto;
 import com.SymptomCheck.userservice.dtos.adminDashboardDto.UserStatsDto;
+import com.SymptomCheck.userservice.exceptions.UserNotFountException;
 import com.SymptomCheck.userservice.models.UserData;
 import com.SymptomCheck.userservice.repositories.UserDataRepository;
 import lombok.RequiredArgsConstructor;
@@ -69,7 +70,7 @@ public class AdminDashboardService {
 
     public AdminUserDto updateUserProfileStatus(String userId, boolean profileComplete) {
         UserData user = userDataRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> {  return new UserNotFountException("User not found") ; } );
 
         user.setProfileComplete(profileComplete);
         user.setUpdatedAt(Instant.now());

@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -100,12 +99,12 @@ public class UserService {
 
     public UserRegistrationRequest updateUser(String userId, UserUpdateDto userUpdateDto) {
         try {
-            log.info("🔄 Updating user basic info: {}", userId);
+            log.info(" Updating user basic info: {}", userId);
 
             // 1. Récupérer le rôle actuel de l'utilisateur
             UserRegistrationRequest currentUser = keycloakService.getUserById(userId);
             String currentRole = currentUser.getRole();
-            log.info("ℹ️ Current user role: {}", currentRole);
+            log.info("Current user role: {}", currentRole);
 
             // 2. Mettre à jour uniquement les informations basiques dans Keycloak
             UserRepresentation updatedUser = keycloakService.updateUserBasicInfo(userId, userUpdateDto);
@@ -135,13 +134,13 @@ public class UserService {
             response.setLastName(userUpdateDto.getLastName());
             response.setEmail(userUpdateDto.getEmail());
             response.setPhoneNumber(userUpdateDto.getPhoneNumber());
-            response.setRole(currentRole); // ✅ Toujours utiliser le rôle actuel
+            response.setRole(currentRole); //  Toujours utiliser le rôle actuel
 
-            log.info("✅ User basic info updated successfully (role unchanged): {}", response);
+            log.info(" User basic info updated successfully (role unchanged): {}", response);
             return response;
 
         } catch (Exception e) {
-            log.error("❌ Error updating user: {}", e.getMessage());
+            log.error(" Error updating user: {}", e.getMessage());
             throw new RuntimeException("Failed to update user: " + e.getMessage());
         }
     }
@@ -149,11 +148,11 @@ public class UserService {
     // Méthode séparée pour mettre à jour le rôle (si nécessaire)
     public void updateUserRole(String userId, String newRole) {
         try {
-            log.info("🔄 Updating user role: {} -> {}", userId, newRole);
+            log.info(" Updating user role: {} -> {}", userId, newRole);
             keycloakService.updateUserRole(userId, newRole);
-            log.info("✅ User role updated successfully");
+            log.info(" User role updated successfully");
         } catch (Exception e) {
-            log.error("❌ Error updating user role: {}", e.getMessage());
+            log.error(" Error updating user role: {}", e.getMessage());
             throw new RuntimeException("Failed to update user role: " + e.getMessage());
         }
     }
@@ -163,19 +162,19 @@ public class UserService {
      */
     public UserData completeDoctorProfile(String userId, DoctorProfileDto doctorProfileDto) {
         try {
-            log.info("🔄 Completing doctor profile for user: {}", userId);
+            log.info(" Completing doctor profile for user: {}", userId);
 
             Optional<UserData> optionalUserData = userDataRepository.findById(userId);
             UserData userData;
 
             if (optionalUserData.isPresent()) {
                 userData = optionalUserData.get();
-                // ✅ CORRIGÉ : Utiliser Instant.now() au lieu de conversion
+                // CORRIGÉ : Utiliser Instant.now() au lieu de conversion
                 userData.setUpdatedAt(Instant.now());
             } else {
                 userData = new UserData();
                 userData.setId(userId);
-                // ✅ CORRIGÉ : Utiliser Instant.now() au lieu de conversion
+                // CORRIGÉ : Utiliser Instant.now() au lieu de conversion
                 userData.setCreatedAt(Instant.now());
                 userData.setUpdatedAt(Instant.now());
             }
@@ -201,11 +200,11 @@ public class UserService {
 
             UserData savedUserData = userDataRepository.save(userData);
 
-            log.info("✅ Doctor profile completed successfully: {}", savedUserData);
+            log.info("Doctor profile completed successfully: {}", savedUserData);
             return savedUserData;
 
         } catch (Exception e) {
-            log.error("❌ Error completing doctor profile: {}", e.getMessage());
+            log.error("Error completing doctor profile: {}", e.getMessage());
             throw new RuntimeException("Failed to complete doctor profile: " + e.getMessage());
         }
     }
@@ -215,7 +214,7 @@ public class UserService {
      */
     public String uploadProfilePhoto(String userId, MultipartFile file) {
         try {
-            log.info("📤 Uploading profile photo for user: {}", userId);
+            log.info(" Uploading profile photo for user: {}", userId);
 
             if (file == null || file.isEmpty()) {
                 throw new IllegalArgumentException("File cannot be null or empty");
@@ -230,12 +229,12 @@ public class UserService {
 
             if (optionalUserData.isPresent()) {
                 userData = optionalUserData.get();
-                // ✅ CORRIGÉ : Utiliser Instant.now() au lieu de conversion
+                //  CORRIGÉ : Utiliser Instant.now() au lieu de conversion
                 userData.setUpdatedAt(Instant.now());
             } else {
                 userData = new UserData();
                 userData.setId(userId);
-                // ✅ CORRIGÉ : Utiliser Instant.now() au lieu de conversion
+                //  CORRIGÉ : Utiliser Instant.now() au lieu de conversion
                 userData.setCreatedAt(Instant.now());
                 userData.setUpdatedAt(Instant.now());
                 userData.setProfileComplete(false);
@@ -244,16 +243,16 @@ public class UserService {
             userData.setProfilePhotoUrl(profilePhotoUrl);
             userDataRepository.save(userData);
 
-            log.info("✅ Profile photo uploaded successfully: {}", profilePhotoUrl);
+            log.info(" Profile photo uploaded successfully: {}", profilePhotoUrl);
             return profilePhotoUrl;
 
         } catch (Exception e) {
-            log.error("❌ Error uploading profile photo: {}", e.getMessage());
+            log.error(" Error uploading profile photo: {}", e.getMessage());
             throw new RuntimeException("Failed to upload profile photo: " + e.getMessage());
         }
     }
 
-    // ✅ MÉTHODE UTILITAIRE pour convertir LocalDateTime en Instant (si vraiment nécessaire)
+    //  MÉTHODE UTILITAIRE pour convertir LocalDateTime en Instant (si vraiment nécessaire)
     private Instant toInstant(LocalDateTime localDateTime) {
         return localDateTime.atZone(ZoneId.systemDefault()).toInstant();
     }

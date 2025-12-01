@@ -1,5 +1,6 @@
-package com.SymptomCheck.userservice.dtos;
+package com.SymptomCheck.userservice.unit.dtos;
 
+import com.SymptomCheck.userservice.dtos.RefreshTokenRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -7,13 +8,13 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class LogoutRequestTest {
+class RefreshTokenRequestTest {
 
-    private LogoutRequest logoutRequest;
+    private RefreshTokenRequest refreshTokenRequest;
 
     @BeforeEach
     void setUp() {
-        logoutRequest = new LogoutRequest();
+        refreshTokenRequest = new RefreshTokenRequest();
     }
 
     @Nested
@@ -24,13 +25,13 @@ class LogoutRequestTest {
         @DisplayName("should set and get refreshToken correctly")
         void shouldSetAndGetRefreshToken() {
             // Given
-            String refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.logout.token";
+            String refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
 
             // When
-            logoutRequest.setRefreshToken(refreshToken);
+            refreshTokenRequest.setRefreshToken(refreshToken);
 
             // Then
-            assertEquals(refreshToken, logoutRequest.getRefreshToken());
+            assertEquals(refreshToken, refreshTokenRequest.getRefreshToken());
         }
 
         @Test
@@ -40,20 +41,20 @@ class LogoutRequestTest {
             String emptyToken = "";
 
             // When
-            logoutRequest.setRefreshToken(emptyToken);
+            refreshTokenRequest.setRefreshToken(emptyToken);
 
             // Then
-            assertEquals(emptyToken, logoutRequest.getRefreshToken());
+            assertEquals(emptyToken, refreshTokenRequest.getRefreshToken());
         }
 
         @Test
         @DisplayName("should handle null refreshToken")
         void shouldHandleNullRefreshToken() {
             // When
-            logoutRequest.setRefreshToken(null);
+            refreshTokenRequest.setRefreshToken(null);
 
             // Then
-            assertNull(logoutRequest.getRefreshToken());
+            assertNull(refreshTokenRequest.getRefreshToken());
         }
     }
 
@@ -65,10 +66,10 @@ class LogoutRequestTest {
         @DisplayName("should create object with all-args constructor")
         void shouldCreateObjectWithAllArgsConstructor() {
             // Given
-            String refreshToken = "logout-refresh-token-123";
+            String refreshToken = "valid-refresh-token-123";
 
             // When
-            LogoutRequest newRequest = new LogoutRequest(refreshToken);
+            RefreshTokenRequest newRequest = new RefreshTokenRequest(refreshToken);
 
             // Then
             assertEquals(refreshToken, newRequest.getRefreshToken());
@@ -81,7 +82,7 @@ class LogoutRequestTest {
             String emptyToken = "";
 
             // When
-            LogoutRequest newRequest = new LogoutRequest(emptyToken);
+            RefreshTokenRequest newRequest = new RefreshTokenRequest(emptyToken);
 
             // Then
             assertEquals(emptyToken, newRequest.getRefreshToken());
@@ -91,7 +92,7 @@ class LogoutRequestTest {
         @DisplayName("should create object with null token using all-args constructor")
         void shouldCreateObjectWithNullToken() {
             // When
-            LogoutRequest newRequest = new LogoutRequest(null);
+            RefreshTokenRequest newRequest = new RefreshTokenRequest(null);
 
             // Then
             assertNull(newRequest.getRefreshToken());
@@ -102,16 +103,15 @@ class LogoutRequestTest {
     @DisplayName("Equals and HashCode Tests")
     class EqualsHashCodeTests {
 
-
         @Test
         @DisplayName("should not be equal when refreshTokens differ")
         void shouldNotBeEqualWhenRefreshTokensDiffer() {
             // Given
-            LogoutRequest request1 = new LogoutRequest();
-            request1.setRefreshToken("logout-token-1");
+            RefreshTokenRequest request1 = new RefreshTokenRequest();
+            request1.setRefreshToken("token-1");
 
-            LogoutRequest request2 = new LogoutRequest();
-            request2.setRefreshToken("logout-token-2");
+            RefreshTokenRequest request2 = new RefreshTokenRequest();
+            request2.setRefreshToken("token-2");
 
             // Then
             assertNotEquals(request1, request2);
@@ -121,8 +121,8 @@ class LogoutRequestTest {
         @DisplayName("should not be equal when compared with null")
         void shouldNotBeEqualWhenComparedWithNull() {
             // Given
-            LogoutRequest request = new LogoutRequest();
-            request.setRefreshToken("test-logout-token");
+            RefreshTokenRequest request = new RefreshTokenRequest();
+            request.setRefreshToken("test-token");
 
             // Then
             assertNotEquals(null, request);
@@ -132,8 +132,8 @@ class LogoutRequestTest {
         @DisplayName("should not be equal when compared with different class")
         void shouldNotBeEqualWhenComparedWithDifferentClass() {
             // Given
-            LogoutRequest request = new LogoutRequest();
-            request.setRefreshToken("test-logout-token");
+            RefreshTokenRequest request = new RefreshTokenRequest();
+            request.setRefreshToken("test-token");
 
             // Then
             assertNotEquals("string-object", request);
@@ -143,16 +143,15 @@ class LogoutRequestTest {
         @DisplayName("should handle null refreshToken in equals")
         void shouldHandleNullRefreshTokenInEquals() {
             // Given
-            LogoutRequest request1 = new LogoutRequest();
+            RefreshTokenRequest request1 = new RefreshTokenRequest();
             request1.setRefreshToken(null);
 
-            LogoutRequest request2 = new LogoutRequest();
-            request2.setRefreshToken("some-logout-token");
+            RefreshTokenRequest request2 = new RefreshTokenRequest();
+            request2.setRefreshToken("some-token");
 
             // Then
             assertNotEquals(request1, request2);
         }
-
 
     }
 
@@ -161,13 +160,14 @@ class LogoutRequestTest {
     class ToStringTests {
 
 
+
         @Test
         @DisplayName("toString should handle null refreshToken gracefully")
         void toStringShouldHandleNullRefreshToken() {
-            // Given - logoutRequest with null token
+            // Given - refreshTokenRequest with null token
 
             // When
-            String toStringResult = logoutRequest.toString();
+            String toStringResult = refreshTokenRequest.toString();
 
             // Then
             assertNotNull(toStringResult);
@@ -178,10 +178,10 @@ class LogoutRequestTest {
         @DisplayName("toString should handle empty refreshToken gracefully")
         void toStringShouldHandleEmptyRefreshToken() {
             // Given
-            logoutRequest.setRefreshToken("");
+            refreshTokenRequest.setRefreshToken("");
 
             // When
-            String toStringResult = logoutRequest.toString();
+            String toStringResult = refreshTokenRequest.toString();
 
             // Then
             assertNotNull(toStringResult);
@@ -189,64 +189,34 @@ class LogoutRequestTest {
         }
     }
 
-
     @Nested
     @DisplayName("Edge Case Tests")
     class EdgeCaseTests {
 
         @Test
-        @DisplayName("should handle very long logout token")
-        void shouldHandleVeryLongLogoutToken() {
+        @DisplayName("should handle very long refresh token")
+        void shouldHandleVeryLongRefreshToken() {
             // Given
-            String longToken = "x".repeat(2000);
+            String longToken = "a".repeat(1000);
 
             // When
-            logoutRequest.setRefreshToken(longToken);
+            refreshTokenRequest.setRefreshToken(longToken);
 
             // Then
-            assertEquals(longToken, logoutRequest.getRefreshToken());
+            assertEquals(longToken, refreshTokenRequest.getRefreshToken());
         }
 
         @Test
-        @DisplayName("should handle logout token with special characters")
-        void shouldHandleLogoutTokenWithSpecialCharacters() {
+        @DisplayName("should handle refresh token with special characters")
+        void shouldHandleRefreshTokenWithSpecialCharacters() {
             // Given
-            String specialToken = "logout!@#$%^&*()_+-=[]{}|;:,.<>?/token";
+            String specialToken = "token!@#$%^&*()_+-=[]{}|;:,.<>?";
 
             // When
-            logoutRequest.setRefreshToken(specialToken);
+            refreshTokenRequest.setRefreshToken(specialToken);
 
             // Then
-            assertEquals(specialToken, logoutRequest.getRefreshToken());
+            assertEquals(specialToken, refreshTokenRequest.getRefreshToken());
         }
-
-        @Test
-        @DisplayName("should handle JWT format tokens")
-        void shouldHandleJWTFormatTokens() {
-            // Given
-            String jwtToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-
-            // When
-            logoutRequest.setRefreshToken(jwtToken);
-
-            // Then
-            assertEquals(jwtToken, logoutRequest.getRefreshToken());
-        }
-    }
-
-    @Nested
-    @DisplayName("Consistency Tests")
-    class ConsistencyTests {
-
-        @Test
-        @DisplayName("should be reflexive in equals")
-        void shouldBeReflexiveInEquals() {
-            // Given
-            LogoutRequest request = new LogoutRequest("reflexive-token");
-
-            // Then
-            assertEquals(request, request);
-        }
-
     }
 }

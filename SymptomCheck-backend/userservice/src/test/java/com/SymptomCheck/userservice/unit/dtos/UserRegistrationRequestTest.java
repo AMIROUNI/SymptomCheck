@@ -1,5 +1,6 @@
-package com.SymptomCheck.userservice.dtos;
+package com.SymptomCheck.userservice.unit.dtos;
 
+import com.SymptomCheck.userservice.dtos.UserRegistrationRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
