@@ -1,6 +1,7 @@
 package com.symptomcheck.appointmentservice.functional.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.symptomcheck.appointmentservice.config.SecurityConfig;
 import com.symptomcheck.appointmentservice.controllers.AppointmentDashboardController;
 import com.symptomcheck.appointmentservice.dtos.dashboardDto.AppointmentDashboardDTO;
 import com.symptomcheck.appointmentservice.dtos.dashboardDto.AppointmentStatsDTO;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AppointmentDashboardController.class)
-class AppointmentDashboardControllerFunctionalTest {
+class AppointmentDashboardControllerApiTest {
 
     @Autowired
     private MockMvc mockMvc;
