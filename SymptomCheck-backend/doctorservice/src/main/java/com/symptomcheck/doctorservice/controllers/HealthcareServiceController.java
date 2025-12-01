@@ -2,6 +2,7 @@ package com.symptomcheck.doctorservice.controllers;
 
 import com.symptomcheck.doctorservice.dtos.HealthcareServiceDto;
 import com.symptomcheck.doctorservice.services.HealthcareServiceService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ public class HealthcareServiceController {
 
 
     @GetMapping("")
+
     public ResponseEntity<?> getHealthcareService() {
         try {
 
@@ -42,7 +44,7 @@ public class HealthcareServiceController {
 
 
     @PostMapping()
-        public ResponseEntity<?> saveHealthcareService(@RequestPart("dto") HealthcareServiceDto dto,
+        public ResponseEntity<?> saveHealthcareService(   @RequestPart("dto") HealthcareServiceDto dto,
                                                        @RequestPart("file") MultipartFile image) throws IOException {
 try {
 
