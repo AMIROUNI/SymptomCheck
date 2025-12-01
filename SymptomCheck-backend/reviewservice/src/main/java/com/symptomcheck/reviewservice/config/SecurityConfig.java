@@ -50,10 +50,8 @@ public class SecurityConfig {
                                 "/uploads/**").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
 
-                        .requestMatchers("/api/v1/users/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/users/doctor/**").hasAnyRole("DOCTOR", "ADMIN")
-                        .requestMatchers("/api/v1/users/patient/**").hasAnyRole("PATIENT", "ADMIN")
-                        .requestMatchers("/api/v1/reviews/**").hasAnyRole("PATIENT", "DOCTOR", "ADMIN") // ✅ Ajouté pour les reviews
+
+                        .requestMatchers("/api/v1/reviews/**").hasAnyRole("PATIENT", "DOCTOR", "ADMIN") //  Ajouté pour les reviews
 
                         .anyRequest().authenticated()
                 )
