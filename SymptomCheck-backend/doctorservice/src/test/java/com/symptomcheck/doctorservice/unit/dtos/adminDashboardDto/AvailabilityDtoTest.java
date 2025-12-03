@@ -1,6 +1,6 @@
 package com.symptomcheck.doctorservice.unit.dtos.adminDashboardDto;
 
-import com.symptomcheck.doctorservice.dtos.adminDashboardDto.AvailabilityDto;
+import com.symptomcheck.doctorservice.dtos.admindashboarddto.AvailabilityDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

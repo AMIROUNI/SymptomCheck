@@ -1,6 +1,6 @@
 package com.symptomcheck.doctorservice.unit.dtos.dashboardDto;
 
-import com.symptomcheck.doctorservice.dtos.dashboardDto.ProfileCompletionDTO;
+import com.symptomcheck.doctorservice.dtos.dashboarddto.ProfileCompletionDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

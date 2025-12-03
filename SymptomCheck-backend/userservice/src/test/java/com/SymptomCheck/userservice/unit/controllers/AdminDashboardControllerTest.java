@@ -1,8 +1,8 @@
 package com.SymptomCheck.userservice.unit.controllers;
 
 import com.SymptomCheck.userservice.controllers.AdminDashboardController;
-import com.SymptomCheck.userservice.dtos.adminDashboardDto.AdminUserDto;
-import com.SymptomCheck.userservice.dtos.adminDashboardDto.UserStatsDto;
+import com.SymptomCheck.userservice.dtos.admindashboarddto.AdminUserDto;
+import com.SymptomCheck.userservice.dtos.admindashboarddto.UserStatsDto;
 import com.SymptomCheck.userservice.services.AdminDashboardService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

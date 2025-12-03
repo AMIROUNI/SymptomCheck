@@ -1,6 +1,5 @@
 package com.symptomcheck.appointmentservice;
 
-import com.symptomcheck.appointmentservice.SecurityTestConfig;
 import com.symptomcheck.appointmentservice.dtos.AppointmentDto;
 import com.symptomcheck.appointmentservice.enums.AppointmentStatus;
 import com.symptomcheck.appointmentservice.models.Appointment;

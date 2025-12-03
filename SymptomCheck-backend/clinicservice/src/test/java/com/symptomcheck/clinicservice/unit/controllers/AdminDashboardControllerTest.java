@@ -1,8 +1,8 @@
 package com.symptomcheck.clinicservice.unit.controllers;
 
 import com.symptomcheck.clinicservice.controllers.AdminDashboardController;
-import com.symptomcheck.clinicservice.dtos.adminDashboardDto.AdminClinicDto;
-import com.symptomcheck.clinicservice.dtos.adminDashboardDto.ClinicStatsDto;
+import com.symptomcheck.clinicservice.dtos.admindashboarddto.AdminClinicDto;
+import com.symptomcheck.clinicservice.dtos.admindashboarddto.ClinicStatsDto;
 import com.symptomcheck.clinicservice.services.AdminDashboardService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

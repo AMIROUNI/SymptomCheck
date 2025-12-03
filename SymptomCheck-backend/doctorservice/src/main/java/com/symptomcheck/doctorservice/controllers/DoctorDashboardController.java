@@ -1,6 +1,6 @@
 package com.symptomcheck.doctorservice.controllers;
 
-import com.symptomcheck.doctorservice.dtos.dashboardDto.DoctorDashboardDTO;
+import com.symptomcheck.doctorservice.dtos.dashboarddto.DoctorDashboardDTO;
 import com.symptomcheck.doctorservice.services.DoctorDashboardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

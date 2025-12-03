@@ -1,4 +1,4 @@
-package com.symptomcheck.appointmentservice.dtos.dashboardDto;
+package com.symptomcheck.appointmentservice.dtos.dashboarddto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

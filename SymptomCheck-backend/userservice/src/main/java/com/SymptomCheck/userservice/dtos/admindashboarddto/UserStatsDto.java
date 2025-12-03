@@ -1,4 +1,4 @@
-package com.SymptomCheck.userservice.dtos.adminDashboardDto;
+package com.SymptomCheck.userservice.dtos.admindashboarddto;
 
 import lombok.Data;
 import java.time.LocalDateTime;

@@ -1,12 +1,10 @@
 package com.symptomcheck.doctorservice.unit.dtos.dashboardDto;
 
-import com.symptomcheck.doctorservice.dtos.dashboardDto.*;
+import com.symptomcheck.doctorservice.dtos.dashboarddto.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.DayOfWeek;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 

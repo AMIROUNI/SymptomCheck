@@ -1,8 +1,7 @@
 package com.symptomcheck.doctorservice.unit.services;
 
-import com.symptomcheck.doctorservice.dtos.adminDashboardDto.AdminDoctorDto;
-import com.symptomcheck.doctorservice.dtos.adminDashboardDto.DoctorStatsDto;
-import com.symptomcheck.doctorservice.dtos.adminDashboardDto.ServiceDto;
+import com.symptomcheck.doctorservice.dtos.admindashboarddto.AdminDoctorDto;
+import com.symptomcheck.doctorservice.dtos.admindashboarddto.DoctorStatsDto;
 import com.symptomcheck.doctorservice.models.DoctorAvailability;
 import com.symptomcheck.doctorservice.models.HealthcareService;
 import com.symptomcheck.doctorservice.repositories.DoctorAvailabilityRepository;
@@ -18,10 +17,8 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.time.LocalDateTime;
 import java.util.*;
 
-import static java.time.DayOfWeek.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 

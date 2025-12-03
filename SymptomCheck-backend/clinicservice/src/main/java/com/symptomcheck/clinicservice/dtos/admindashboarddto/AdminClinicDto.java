@@ -1,4 +1,4 @@
-package com.symptomcheck.clinicservice.dtos.adminDashboardDto;
+package com.symptomcheck.clinicservice.dtos.admindashboarddto;
 
 
 import jakarta.validation.constraints.NotBlank;

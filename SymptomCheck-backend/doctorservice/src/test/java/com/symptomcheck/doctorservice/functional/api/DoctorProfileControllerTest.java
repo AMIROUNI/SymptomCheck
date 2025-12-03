@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;

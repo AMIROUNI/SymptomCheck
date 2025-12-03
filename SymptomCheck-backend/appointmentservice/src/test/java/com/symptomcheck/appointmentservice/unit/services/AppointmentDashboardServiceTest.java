@@ -1,7 +1,7 @@
 package com.symptomcheck.appointmentservice.unit.services;
 
-import com.symptomcheck.appointmentservice.dtos.dashboardDto.AppointmentDashboardDTO;
-import com.symptomcheck.appointmentservice.dtos.dashboardDto.AppointmentStatsDTO;
+import com.symptomcheck.appointmentservice.dtos.dashboarddto.AppointmentDashboardDTO;
+import com.symptomcheck.appointmentservice.dtos.dashboarddto.AppointmentStatsDTO;
 import com.symptomcheck.appointmentservice.enums.AppointmentStatus;
 import com.symptomcheck.appointmentservice.models.Appointment;
 import com.symptomcheck.appointmentservice.repositories.AppointmentRepository;
@@ -12,9 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 import static org.mockito.Mockito.*;

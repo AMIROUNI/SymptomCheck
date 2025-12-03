@@ -1,7 +1,7 @@
 package com.symptomcheck.clinicservice.unit.services;
 
-import com.symptomcheck.clinicservice.dtos.adminDashboardDto.AdminClinicDto;
-import com.symptomcheck.clinicservice.dtos.adminDashboardDto.ClinicStatsDto;
+import com.symptomcheck.clinicservice.dtos.admindashboarddto.AdminClinicDto;
+import com.symptomcheck.clinicservice.dtos.admindashboarddto.ClinicStatsDto;
 import com.symptomcheck.clinicservice.models.MedicalClinic;
 import com.symptomcheck.clinicservice.repositories.MedicalClinicRepository;
 import com.symptomcheck.clinicservice.services.AdminDashboardService;

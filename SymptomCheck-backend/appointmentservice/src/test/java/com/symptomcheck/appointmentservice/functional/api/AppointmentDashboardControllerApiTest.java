@@ -1,10 +1,9 @@
 package com.symptomcheck.appointmentservice.functional.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.symptomcheck.appointmentservice.config.SecurityConfig;
 import com.symptomcheck.appointmentservice.controllers.AppointmentDashboardController;
-import com.symptomcheck.appointmentservice.dtos.dashboardDto.AppointmentDashboardDTO;
-import com.symptomcheck.appointmentservice.dtos.dashboardDto.AppointmentStatsDTO;
+import com.symptomcheck.appointmentservice.dtos.dashboarddto.AppointmentDashboardDTO;
+import com.symptomcheck.appointmentservice.dtos.dashboarddto.AppointmentStatsDTO;
 import com.symptomcheck.appointmentservice.enums.AppointmentStatus;
 import com.symptomcheck.appointmentservice.models.Appointment;
 import com.symptomcheck.appointmentservice.services.AppointmentDashboardService;

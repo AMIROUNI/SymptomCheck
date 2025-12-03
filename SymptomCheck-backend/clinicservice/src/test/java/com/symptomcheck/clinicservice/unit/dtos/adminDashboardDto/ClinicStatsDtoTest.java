@@ -1,6 +1,6 @@
 package com.symptomcheck.clinicservice.unit.dtos.adminDashboardDto;
 
-import com.symptomcheck.clinicservice.dtos.adminDashboardDto.ClinicStatsDto;
+import com.symptomcheck.clinicservice.dtos.admindashboarddto.ClinicStatsDto;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;

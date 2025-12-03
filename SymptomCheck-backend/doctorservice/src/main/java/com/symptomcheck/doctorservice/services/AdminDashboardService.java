@@ -2,10 +2,10 @@ package com.symptomcheck.doctorservice.services;
 
 
 
-import com.symptomcheck.doctorservice.dtos.adminDashboardDto.AdminDoctorDto;
-import com.symptomcheck.doctorservice.dtos.adminDashboardDto.AvailabilityDto;
-import com.symptomcheck.doctorservice.dtos.adminDashboardDto.DoctorStatsDto;
-import com.symptomcheck.doctorservice.dtos.adminDashboardDto.ServiceDto;
+import com.symptomcheck.doctorservice.dtos.admindashboarddto.AdminDoctorDto;
+import com.symptomcheck.doctorservice.dtos.admindashboarddto.AvailabilityDto;
+import com.symptomcheck.doctorservice.dtos.admindashboarddto.DoctorStatsDto;
+import com.symptomcheck.doctorservice.dtos.admindashboarddto.ServiceDto;
 import com.symptomcheck.doctorservice.models.DoctorAvailability;
 import com.symptomcheck.doctorservice.models.HealthcareService;
 import com.symptomcheck.doctorservice.repositories.DoctorAvailabilityRepository;

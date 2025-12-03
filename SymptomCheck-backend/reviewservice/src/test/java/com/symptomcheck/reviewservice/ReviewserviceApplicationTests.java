@@ -1,7 +1,6 @@
 package com.symptomcheck.reviewservice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 
 import com.symptomcheck.reviewservice.dtos.DoctorReviewRequest;
 import com.symptomcheck.reviewservice.dtos.DoctorReviewResponse;
@@ -31,7 +30,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;

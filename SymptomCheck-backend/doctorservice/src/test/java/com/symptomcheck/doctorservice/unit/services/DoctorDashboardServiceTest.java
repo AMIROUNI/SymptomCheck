@@ -1,6 +1,6 @@
 package com.symptomcheck.doctorservice.unit.services;
 
-import com.symptomcheck.doctorservice.dtos.dashboardDto.*;
+import com.symptomcheck.doctorservice.dtos.dashboarddto.*;
 import com.symptomcheck.doctorservice.models.DoctorAvailability;
 import com.symptomcheck.doctorservice.models.HealthcareService;
 import com.symptomcheck.doctorservice.repositories.DoctorAvailabilityRepository;
@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;

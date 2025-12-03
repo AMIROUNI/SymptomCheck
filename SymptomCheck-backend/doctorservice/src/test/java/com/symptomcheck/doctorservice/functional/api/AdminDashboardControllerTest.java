@@ -2,7 +2,7 @@ package com.symptomcheck.doctorservice.functional.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.symptomcheck.doctorservice.controllers.AdminDashboardController;
-import com.symptomcheck.doctorservice.dtos.adminDashboardDto.*;
+import com.symptomcheck.doctorservice.dtos.admindashboarddto.*;
 import com.symptomcheck.doctorservice.services.AdminDashboardService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;

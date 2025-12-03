@@ -1,7 +1,7 @@
 package com.symptomcheck.appointmentservice.unit.services;
 
-import com.symptomcheck.appointmentservice.dtos.adminDashboardDto.AdminAppointmentDto;
-import com.symptomcheck.appointmentservice.dtos.adminDashboardDto.AppointmentStatsDto;
+import com.symptomcheck.appointmentservice.dtos.admindashboarddto.AdminAppointmentDto;
+import com.symptomcheck.appointmentservice.dtos.admindashboarddto.AppointmentStatsDto;
 import com.symptomcheck.appointmentservice.enums.AppointmentStatus;
 import com.symptomcheck.appointmentservice.models.Appointment;
 import com.symptomcheck.appointmentservice.repositories.AppointmentRepository;

@@ -2,7 +2,7 @@ package com.symptomcheck.appointmentservice.unit.dtos.dashboardDto;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.symptomcheck.appointmentservice.dtos.dashboardDto.AppointmentStatsDTO;
+import com.symptomcheck.appointmentservice.dtos.dashboarddto.AppointmentStatsDTO;
 import org.junit.jupiter.api.Test;
 
 class AppointmentStatsDTOTest {

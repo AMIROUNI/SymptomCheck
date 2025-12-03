@@ -3,8 +3,8 @@ package com.symptomcheck.appointmentservice.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.symptomcheck.appointmentservice.config.SecurityConfig;
 import com.symptomcheck.appointmentservice.controllers.AdminDashboardController;
-import com.symptomcheck.appointmentservice.dtos.adminDashboardDto.AdminAppointmentDto;
-import com.symptomcheck.appointmentservice.dtos.adminDashboardDto.AppointmentStatsDto;
+import com.symptomcheck.appointmentservice.dtos.admindashboarddto.AdminAppointmentDto;
+import com.symptomcheck.appointmentservice.dtos.admindashboarddto.AppointmentStatsDto;
 import com.symptomcheck.appointmentservice.services.AdminDashboardService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 

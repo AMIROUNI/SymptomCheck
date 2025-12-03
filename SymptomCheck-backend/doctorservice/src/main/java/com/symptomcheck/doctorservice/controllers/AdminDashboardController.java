@@ -1,8 +1,8 @@
 package com.symptomcheck.doctorservice.controllers;
 
 
-import com.symptomcheck.doctorservice.dtos.adminDashboardDto.AdminDoctorDto;
-import com.symptomcheck.doctorservice.dtos.adminDashboardDto.DoctorStatsDto;
+import com.symptomcheck.doctorservice.dtos.admindashboarddto.AdminDoctorDto;
+import com.symptomcheck.doctorservice.dtos.admindashboarddto.DoctorStatsDto;
 import com.symptomcheck.doctorservice.services.AdminDashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

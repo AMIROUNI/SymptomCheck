@@ -1,7 +1,7 @@
 package com.symptomcheck.appointmentservice.controllers;
 
-import com.symptomcheck.appointmentservice.dtos.adminDashboardDto.AdminAppointmentDto;
-import com.symptomcheck.appointmentservice.dtos.adminDashboardDto.AppointmentStatsDto;
+import com.symptomcheck.appointmentservice.dtos.admindashboarddto.AdminAppointmentDto;
+import com.symptomcheck.appointmentservice.dtos.admindashboarddto.AppointmentStatsDto;
 import com.symptomcheck.appointmentservice.services.AdminDashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;

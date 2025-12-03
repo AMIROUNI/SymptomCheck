@@ -2,8 +2,8 @@ package com.SymptomCheck.userservice.integration;
 
 import com.SymptomCheck.userservice.config.KeycloakSecurityConfig;
 import com.SymptomCheck.userservice.controllers.AdminDashboardController;
-import com.SymptomCheck.userservice.dtos.adminDashboardDto.AdminUserDto;
-import com.SymptomCheck.userservice.dtos.adminDashboardDto.UserStatsDto;
+import com.SymptomCheck.userservice.dtos.admindashboarddto.AdminUserDto;
+import com.SymptomCheck.userservice.dtos.admindashboarddto.UserStatsDto;
 import com.SymptomCheck.userservice.exceptions.UserNotFountException;
 import com.SymptomCheck.userservice.services.AdminDashboardService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -25,9 +24,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;

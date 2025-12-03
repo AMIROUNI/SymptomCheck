@@ -2,8 +2,8 @@ package com.SymptomCheck.userservice.functional.api;
 
 import com.SymptomCheck.userservice.config.KeycloakSecurityConfig;
 import com.SymptomCheck.userservice.controllers.AdminDashboardController;
-import com.SymptomCheck.userservice.dtos.adminDashboardDto.AdminUserDto;
-import com.SymptomCheck.userservice.dtos.adminDashboardDto.UserStatsDto;
+import com.SymptomCheck.userservice.dtos.admindashboarddto.AdminUserDto;
+import com.SymptomCheck.userservice.dtos.admindashboarddto.UserStatsDto;
 import com.SymptomCheck.userservice.exceptions.UserNotFountException;
 import com.SymptomCheck.userservice.services.AdminDashboardService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,8 +23,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;

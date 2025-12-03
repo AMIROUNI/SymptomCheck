@@ -30,6 +30,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final String admin="ADMIN";
+    private final String patient="PATIENT";
+    private final String doctor="DOCTOR";
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -53,9 +57,9 @@ public class SecurityConfig {
                                 "/uploads/**").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
 
-                        .requestMatchers("/api/v1/users/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/users/doctor/**").hasAnyRole("DOCTOR", "ADMIN")
-                        .requestMatchers("/api/v1/users/patient/**").hasAnyRole("PATIENT", "ADMIN")
+                        .requestMatchers("/api/v1/users/admin/**").hasRole(admin)
+                        .requestMatchers("/api/v1/users/doctor/**").hasAnyRole(doctor, admin)
+                        .requestMatchers("/api/v1/users/patient/**").hasAnyRole(patient, admin)
 
                         .anyRequest().authenticated()
                 )

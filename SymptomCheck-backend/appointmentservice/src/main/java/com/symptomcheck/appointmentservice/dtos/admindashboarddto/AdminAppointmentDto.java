@@ -1,4 +1,4 @@
-package com.symptomcheck.appointmentservice.dtos.adminDashboardDto;
+package com.symptomcheck.appointmentservice.dtos.admindashboarddto;
 
 
 import lombok.Data;

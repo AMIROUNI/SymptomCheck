@@ -1,6 +1,5 @@
 package com.symptomcheck.appointmentservice.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.symptomcheck.appointmentservice.enums.AppointmentStatus;
 import com.symptomcheck.appointmentservice.models.Appointment;
 import com.symptomcheck.appointmentservice.repositories.AppointmentRepository;

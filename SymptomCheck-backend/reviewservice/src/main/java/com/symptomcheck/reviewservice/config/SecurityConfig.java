@@ -29,7 +29,9 @@ import java.util.stream.Collectors;
 @EnableMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
-
+    private final String admin="ADMIN";
+    private final String patient="PATIENT";
+    private final String doctor="DOCTOR";
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -51,7 +53,7 @@ public class SecurityConfig {
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
 
 
-                        .requestMatchers("/api/v1/reviews/**").hasAnyRole("PATIENT", "DOCTOR", "ADMIN") //  Ajouté pour les reviews
+                        .requestMatchers("/api/v1/reviews/**").hasAnyRole(patient,admin,doctor) //  Ajouté pour les reviews
 
                         .anyRequest().authenticated()
                 )

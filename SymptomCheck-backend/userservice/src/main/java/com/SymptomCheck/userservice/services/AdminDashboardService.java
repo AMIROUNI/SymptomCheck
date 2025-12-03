@@ -1,7 +1,7 @@
 package com.SymptomCheck.userservice.services;
 
-import com.SymptomCheck.userservice.dtos.adminDashboardDto.AdminUserDto;
-import com.SymptomCheck.userservice.dtos.adminDashboardDto.UserStatsDto;
+import com.SymptomCheck.userservice.dtos.admindashboarddto.AdminUserDto;
+import com.SymptomCheck.userservice.dtos.admindashboarddto.UserStatsDto;
 import com.SymptomCheck.userservice.exceptions.UserNotFountException;
 import com.SymptomCheck.userservice.models.UserData;
 import com.SymptomCheck.userservice.repositories.UserDataRepository;

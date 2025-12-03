@@ -1,6 +1,6 @@
 package com.symptomcheck.appointmentservice.unit.dtos.adminDashboardDto;
 
-import com.symptomcheck.appointmentservice.dtos.adminDashboardDto.AdminAppointmentDto;
+import com.symptomcheck.appointmentservice.dtos.admindashboarddto.AdminAppointmentDto;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;

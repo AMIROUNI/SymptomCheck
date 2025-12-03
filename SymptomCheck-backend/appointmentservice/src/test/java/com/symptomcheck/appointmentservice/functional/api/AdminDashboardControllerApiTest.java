@@ -2,8 +2,8 @@ package com.symptomcheck.appointmentservice.functional.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.symptomcheck.appointmentservice.controllers.AdminDashboardController;
-import com.symptomcheck.appointmentservice.dtos.adminDashboardDto.AdminAppointmentDto;
-import com.symptomcheck.appointmentservice.dtos.adminDashboardDto.AppointmentStatsDto;
+import com.symptomcheck.appointmentservice.dtos.admindashboarddto.AdminAppointmentDto;
+import com.symptomcheck.appointmentservice.dtos.admindashboarddto.AppointmentStatsDto;
 import com.symptomcheck.appointmentservice.services.AdminDashboardService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -270,9 +270,6 @@ class AdminDashboardControllerApiTest {
     class GetAppointmentsByDateRangeTests {
         @Test
         void shouldReturnAppointmentsByDateRangeSuccessfully() throws Exception {
-            // Given
-            LocalDateTime start = LocalDateTime.of(2024, 1, 1, 0, 0);
-            LocalDateTime end = LocalDateTime.of(2024, 1, 31, 23, 59);
 
             when(adminDashboardService.getAppointmentsByDateRange(any(LocalDateTime.class), any(LocalDateTime.class)))
                     .thenReturn(appointmentList);

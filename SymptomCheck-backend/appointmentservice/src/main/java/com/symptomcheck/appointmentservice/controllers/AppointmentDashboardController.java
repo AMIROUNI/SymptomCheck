@@ -1,7 +1,7 @@
     package com.symptomcheck.appointmentservice.controllers;
 
 
-    import com.symptomcheck.appointmentservice.dtos.dashboardDto.AppointmentDashboardDTO;
+    import com.symptomcheck.appointmentservice.dtos.dashboarddto.AppointmentDashboardDTO;
     import com.symptomcheck.appointmentservice.models.Appointment;
     import com.symptomcheck.appointmentservice.services.AppointmentDashboardService;
     import io.swagger.v3.oas.annotations.Operation;

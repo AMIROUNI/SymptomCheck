@@ -1,6 +1,6 @@
 package com.symptomcheck.clinicservice.unit.dtos.adminDashboardDto;
 
-import com.symptomcheck.clinicservice.dtos.adminDashboardDto.AdminClinicDto;
+import com.symptomcheck.clinicservice.dtos.admindashboarddto.AdminClinicDto;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

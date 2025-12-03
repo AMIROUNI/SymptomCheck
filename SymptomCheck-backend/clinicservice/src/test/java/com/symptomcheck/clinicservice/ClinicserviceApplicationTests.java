@@ -1,6 +1,6 @@
 package com.symptomcheck.clinicservice;
 
-import com.symptomcheck.clinicservice.dtos.adminDashboardDto.AdminClinicDto;
+import com.symptomcheck.clinicservice.dtos.admindashboarddto.AdminClinicDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

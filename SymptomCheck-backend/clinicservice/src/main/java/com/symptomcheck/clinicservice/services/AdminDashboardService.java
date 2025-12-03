@@ -1,7 +1,7 @@
 package com.symptomcheck.clinicservice.services;
 
-import com.symptomcheck.clinicservice.dtos.adminDashboardDto.AdminClinicDto;
-import com.symptomcheck.clinicservice.dtos.adminDashboardDto.ClinicStatsDto;
+import com.symptomcheck.clinicservice.dtos.admindashboarddto.AdminClinicDto;
+import com.symptomcheck.clinicservice.dtos.admindashboarddto.ClinicStatsDto;
 import com.symptomcheck.clinicservice.exception.ClinicNotFoundException;
 import com.symptomcheck.clinicservice.exception.ClinicValidationException;
 import com.symptomcheck.clinicservice.models.MedicalClinic;

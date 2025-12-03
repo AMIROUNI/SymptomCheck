@@ -1,11 +1,11 @@
 package com.symptomcheck.doctorservice.unit.controllers;
 
 import com.symptomcheck.doctorservice.controllers.DoctorDashboardController;
-import com.symptomcheck.doctorservice.dtos.dashboardDto.DoctorDashboardDTO;
-import com.symptomcheck.doctorservice.dtos.dashboardDto.DoctorStatsDTO;
-import com.symptomcheck.doctorservice.dtos.dashboardDto.DoctorServiceDTO;
-import com.symptomcheck.doctorservice.dtos.dashboardDto.DoctorAvailabilityDTO;
-import com.symptomcheck.doctorservice.dtos.dashboardDto.ProfileCompletionDTO;
+import com.symptomcheck.doctorservice.dtos.dashboarddto.DoctorDashboardDTO;
+import com.symptomcheck.doctorservice.dtos.dashboarddto.DoctorStatsDTO;
+import com.symptomcheck.doctorservice.dtos.dashboarddto.DoctorServiceDTO;
+import com.symptomcheck.doctorservice.dtos.dashboarddto.DoctorAvailabilityDTO;
+import com.symptomcheck.doctorservice.dtos.dashboarddto.ProfileCompletionDTO;
 import com.symptomcheck.doctorservice.services.DoctorDashboardService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
