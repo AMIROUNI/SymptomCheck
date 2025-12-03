@@ -32,13 +32,20 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
-                .cors() // ✅ Enable CORS in Spring Security
-                .and()
+                // CORS without deprecated methods
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // CSRF disabled for stateless APIs
                 .csrf(csrf -> csrf.disable())
+
+                // Stateless session
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authz -> authz
+
+                // Authorization rules
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
@@ -50,35 +57,46 @@ public class SecurityConfig {
                                 "/api/v1/auth/**",
                                 "/actuator/health",
                                 "/uploads/**",
-                        "/api/v1/medical/clinic").permitAll()
-                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                                "/api/v1/medical/clinic"
+                        ).permitAll()
 
-                        .requestMatchers("/api//admin/**").hasRole("ADMIN")
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                        .permitAll()
+
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/users/doctor/**").hasAnyRole("DOCTOR", "ADMIN")
                         .requestMatchers("/api/v1/users/patient/**").hasAnyRole("PATIENT", "ADMIN")
 
                         .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
+
+                // OAuth2 Resource Server (JWT)
+                .oauth2ResourceServer(oauth2 ->
+                        oauth2.jwt(jwt ->
+                                jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        )
                 );
 
         return http.build();
     }
 
+
+    // CORS configuration
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200")); // ✅ Angular app URL
+        config.setAllowedOrigins(List.of("http://localhost:4200"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true); // ✅ Required when using Keycloak cookies/tokens
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
 
+
+    // JWT Role Converter
     @Bean
     public Converter<Jwt, AbstractAuthenticationToken> jwtAuthenticationConverter() {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
@@ -87,16 +105,16 @@ public class SecurityConfig {
     }
 
     public static class KeycloakRealmRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
-
         @Override
         public Collection<GrantedAuthority> convert(Jwt jwt) {
-            final Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("realm_access");
+            Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("realm_access");
             if (realmAccess == null || realmAccess.get("roles") == null) {
                 return List.of();
             }
 
-            return ((List<String>) realmAccess.get("roles")).stream()
-                    .map(roleName -> "ROLE_" + roleName.toUpperCase())
+            return ((List<String>) realmAccess.get("roles"))
+                    .stream()
+                    .map(role -> "ROLE_" + role.toUpperCase())
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
         }

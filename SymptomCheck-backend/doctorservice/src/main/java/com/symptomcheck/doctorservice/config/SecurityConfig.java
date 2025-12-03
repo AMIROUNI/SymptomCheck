@@ -33,8 +33,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors() // ✅ Enable CORS in Spring Security
-                .and()
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // Disable CSRF for stateless APIs
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
