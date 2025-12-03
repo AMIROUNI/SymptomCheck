@@ -1,2 +1,0 @@
-include:
-  - local: 'clinicservice/.gitlab-ci.yml'
