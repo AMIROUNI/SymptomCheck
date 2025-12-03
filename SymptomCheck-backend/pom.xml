@@ -9,7 +9,6 @@
     <modules>
         <module>userservice</module>
         <module>appointmentservice</module>
-        <module>medicalrecordservice</module>
         <module>doctorservice</module>
         <module>clinicservice</module>
         <module>reviewservice</module>
