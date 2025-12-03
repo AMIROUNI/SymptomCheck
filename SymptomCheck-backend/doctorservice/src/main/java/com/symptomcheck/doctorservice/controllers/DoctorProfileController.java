@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -21,6 +22,7 @@ public class DoctorProfileController {
     private final HealthcareServiceService healthcareServiceService;
 
     @GetMapping("/{doctorId}/profile-status")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<Boolean> getProfileStatus(@PathVariable String doctorId) {
 
         // Conversion de la chaîne en UUID
@@ -32,8 +34,8 @@ public class DoctorProfileController {
 
         return ResponseEntity.ok(availabilityCompleted && healthcareServiceCompleted);
     }
-
     @PostMapping("/completeprofile")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<?> complete(@Valid @RequestBody AvailabilityHealthDto availabilityHealthDto){
         try {
             log.info("Recelived request to compete profile");
