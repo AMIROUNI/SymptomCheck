@@ -1,2 +1,2 @@
 include:
-  - local: 'clinicservice/.gitlab-ci.yml'
+  - local: '/SymptomCheck-backend/clinicservice/.gitlab-ci.yml'
