@@ -3,7 +3,6 @@ package com.symptomcheck.reviewservice.dtos;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.time.Instant;
 
 @Data
 @Builder

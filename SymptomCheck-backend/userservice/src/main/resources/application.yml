@@ -16,14 +16,14 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/user_service_db
     username: postgres
-    password: 1234    #badrix bellahi chouf louta
+    password: amir
 
 
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update   #badrix taw takhrali fih
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:

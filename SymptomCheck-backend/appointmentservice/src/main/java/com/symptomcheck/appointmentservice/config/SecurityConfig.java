@@ -28,8 +28,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors() // ✅ Enable CORS in Spring Security
-                .and()
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // Disable CSRF for stateless APIs
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -84,15 +85,25 @@ public class SecurityConfig {
 
         @Override
         public Collection<GrantedAuthority> convert(Jwt jwt) {
-            final Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("realm_access");
-            if (realmAccess == null || realmAccess.get("roles") == null) {
+
+            // Ensure claim exists (avoids returning null, required by @NonNullApi)
+            Object realmAccessObj = jwt.getClaims().get("realm_access");
+            if (!(realmAccessObj instanceof Map<?, ?> realmAccess)) {
                 return List.of();
             }
 
-            return ((List<String>) realmAccess.get("roles")).stream()
-                    .map(roleName -> "ROLE_" + roleName.toUpperCase())
+            Object rolesObj = realmAccess.get("roles");
+            if (!(rolesObj instanceof List<?> rolesList)) {
+                return List.of();
+            }
+
+            // Safe conversion + non-null return
+            return rolesList.stream()
+                    .filter(role -> role instanceof String)
+                    .map(role -> "ROLE_" + ((String) role).toUpperCase())
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
         }
     }
+
 }
