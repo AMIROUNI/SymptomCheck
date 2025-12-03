@@ -1,20 +1,33 @@
 package com.symptomcheck.doctorservice.dtos;
 
-import jakarta.persistence.Column;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.util.UUID;
 
-
 @Data
 public class HealthcareServiceDto {
 
+    @NotNull(message = "Doctor ID is required")
     private UUID doctorId;
-    private String name;
-    @Column(length = 1000)
-    private String description;
-    private String category;
-    private Integer durationMinutes;
-    private Double price;
 
+    @NotBlank(message = "Name is required")
+    private String name;
+
+    @NotBlank(message = "Description is required")
+    private String description;
+
+    @NotBlank(message = "Category is required")
+    private String category;
+
+    @NotNull(message = "Duration is required")
+    @Min(value = 1, message = "Duration must be at least 1 minute")
+    private Integer durationMinutes;
+
+    @NotNull(message = "Price is required")
+    @Positive(message = "Price must be positive")
+    private Double price;
 }

@@ -40,8 +40,23 @@ public class HealthcareServiceService {
 
 
         public  HealthcareService createHealthcareService(HealthcareServiceDto dto, MultipartFile image) throws IOException {
+            if (dto.getName() == null || dto.getName().trim().isEmpty()) {
+                throw new IllegalArgumentException("Service name is required");
+            }
+            if (dto.getDescription() == null || dto.getDescription().trim().isEmpty()) {
+                throw new IllegalArgumentException("Description is required");
+            }
+            if (dto.getCategory() == null || dto.getCategory().trim().isEmpty()) {
+                throw new IllegalArgumentException("Category is required");
+            }
+            if (dto.getDurationMinutes() == null || dto.getDurationMinutes() <= 0) {
+                throw new IllegalArgumentException("Valid duration is required");
+            }
+            if (dto.getPrice() == null || dto.getPrice() <= 0) {
+                throw new IllegalArgumentException("Valid price is required");
+            }
 
-        HealthcareService healthcareService =  new HealthcareService();
+            HealthcareService healthcareService =  new HealthcareService();
         healthcareService.setDoctorId(dto.getDoctorId());
         healthcareService.setName(dto.getName());
         healthcareService.setCategory(dto.getCategory());
