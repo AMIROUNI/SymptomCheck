@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
-import java.util.List;
+
 
 @Entity
 @Table(name = "clinics")

@@ -2,7 +2,6 @@ package com.symptomcheck.doctorservice.controllers;
 
 import com.symptomcheck.doctorservice.dtos.HealthcareServiceDto;
 import com.symptomcheck.doctorservice.services.HealthcareServiceService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
