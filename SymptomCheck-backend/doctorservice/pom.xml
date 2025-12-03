@@ -20,9 +20,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sonar.organization>amirouni</sonar.organization>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>me.paulschwarz</groupId>
+            <artifactId>spring-dotenv</artifactId>
+            <version>4.0.0</version>
+        </dependency>
         <!-- ========== SPRING BOOT STARTERS ========== -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

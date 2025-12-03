@@ -99,10 +99,11 @@ public class SecurityConfig {
 
             // Safe conversion + non-null return
             return rolesList.stream()
-                    .filter(role -> role instanceof String)
+                    .filter(String.class::isInstance)
                     .map(role -> "ROLE_" + ((String) role).toUpperCase())
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toList());
+
         }
     }
 

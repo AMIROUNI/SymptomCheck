@@ -20,9 +20,38 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sonar.organization>amirouni</sonar.organization>
+
+        <sonar.projectKey>AMIROUNI_SymptomCheck-clinicservice</sonar.projectKey>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
+        <!-- Coverage Configuration -->
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.build.directory}/site/jacoco/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
+
+        <!-- Exclusions -->
+        <sonar.exclusions>
+            **/dtos/**,
+            **/config/**,
+            **/exception/**,
+            **/models/**
+        </sonar.exclusions>
+
+        <sonar.test.inclusions>
+            **/unit/**/*Test.java,
+            **/functional/**/*Test.java,
+            **/integration/**/*Test.java
+        </sonar.test.inclusions>
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>me.paulschwarz</groupId>
+            <artifactId>spring-dotenv</artifactId>
+            <version>4.0.0</version>
+        </dependency>
         <!-- ========== SPRING BOOT STARTERS ========== -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -1,80 +1,72 @@
 server:
-  port: 8082
+  port: ${SERVER_PORT:8082}
 
 app:
-  upload-dir: uploads
+  upload-dir: ${APP_UPLOAD_DIR:uploads}
 
 spring:
   application:
-    name: user-service
+    name: ${SPRING_APPLICATION_NAME:user-service}
   servlet:
     multipart:
-      enabled: true
-      max-file-size: 10MB
-      max-request-size: 10MB
+      enabled: ${SPRING_SERVLET_MULTIPART_ENABLED:true}
+      max-file-size: ${SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE:10MB}
+      max-request-size: ${SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE:10MB}
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/user_service_db
-    username: postgres
-    password: amir
-
-
-    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/user_service_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:amir}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.postgresql.Driver}
 
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: ${SPRING_JPA_SHOW_SQL:true}
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
+        dialect: ${SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
+        format_sql: ${SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL:true}
 
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/symptomcheck-realm
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI:http://localhost:8080/realms/symptomcheck-realm}
 
 # ===============================
-# 🔐 Keycloak Admin Configuration
+# Keycloak Admin Configuration
 # ===============================
 keycloak:
   admin:
-    server-url: http://localhost:8080
-    realm: master
-    username: admin
-    password: admin
-    client-id: admin-cli
+    server-url: ${KEYCLOAK_ADMIN_SERVER_URL:http://localhost:8080}
+    realm: ${KEYCLOAK_ADMIN_REALM:master}
+    username: ${KEYCLOAK_ADMIN_USERNAME:admin}
+    password: ${KEYCLOAK_ADMIN_PASSWORD:admin}
+    client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:admin-cli}
   app:
-    realm: symptomcheck-realm
-    client-id: userservice
-    client-secret: userservice-secret
-    roles: USER,ADMIN,DOCTOR,PATIENT
+    realm: ${KEYCLOAK_APP_REALM:symptomcheck-realm}
+    client-id: ${KEYCLOAK_APP_CLIENT_ID:userservice}
+    client-secret: ${KEYCLOAK_APP_CLIENT_SECRET:userservice-secret}
+    roles: ${KEYCLOAK_APP_ROLES:USER,ADMIN,DOCTOR,PATIENT}
 
 # ===============================
-# 🩺 Monitoring (Optional)
+# Monitoring
 # ===============================
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:*}
   endpoint:
     health:
-      show-details: always
+      show-details: ${MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS:always}
 
 # ===============================
-#  Logging Levels
+# Logging Levels
 # ===============================
 logging:
   level:
-    com.SymptomCheck.userservice: DEBUG
-    org.keycloak: INFO
-    org.springframework.security: DEBUG
-
-
-
-
-
-
+    com.SymptomCheck.userservice: ${LOGGING_LEVEL_USERSERVICE:DEBUG}
+    org.keycloak: ${LOGGING_LEVEL_KEYCLOAK:INFO}
+    org.springframework.security: ${LOGGING_LEVEL_SECURITY:DEBUG}
