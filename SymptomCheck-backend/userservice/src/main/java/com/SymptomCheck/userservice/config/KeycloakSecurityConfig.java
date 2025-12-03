@@ -1,5 +1,6 @@
 package com.SymptomCheck.userservice.config;
 
+import com.SymptomCheck.userservice.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -53,9 +54,9 @@ public class KeycloakSecurityConfig {
                                 "/uploads/**").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
 
-                        .requestMatchers("/api/v1/users/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/users/doctor/**").hasAnyRole("DOCTOR", "ADMIN")
-                        .requestMatchers("/api/v1/users/patient/**").hasAnyRole("PATIENT", "ADMIN")
+                        .requestMatchers("/api/v1/users/admin/**").hasRole(UserRole.ADMIN.toString())
+                        .requestMatchers("/api/v1/users/doctor/**").hasAnyRole(UserRole.DOCTOR.toString(), UserRole.ADMIN.toString())
+                        .requestMatchers("/api/v1/users/patient/**").hasAnyRole(UserRole.PATIENT.toString(), UserRole.ADMIN.toString())
 
                         .anyRequest().authenticated()
                 )

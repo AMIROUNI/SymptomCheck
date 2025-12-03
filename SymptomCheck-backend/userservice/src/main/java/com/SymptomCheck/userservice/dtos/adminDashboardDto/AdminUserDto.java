@@ -1,7 +1,6 @@
 package com.SymptomCheck.userservice.dtos.adminDashboardDto;
 
 
-import lombok.Builder;
 import lombok.Data;
 
 import java.time.Instant;

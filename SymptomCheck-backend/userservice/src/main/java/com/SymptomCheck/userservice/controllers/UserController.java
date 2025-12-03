@@ -7,7 +7,6 @@ import com.SymptomCheck.userservice.models.UserData;
 import com.SymptomCheck.userservice.services.UserDataService;
 import com.SymptomCheck.userservice.services.UserService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;

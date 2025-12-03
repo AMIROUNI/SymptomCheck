@@ -1,18 +1,10 @@
 package com.SymptomCheck.userservice.controllers;
 
-import com.SymptomCheck.userservice.dtos.LoginRequest;
-import com.SymptomCheck.userservice.dtos.LogoutRequest;
-import com.SymptomCheck.userservice.dtos.RefreshTokenRequest;
-import io.swagger.v3.oas.annotations.Operation;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
