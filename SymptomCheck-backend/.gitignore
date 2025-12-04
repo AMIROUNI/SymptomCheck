@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 
 .env*
+application.*
 venv/
 .venv/
 ### STS ###
