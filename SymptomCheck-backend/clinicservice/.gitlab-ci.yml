@@ -55,7 +55,8 @@ functional-tests:
   image: maven:3.9.0-eclipse-temurin-17
   script:
     - cd SymptomCheck-backend/clinicservice
-    - mvn test -Dtest=com.symptomcheck.clinicservice.functional.**.*
+    - mvn test -Dtest=**/functional/api/*Test.java
+
   artifacts:
     paths:
       - SymptomCheck-backend/clinicservice/target/surefire-reports/
@@ -157,7 +158,7 @@ package-job:
     - build-job
 
 # -------------------------------
-# 6️⃣ BUILD & PUSH DOCKER IMAGE
+# BUILD & PUSH DOCKER IMAGE
 # -------------------------------
 docker-build-push:
   stage: docker
