@@ -79,6 +79,12 @@ integration-tests:
     DOCKER_TLS_CERTDIR: ""
     DOCKER_DRIVER: overlay2
     TESTCONTAINERS_RYUK_DISABLED: "true"
+    TESTCONTAINERS_HOST_OVERRIDE: "docker"
+  before_script:
+    # Wait for Docker to be ready
+    - apt-get update && apt-get install -y docker.io
+    - until docker info > /dev/null 2>&1; do echo "Waiting for Docker..."; sleep 1; done
+    - docker info
   script:
     - cd SymptomCheck-backend/clinicservice
     - mvn test -Dtest="**/integration/*Test"
