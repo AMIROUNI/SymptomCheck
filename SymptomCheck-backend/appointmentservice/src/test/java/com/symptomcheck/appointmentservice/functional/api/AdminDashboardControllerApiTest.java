@@ -417,43 +417,43 @@ class AdminDashboardControllerApiTest {
 
     }
 
-        @Test
-        void shouldAllowAccessWithAdminRole() throws Exception {
-            // Test that all endpoints work with ADMIN role
-            when(adminDashboardService.getAppointmentStatistics()).thenReturn(statsDto);
-            when(adminDashboardService.getAllAppointments()).thenReturn(Collections.emptyList());
-            when(adminDashboardService.getAppointmentsByStatus(anyString())).thenReturn(Collections.emptyList());
-            when(adminDashboardService.getAppointmentsByDateRange(any(), any())).thenReturn(Collections.emptyList());
-            when(adminDashboardService.getAppointmentsByDoctor(any())).thenReturn(Collections.emptyList());
-            when(adminDashboardService.updateAppointmentStatus(any(), any())).thenReturn(adminAppointmentDto);
+    @Test
+    void shouldAllowAccessWithAdminRole() throws Exception {
+        // Test that all endpoints work with ADMIN role
+        when(adminDashboardService.getAppointmentStatistics()).thenReturn(statsDto);
+        when(adminDashboardService.getAllAppointments()).thenReturn(Collections.emptyList());
+        when(adminDashboardService.getAppointmentsByStatus(anyString())).thenReturn(Collections.emptyList());
+        when(adminDashboardService.getAppointmentsByDateRange(any(), any())).thenReturn(Collections.emptyList());
+        when(adminDashboardService.getAppointmentsByDoctor(any())).thenReturn(Collections.emptyList());
+        when(adminDashboardService.updateAppointmentStatus(any(), any())).thenReturn(adminAppointmentDto);
 
-            // All endpoints should return 200 with ADMIN role
-            mockMvc.perform(get("/api/admin/dashboard/stats")
-                            .with(jwt().jwt(jwt).authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
-                    .andExpect(status().isOk());
+        // All endpoints should return 200 with ADMIN role
+        mockMvc.perform(get("/api/admin/dashboard/stats")
+                        .with(jwt().jwt(jwt).authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                .andExpect(status().isOk());
 
-            mockMvc.perform(get("/api/admin/appointments")
-                            .with(jwt().jwt(jwt).authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
-                    .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/appointments")
+                        .with(jwt().jwt(jwt).authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                .andExpect(status().isOk());
 
-            mockMvc.perform(get("/api/admin/appointments/status/PENDING")
-                            .with(jwt().jwt(jwt).authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
-                    .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/appointments/status/PENDING")
+                        .with(jwt().jwt(jwt).authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                .andExpect(status().isOk());
 
-            mockMvc.perform(get("/api/admin/appointments/date-range")
-                            .param("start", "2024-01-01T00:00:00")
-                            .param("end", "2024-01-31T23:59:59")
-                            .with(jwt().jwt(jwt).authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
-                    .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/appointments/date-range")
+                        .param("start", "2024-01-01T00:00:00")
+                        .param("end", "2024-01-31T23:59:59")
+                        .with(jwt().jwt(jwt).authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                .andExpect(status().isOk());
 
-            mockMvc.perform(get("/api/admin/appointments/doctor/{doctorId}", doctorId)
-                            .with(jwt().jwt(jwt).authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
-                    .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/appointments/doctor/{doctorId}", doctorId)
+                        .with(jwt().jwt(jwt).authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                .andExpect(status().isOk());
 
-            mockMvc.perform(put("/api/admin/appointments/{appointmentId}/status", appointmentId)
-                            .param("status", "CONFIRMED")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .with(jwt().jwt(jwt).authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
-                    .andExpect(status().isOk());
-        }
+        mockMvc.perform(put("/api/admin/appointments/{appointmentId}/status", appointmentId)
+                        .param("status", "CONFIRMED")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(jwt().jwt(jwt).authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                .andExpect(status().isOk());
     }
+}

@@ -20,30 +20,30 @@ import java.util.UUID;
 public class AdminDashboardController {
 
     private final AdminDashboardService adminDashboardService;
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/dashboard/stats")
     public ResponseEntity<AppointmentStatsDto> getDashboardStats() {
         return ResponseEntity.ok(adminDashboardService.getAppointmentStatistics());
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/appointments")
     public ResponseEntity<List<AdminAppointmentDto>> getAllAppointments() {
         return ResponseEntity.ok(adminDashboardService.getAllAppointments());
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/appointments/status/{status}")
 
     public ResponseEntity<List<AdminAppointmentDto>> getAppointmentsByStatus(@PathVariable String status) {
         return ResponseEntity.ok(adminDashboardService.getAppointmentsByStatus(status));
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/appointments/date-range")
     public ResponseEntity<List<AdminAppointmentDto>> getAppointmentsByDateRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
         return ResponseEntity.ok(adminDashboardService.getAppointmentsByDateRange(start, end));
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/appointments/doctor/{doctorId}")
     public ResponseEntity<List<AdminAppointmentDto>> getAppointmentsByDoctor(@PathVariable UUID doctorId) {
         return ResponseEntity.ok(adminDashboardService.getAppointmentsByDoctor(doctorId));

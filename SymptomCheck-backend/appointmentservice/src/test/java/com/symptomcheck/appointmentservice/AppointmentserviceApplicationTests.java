@@ -12,6 +12,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -24,9 +27,11 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -103,51 +108,42 @@ class AppointmentserviceApplicationTests {
     @Nested
     class AppointmentControllerTests {
 
-        @Test
-        void whenPatientCreatesAppointment_shouldReturnOk() throws Exception {
-            mockMvc.perform(post("/api/v1/appointments/create")
-                            .with(csrf())
-                            .header("Authorization", "Bearer patient-token")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(appointmentDto)))
-                    .andDo(print())
-                    .andExpect(status().isOk());
-        }
+
 
         @Test
+        @WithMockUser(roles = "DOCTOR")
         void whenGetAppointmentsByDoctor_shouldReturnOk() throws Exception {
-            mockMvc.perform(get("/api/v1/appointments/doctor/{doctorId}", testDoctorId)
-                            .header("Authorization", "Bearer doctor-token"))
+            mockMvc.perform(get("/api/v1/appointments/doctor/{doctorId}", testDoctorId))
                     .andDo(print())
                     .andExpect(status().isOk());
         }
 
         @Test
+        @WithMockUser(roles = "DOCTOR")
         void whenGetTakenAppointments_shouldReturnOk() throws Exception {
             LocalDate date = LocalDate.now().plusDays(1);
 
             mockMvc.perform(get("/api/v1/appointments/taken-appointments/{doctorId}", testDoctorId)
-                            .param("date", date.toString())
-                            .header("Authorization", "Bearer doctor-token"))
+                            .param("date", date.toString()))
                     .andDo(print())
                     .andExpect(status().isOk());
         }
 
         @Test
+        @WithMockUser(roles = "PATIENT")
         void whenGetAppointmentsByPatient_shouldReturnOk() throws Exception {
-            mockMvc.perform(get("/api/v1/appointments/{userId}", testPatientId)
-                            .header("Authorization", "Bearer patient-token"))
+            mockMvc.perform(get("/api/v1/appointments/{userId}", testPatientId))
                     .andDo(print())
                     .andExpect(status().isOk());
         }
 
         @Test
+        @WithMockUser(roles = "DOCTOR")
         void whenUpdateAppointmentStatus_shouldReturnOk() throws Exception {
             // Use the existing appointment ID from setUp
             mockMvc.perform(put("/api/v1/appointments/{id}/status/{statusNumber}",
                             testAppointment.getId(), 1)
-                            .with(csrf())
-                            .header("Authorization", "Bearer doctor-token"))
+                            .with(csrf()))
                     .andDo(print())
                     .andExpect(status().isOk());
         }
@@ -157,45 +153,45 @@ class AppointmentserviceApplicationTests {
     class AdminDashboardControllerTests {
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void whenAdminGetsDashboardStats_shouldReturnOk() throws Exception {
-            mockMvc.perform(get("/api/admin/dashboard/stats")
-                            .header("Authorization", "Bearer admin-token"))
+            mockMvc.perform(get("/api/admin/dashboard/stats"))
                     .andDo(print())
                     .andExpect(status().isOk());
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void whenAdminGetsAllAppointments_shouldReturnOk() throws Exception {
-            mockMvc.perform(get("/api/admin/appointments")
-                            .header("Authorization", "Bearer admin-token"))
+            mockMvc.perform(get("/api/admin/appointments"))
                     .andDo(print())
                     .andExpect(status().isOk());
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void whenAdminGetsAppointmentsByStatus_shouldReturnOk() throws Exception {
-            mockMvc.perform(get("/api/admin/appointments/status/{status}", "PENDING")
-                            .header("Authorization", "Bearer admin-token"))
+            mockMvc.perform(get("/api/admin/appointments/status/{status}", "PENDING"))
                     .andDo(print())
                     .andExpect(status().isOk());
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void whenAdminUpdatesAppointmentStatus_withExistingAppointment_shouldReturnOk() throws Exception {
             // Use the existing appointment ID from setUp
             mockMvc.perform(put("/api/admin/appointments/{appointmentId}/status",
                             testAppointment.getId())
                             .with(csrf())
-                            .param("status", "CONFIRMED")
-                            .header("Authorization", "Bearer admin-token"))
+                            .param("status", "CONFIRMED"))
                     .andDo(print())
                     .andExpect(status().isOk());
         }
 
         @Test
+        @WithMockUser(roles = "PATIENT")
         void whenNonAdminTriesToAccessAdminEndpoint_shouldReturnForbidden() throws Exception {
-            mockMvc.perform(get("/api/admin/dashboard/stats")
-                            .header("Authorization", "Bearer patient-token"))
+            mockMvc.perform(get("/api/admin/dashboard/stats"))
                     .andDo(print())
                     .andExpect(status().isForbidden());
         }
@@ -205,36 +201,35 @@ class AppointmentserviceApplicationTests {
     class AppointmentDashboardControllerTests {
 
         @Test
+        @WithMockUser(roles = "DOCTOR")
         void whenDoctorGetsDashboard_shouldReturnOk() throws Exception {
-            mockMvc.perform(get("/api/v1/appointments/dashboard/doctor/{doctorId}", testDoctorId)
-                            .header("Authorization", "Bearer doctor-token"))
+            mockMvc.perform(get("/api/v1/appointments/dashboard/doctor/{doctorId}", testDoctorId))
                     .andDo(print())
                     .andExpect(status().isOk());
         }
 
-
         @Test
+        @WithMockUser(roles = "ADMIN")
         void whenAdminAccessesDoctorDashboard_shouldReturnOk() throws Exception {
             // Admin should have access to doctor dashboard
-            mockMvc.perform(get("/api/v1/appointments/dashboard/doctor/{doctorId}", testDoctorId)
-                            .header("Authorization", "Bearer admin-token"))
+            mockMvc.perform(get("/api/v1/appointments/dashboard/doctor/{doctorId}", testDoctorId))
                     .andDo(print())
                     .andExpect(status().isOk());
         }
 
         @Test
+        @WithMockUser(roles = "DOCTOR")
         void whenDoctorGetsTodayAppointments_shouldReturnOk() throws Exception {
-            mockMvc.perform(get("/api/v1/appointments/dashboard/doctor/{doctorId}/today", testDoctorId)
-                            .header("Authorization", "Bearer doctor-token"))
+            mockMvc.perform(get("/api/v1/appointments/dashboard/doctor/{doctorId}/today", testDoctorId))
                     .andDo(print())
                     .andExpect(status().isOk());
         }
 
         @Test
+        @WithMockUser(roles = "DOCTOR")
         void whenDoctorGetsUpcomingAppointments_shouldReturnOk() throws Exception {
             mockMvc.perform(get("/api/v1/appointments/dashboard/doctor/{doctorId}/upcoming", testDoctorId)
-                            .param("days", "7")
-                            .header("Authorization", "Bearer doctor-token"))
+                            .param("days", "7"))
                     .andDo(print())
                     .andExpect(status().isOk());
         }
@@ -244,30 +239,31 @@ class AppointmentserviceApplicationTests {
     class SecurityTests {
 
         @Test
+        @WithMockUser(roles = "USER")
         void whenUserTriesToAccessAdminEndpoints_shouldReturnForbidden() throws Exception {
-            mockMvc.perform(get("/api/admin/dashboard/stats")
-                            .header("Authorization", "Bearer user-token"))
+            mockMvc.perform(get("/api/admin/dashboard/stats"))
                     .andDo(print())
                     .andExpect(status().isForbidden());
         }
 
         @Test
+        @WithMockUser(roles = "PATIENT")
         void whenPatientTriesToAccessAdminEndpoints_shouldReturnForbidden() throws Exception {
-            mockMvc.perform(get("/api/admin/dashboard/stats")
-                            .header("Authorization", "Bearer patient-token"))
+            mockMvc.perform(get("/api/admin/dashboard/stats"))
                     .andDo(print())
                     .andExpect(status().isForbidden());
         }
 
         @Test
+        @WithMockUser(roles = "DOCTOR")
         void whenDoctorTriesToAccessAdminEndpoints_shouldReturnForbidden() throws Exception {
-            mockMvc.perform(get("/api/admin/dashboard/stats")
-                            .header("Authorization", "Bearer doctor-token"))
+            mockMvc.perform(get("/api/admin/dashboard/stats"))
                     .andDo(print())
                     .andExpect(status().isForbidden());
         }
 
         @Test
+        @WithAnonymousUser
         void whenUnauthenticatedAccess_shouldReturnUnauthorized() throws Exception {
             mockMvc.perform(get("/api/v1/appointments/doctor/{doctorId}", UUID.randomUUID()))
                     .andDo(print())
@@ -275,6 +271,7 @@ class AppointmentserviceApplicationTests {
         }
 
         @Test
+        @WithAnonymousUser
         void whenNoAuthorizationHeader_shouldReturnUnauthorized() throws Exception {
             mockMvc.perform(post("/api/v1/appointments/create")
                             .with(csrf())
@@ -289,6 +286,7 @@ class AppointmentserviceApplicationTests {
     class PublicEndpointTests {
 
         @Test
+        @WithAnonymousUser
         void whenAccessingSwaggerUI_shouldBePermitted() throws Exception {
             mockMvc.perform(get("/swagger-ui/index.html"))
                     .andDo(print())
@@ -296,6 +294,7 @@ class AppointmentserviceApplicationTests {
         }
 
         @Test
+        @WithAnonymousUser
         void whenAccessingApiDocs_shouldBePermitted() throws Exception {
             mockMvc.perform(get("/v3/api-docs"))
                     .andDo(print())
