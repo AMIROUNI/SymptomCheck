@@ -96,6 +96,10 @@ class AppointmentTest {
         void shouldBeEqualWhenFieldsMatch() {
             Appointment a1 = new Appointment();
             Appointment a2 = new Appointment();
+            Instant now = Instant.now();
+
+            a1.setCreatedAt(now);
+            a2.setCreatedAt(now);
 
             a1.setId(1L);
             a2.setId(1L);
@@ -105,6 +109,7 @@ class AppointmentTest {
 
             a1.setDoctorId(doctorId);
             a2.setDoctorId(doctorId);
+
 
             assertEquals(a1, a2);
             assertEquals(a1.hashCode(), a2.hashCode());
