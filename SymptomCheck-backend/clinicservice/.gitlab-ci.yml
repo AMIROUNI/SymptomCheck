@@ -133,7 +133,7 @@ sonarqube:
     - |
       mvn verify sonar:sonar -DskipTests \
         -Dsonar.projectKey=$SONAR_PROJECT_KEY \
-        -Dsonar.organization=amirouni \
+        -Dsonar.organization=amirouni162 \
         -Dsonar.host.url=$SONAR_HOST_URL \
         -Dsonar.token=$SONAR_TOKEN \
         -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
