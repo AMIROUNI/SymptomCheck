@@ -1,8 +1,6 @@
 package com.symptomcheck.doctorservice.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.symptomcheck.doctorservice.config.SecurityConfig;
-import com.symptomcheck.doctorservice.dtos.dashboardDto.DoctorDashboardDTO;
 import com.symptomcheck.doctorservice.models.DoctorAvailability;
 import com.symptomcheck.doctorservice.models.HealthcareService;
 import com.symptomcheck.doctorservice.repositories.DoctorAvailabilityRepository;
@@ -13,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
