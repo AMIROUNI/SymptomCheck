@@ -12,7 +12,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -24,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Testcontainers
 class AppointmentDashboardControllerIntegrationTest {
 
     @Autowired
@@ -33,6 +39,24 @@ class AppointmentDashboardControllerIntegrationTest {
     private AppointmentRepository appointmentRepository;
 
     private UUID doctorId;
+
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
+            .withDatabaseName("testdb")
+            .withUsername("test")
+            .withPassword("test")
+            .withReuse(true);
+
+    @DynamicPropertySource
+    static void overrideProps(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+        registry.add("spring.jpa.properties.hibernate.dialect", () -> "org.hibernate.dialect.PostgreSQLDialect");
+        registry.add("spring.sql.init.mode", () -> "never");
+    }
+
 
     @BeforeEach
     void setup() {

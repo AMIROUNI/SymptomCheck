@@ -208,7 +208,7 @@ class UserDataTest {
 
             UserData userData2 = new UserData();
             userData2.setId(null);
-            userData2.setCreatedAt(now);
+            userData1.setCreatedAt(now);
 
             // Then
             assertEquals(userData1, userData2);
