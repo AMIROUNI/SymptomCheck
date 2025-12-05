@@ -13,8 +13,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
+@Testcontainers
 @Import(SecurityConfig.class)
 class DoctorReviewIntegrationTest {
 
@@ -33,10 +39,32 @@ class DoctorReviewIntegrationTest {
     @Autowired private ObjectMapper objectMapper;
     @Autowired private DoctorReviewRepository repository;
 
+    // -------------------------------
+    // ADDING THE POSTGRES CONTAINER
+    // -------------------------------
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
+            .withDatabaseName("testdb")
+            .withUsername("test")
+            .withPassword("test")
+            .withReuse(true);
+
+    @DynamicPropertySource
+    static void overrideProps(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+        registry.add("spring.jpa.properties.hibernate.dialect", () -> "org.hibernate.dialect.PostgreSQLDialect");
+        registry.add("spring.sql.init.mode", () -> "always");
+    }
+    // -------------------------------
+
     @BeforeEach
     void setUp() {
         repository.deleteAll();
     }
+
     @Test
     void patientCanCreateReview() throws Exception {
         String patientId = "gc6274gg-730g-44g0-9245-17gdg9054fe8";
@@ -53,14 +81,14 @@ class DoctorReviewIntegrationTest {
                                         .subject(patientId)
                                         .claim("realm_access", Map.of("roles", List.of("patient")))
                                         .claim("scope", "openid profile email"))
-                                .authorities(new SimpleGrantedAuthority("ROLE_PATIENT"))) // Ajoutez ceci
+                                .authorities(new SimpleGrantedAuthority("ROLE_PATIENT")))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
     }
+
     @Test
     void authenticatedUserCanViewDoctorReviews() throws Exception {
-        // Setup
         DoctorReview review = DoctorReview.builder()
                 .patientId("patient-1")
                 .doctorId("doctor-1")
@@ -69,7 +97,6 @@ class DoctorReviewIntegrationTest {
                 .build();
         repository.save(review);
 
-        // Use authentication
         mockMvc.perform(get("/api/v1/reviews/doctor/{doctorId}", "doctor-1")
                         .with(jwt()
                                 .jwt(jwt -> jwt
@@ -78,6 +105,7 @@ class DoctorReviewIntegrationTest {
                                 .authorities(new SimpleGrantedAuthority("ROLE_PATIENT"))))
                 .andExpect(status().isOk());
     }
+
     @Test
     void patientCanViewTheirReviews() throws Exception {
         String patientId = "patient-123";
@@ -94,17 +122,17 @@ class DoctorReviewIntegrationTest {
                         .with(jwt()
                                 .jwt(jwt -> jwt
                                         .subject(patientId)
-                                        .claim("realm_access", Map.of("roles", List.of("patient")))) // minuscules
-                                .authorities(new SimpleGrantedAuthority("ROLE_PATIENT")))) // Ajoutez ceci
+                                        .claim("realm_access", Map.of("roles", List.of("patient"))))
+                                .authorities(new SimpleGrantedAuthority("ROLE_PATIENT"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].patientId").value(patientId))
                 .andExpect(jsonPath("$[0].doctorId").value("doctor-456"))
                 .andExpect(jsonPath("$[0].rating").value(4))
                 .andExpect(jsonPath("$[0].comment").value("Good"));
     }
+
     @Test
     void unauthorizedAccessToPatientEndpointsShouldFail() throws Exception {
-        // No PATIENT role
         mockMvc.perform(post("/api/v1/reviews")
                         .with(jwt().jwt(jwt -> jwt
                                 .subject("user")
@@ -113,10 +141,7 @@ class DoctorReviewIntegrationTest {
                         .content("{}"))
                 .andExpect(status().isForbidden());
 
-        // No authentication
         mockMvc.perform(get("/api/v1/reviews/patient/my-reviews"))
                 .andExpect(status().isUnauthorized());
     }
-
-
 }
