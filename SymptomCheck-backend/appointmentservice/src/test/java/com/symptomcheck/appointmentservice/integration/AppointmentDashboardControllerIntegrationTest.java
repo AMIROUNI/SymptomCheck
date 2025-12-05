@@ -56,7 +56,7 @@ class AppointmentDashboardControllerIntegrationTest {
         registry.add("spring.datasource.password", postgres::getPassword);
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
         registry.add("spring.jpa.properties.hibernate.dialect", () -> "org.hibernate.dialect.PostgreSQLDialect");
-        registry.add("spring.sql.init.mode", () -> "never");
+        registry.add("spring.sql.init.mode", () -> "always");
     }
 
 
