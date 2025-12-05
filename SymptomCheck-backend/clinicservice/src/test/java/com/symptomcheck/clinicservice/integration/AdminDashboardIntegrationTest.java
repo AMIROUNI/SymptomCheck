@@ -2,7 +2,7 @@
 
     import com.fasterxml.jackson.databind.ObjectMapper;
     import com.symptomcheck.clinicservice.config.SecurityConfig;
-    import com.symptomcheck.clinicservice.dtos.adminDashboardDto.AdminClinicDto;
+    import com.symptomcheck.clinicservice.dtos.admindashboarddto.AdminClinicDto;
     import com.symptomcheck.clinicservice.models.MedicalClinic;
     import com.symptomcheck.clinicservice.repositories.MedicalClinicRepository;
     import org.junit.jupiter.api.BeforeEach;

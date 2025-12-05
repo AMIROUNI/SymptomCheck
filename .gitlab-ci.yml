@@ -1,2 +1,3 @@
 include:
   - local: 'SymptomCheck-backend/clinicservice/.gitlab-ci.yml'
+  
