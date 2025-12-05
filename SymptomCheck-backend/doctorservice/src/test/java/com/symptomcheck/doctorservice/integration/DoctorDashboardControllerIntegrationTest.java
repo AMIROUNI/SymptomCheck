@@ -12,8 +12,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
@@ -28,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Transactional
 @Import(SecurityConfig.class)
+@Testcontainers
 class DoctorDashboardControllerIntegrationTest {
 
     @Autowired private MockMvc mockMvc;
@@ -36,12 +42,36 @@ class DoctorDashboardControllerIntegrationTest {
 
     private UUID doctorId;
 
+    // -------------------------------
+    // ADDING THE POSTGRES CONTAINER
+    // -------------------------------
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15")
+            .withDatabaseName("testdb")
+            .withUsername("test")
+            .withPassword("test")
+            .withReuse(true);
+
+    @DynamicPropertySource
+    static void overrideProps(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+        registry.add("spring.jpa.properties.hibernate.dialect", () -> "org.hibernate.dialect.PostgreSQLDialect");
+        registry.add("spring.sql.init.mode", () -> "never");
+    }
+    // -------------------------------
+
     @BeforeEach
     void setup() {
         serviceRepo.deleteAll();
         availabilityRepo.deleteAll();
         doctorId = UUID.fromString("550e8400-e29b-41d4-a716-446655440001");
     }
+
+
+
 
     // -----------------------------------------------------
     // Helper Methods
