@@ -1,179 +1,173 @@
 package com.symptomcheck.appointmentservice.functional.api;
 
+import com.symptomcheck.appointmentservice.controllers.AppointmentDashboardController;
+import com.symptomcheck.appointmentservice.dtos.dashboarddto.AppointmentDashboardDTO;
+import com.symptomcheck.appointmentservice.dtos.dashboarddto.AppointmentStatsDTO;
 import com.symptomcheck.appointmentservice.enums.AppointmentStatus;
 import com.symptomcheck.appointmentservice.models.Appointment;
-import com.symptomcheck.appointmentservice.repositories.AppointmentRepository;
-import org.junit.jupiter.api.AfterEach;
+import com.symptomcheck.appointmentservice.services.AppointmentDashboardService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
- * Functional tests for AppointmentDashboardController.
+ * Controller slice test for AppointmentDashboardController using mocked service (no DB).
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
-@Testcontainers
+@WebMvcTest(controllers = AppointmentDashboardController.class)
 @ActiveProfiles("test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class AppointmentDashboardControllerApiTest {
 
-    @Container
-    static final PostgreSQLContainer<?> POSTGRES_CONTAINER =
-            new PostgreSQLContainer<>("postgres:15-alpine")
-                    .withDatabaseName("testdb")
-                    .withUsername("test")
-                    .withPassword("test");
-
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private AppointmentRepository appointmentRepository;
+    @MockBean
+    private AppointmentDashboardService dashboardService;
 
-    @DynamicPropertySource
-    static void registerPgProperties(DynamicPropertyRegistry registry) {
-        if (!POSTGRES_CONTAINER.isRunning()) {
-            POSTGRES_CONTAINER.start();
-        }
-        registry.add("spring.datasource.url", POSTGRES_CONTAINER::getJdbcUrl);
-        registry.add("spring.datasource.username", POSTGRES_CONTAINER::getUsername);
-        registry.add("spring.datasource.password", POSTGRES_CONTAINER::getPassword);
-        registry.add("spring.jpa.hibernate.ddl-auto", () -> "update");
-    }
-
-    @AfterEach
-    void cleanup() {
-        appointmentRepository.deleteAll();
-    }
-
-    /* ----------------------
-       JWT helper for DOCTOR role
-       ---------------------- */
+    // Helper to produce a Jwt post-processor with ROLE_DOCTOR authority
     private SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor doctorJwt() {
         Jwt jwt = Jwt.withTokenValue("doctor-token")
                 .header("alg", "none")
                 .claim("sub", "doctor-sub")
-                .claim("realm_access", java.util.Map.of("roles", List.of("DOCTOR")))
+                .claim("realm_access", Map.of("roles", List.of("DOCTOR")))
                 .build();
+
         return jwt().jwt(jwt).authorities(new SimpleGrantedAuthority("ROLE_DOCTOR"));
     }
 
-    /* ----------------------
-       Helper to save appointment
-       ---------------------- */
-    private Appointment saveAppointment(LocalDateTime dateTime, UUID patientId, UUID doctorId, AppointmentStatus status, String desc) {
+    // Simple Appointment helper
+    private Appointment appointment(Long id, LocalDateTime dt, UUID patientId, UUID doctorId, AppointmentStatus status, String desc) {
         Appointment a = new Appointment();
-        a.setDateTime(dateTime);
+        a.setId(id);
+        a.setDateTime(dt);
         a.setPatientId(patientId);
         a.setDoctorId(doctorId);
         a.setStatus(status);
         a.setDescription(desc);
         a.setCreatedAt(Instant.now());
         a.setUpdatedAt(Instant.now());
-        return appointmentRepository.save(a);
+        return a;
     }
 
     @Test
-    void getAppointmentDashboard_returnsExpectedStructure() throws Exception {
-        UUID p = UUID.randomUUID();
-        UUID d = UUID.randomUUID();
+    void getAppointmentDashboard_returnsDto_whenDoctorAuthorized() throws Exception {
+        UUID doctorId = UUID.randomUUID();
 
-        // seed: 3 appointments across days and statuses
-        saveAppointment(LocalDateTime.now().minusDays(1).withHour(9), p, d, AppointmentStatus.PENDING, "yesterday");
-        saveAppointment(LocalDateTime.now().withHour(10), p, d, AppointmentStatus.COMPLETED, "today");
-        saveAppointment(LocalDateTime.now().plusDays(2).withHour(11), p, d, AppointmentStatus.CONFIRMED, "future");
+        // Prepare mocked stats DTO
+        AppointmentStatsDTO stats = new AppointmentStatsDTO(
+                3L,    // totalAppointments
+                1L,    // todayAppointments
+                1L,    // pending
+                1L,    // completed
+                0L     // cancelled
+        );
 
-        mockMvc.perform(get("/api/v1/appointments/dashboard/doctor/{doctorId}", d)
+        Map<String, Long> byStatus = Map.of(
+                "PENDING", 1L,
+                "CONFIRMED", 1L,
+                "COMPLETED", 1L
+        );
+
+        Map<String, Long> weekly = new LinkedHashMap<>();
+        weekly.put("MONDAY", 0L);
+        weekly.put("TUESDAY", 0L);
+        weekly.put("WEDNESDAY", 1L);
+        weekly.put("THURSDAY", 0L);
+        weekly.put("FRIDAY", 1L);
+        weekly.put("SATURDAY", 0L);
+        weekly.put("SUNDAY", 1L);
+
+        AppointmentDashboardDTO dashboardDto = new AppointmentDashboardDTO(stats, byStatus, weekly);
+
+        Mockito.when(dashboardService.getAppointmentDashboard(eq(doctorId))).thenReturn(dashboardDto);
+
+        mockMvc.perform(get("/api/v1/appointments/dashboard/doctor/{doctorId}", doctorId)
                         .with(doctorJwt())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                // top-level DTO shape: expecting stats, appointmentsByStatus, weeklyAppointments
-                .andExpect(jsonPath("$.stats").exists())
-                .andExpect(jsonPath("$.appointmentsByStatus").exists())
-                .andExpect(jsonPath("$.weeklyAppointments").exists())
-                // stats inside should contain totalAppointments
                 .andExpect(jsonPath("$.stats.totalAppointments", is(3)))
-                .andExpect(jsonPath("$.appointmentsByStatus.PENDING", isA(Number.class)))
-                .andExpect(jsonPath("$.weeklyAppointments", aMapWithSize(7)));
+                .andExpect(jsonPath("$.appointmentsByStatus.PENDING", is(1)))
+                .andExpect(jsonPath("$.weeklyAppointments.WEDNESDAY", is(1)))
+                .andExpect(jsonPath("$.stats.todayAppointments", is(1)));
     }
 
     @Test
-    void getTodayAppointments_returnsOnlyTodayForDoctor() throws Exception {
-        UUID p = UUID.randomUUID();
-        UUID d = UUID.randomUUID();
+    void getTodayAppointments_returnsList_whenDoctorAuthorized() throws Exception {
+        UUID doctorId = UUID.randomUUID();
+        UUID patient = UUID.randomUUID();
 
-        // one appointment today, one yesterday
-        saveAppointment(LocalDateTime.now().withHour(9), p, d, AppointmentStatus.PENDING, "today1");
-        saveAppointment(LocalDateTime.now().minusDays(1).withHour(10), p, d, AppointmentStatus.PENDING, "yesterday");
+        List<Appointment> today = List.of(
+                appointment(1L, LocalDateTime.now().withHour(9), patient, doctorId, AppointmentStatus.PENDING, "a1"),
+                appointment(2L, LocalDateTime.now().withHour(11), patient, doctorId, AppointmentStatus.CONFIRMED, "a2")
+        );
 
-        mockMvc.perform(get("/api/v1/appointments/dashboard/doctor/{doctorId}/today", d)
-                        .with(doctorJwt())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].doctorId", is(d.toString())));
-    }
+        Mockito.when(dashboardService.getTodayAppointments(eq(doctorId))).thenReturn(today);
 
-    @Test
-    void getUpcomingAppointments_returnsAppointmentsWithinDaysWindow() throws Exception {
-        UUID p = UUID.randomUUID();
-        UUID d = UUID.randomUUID();
-
-        // now, +3 days (within default 7), +10 days (outside default)
-        saveAppointment(LocalDateTime.now().plusDays(1), p, d, AppointmentStatus.PENDING, "in1");
-        saveAppointment(LocalDateTime.now().plusDays(3), p, d, AppointmentStatus.PENDING, "in3");
-        saveAppointment(LocalDateTime.now().plusDays(10), p, d, AppointmentStatus.PENDING, "in10");
-
-        mockMvc.perform(get("/api/v1/appointments/dashboard/doctor/{doctorId}/upcoming", d)
+        mockMvc.perform(get("/api/v1/appointments/dashboard/doctor/{doctorId}/today", doctorId)
                         .with(doctorJwt())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].doctorId", is(d.toString())));
+                .andExpect(jsonPath("$[0].doctorId", is(doctorId.toString())));
     }
 
     @Test
-    void getAppointmentAnalytics_returnsMetrics() throws Exception {
-        UUID p = UUID.randomUUID();
-        UUID d = UUID.randomUUID();
+    void getUpcomingAppointments_returnsList_withDefaultDays_whenDoctorAuthorized() throws Exception {
+        UUID doctorId = UUID.randomUUID();
+        UUID patient = UUID.randomUUID();
 
-        // seed: 4 appointments, 2 completed
-        saveAppointment(LocalDateTime.now().minusDays(10), p, d, AppointmentStatus.COMPLETED, "c1");
-        saveAppointment(LocalDateTime.now().minusDays(7), p, d, AppointmentStatus.COMPLETED, "c2");
-        saveAppointment(LocalDateTime.now().minusDays(3), p, d, AppointmentStatus.PENDING, "p1");
-        saveAppointment(LocalDateTime.now().plusDays(2), p, d, AppointmentStatus.CONFIRMED, "f1");
+        List<Appointment> upcoming = List.of(
+                appointment(10L, LocalDateTime.now().plusDays(1), patient, doctorId, AppointmentStatus.PENDING, "up1"),
+                appointment(11L, LocalDateTime.now().plusDays(3), patient, doctorId, AppointmentStatus.CONFIRMED, "up2")
+        );
 
-        mockMvc.perform(get("/api/v1/appointments/dashboard/doctor/{doctorId}/analytics", d)
+        Mockito.when(dashboardService.getUpcomingAppointments(eq(doctorId), Mockito.anyInt())).thenReturn(upcoming);
+
+        mockMvc.perform(get("/api/v1/appointments/dashboard/doctor/{doctorId}/upcoming", doctorId)
+                        .with(doctorJwt())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[1].description", is("up2")));
+    }
+
+    @Test
+    void getAppointmentAnalytics_returnsMap_whenDoctorAuthorized() throws Exception {
+        UUID doctorId = UUID.randomUUID();
+
+        Map<String, Object> analytics = new HashMap<>();
+        analytics.put("totalAppointments", 4);
+        analytics.put("completionRate", 50.0);
+        analytics.put("averageAppointmentsPerWeek", 1.0);
+
+        Mockito.when(dashboardService.getAppointmentAnalytics(eq(doctorId))).thenReturn(analytics);
+
+        mockMvc.perform(get("/api/v1/appointments/dashboard/doctor/{doctorId}/analytics", doctorId)
                         .with(doctorJwt())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalAppointments", is(4)))
-                .andExpect(jsonPath("$.completionRate", isA(Number.class)))
-                .andExpect(jsonPath("$.averageAppointmentsPerWeek", isA(Number.class)));
+                .andExpect(jsonPath("$.completionRate", is(50.0)))
+                .andExpect(jsonPath("$.averageAppointmentsPerWeek", is(1.0)));
     }
 }
