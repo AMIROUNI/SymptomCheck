@@ -1,6 +1,7 @@
 package com.symptomcheck.appointmentservice.functional.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.symptomcheck.appointmentservice.SecurityTestConfig;
 import com.symptomcheck.appointmentservice.controllers.AdminDashboardController;
 import com.symptomcheck.appointmentservice.dtos.admindashboarddto.AdminAppointmentDto;
 import com.symptomcheck.appointmentservice.dtos.admindashboarddto.AppointmentStatsDto;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -30,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ActiveProfiles("test")
 @WebMvcTest(AdminDashboardController.class)
+@Import(SecurityTestConfig.class)
 class AdminDashboardControllerApiTest {
 
     @Autowired
