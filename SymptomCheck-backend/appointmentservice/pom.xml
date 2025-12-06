@@ -20,18 +20,40 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <sonar.organization>amirouni</sonar.organization>
+        <!-- using clinicservice sonar organization from the example -->
+        <sonar.organization>amirouni162</sonar.organization>
+
+        <sonar.projectKey>AMIROUNI_SymptomCheck-appointmentservice</sonar.projectKey>
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
+        <!-- Coverage Configuration -->
+        <sonar.coverage.jacoco.xmlReportPaths>
+            ${project.build.directory}/site/jacoco/jacoco.xml
+        </sonar.coverage.jacoco.xmlReportPaths>
+
+        <!-- Exclusions -->
+        <sonar.exclusions>
+            **/dtos/**,
+            **/config/**,
+            **/exception/**,
+            **/models/**
+        </sonar.exclusions>
+
+        <sonar.test.inclusions>
+            **/unit/**/*Test.java,
+            **/functional/**/*Test.java,
+            **/integration/**/*Test.java
+        </sonar.test.inclusions>
     </properties>
 
     <dependencies>
-
 
         <dependency>
             <groupId>me.paulschwarz</groupId>
             <artifactId>spring-dotenv</artifactId>
             <version>4.0.0</version>
         </dependency>
-        <!-- SPRING BOOT STARTERS -->
+        <!-- ========== SPRING BOOT STARTERS ========== -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -47,7 +69,7 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- SECURITY -->
+        <!-- ========== SECURITY ========== -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -63,56 +85,57 @@
             <artifactId>spring-security-oauth2-jose</artifactId>
         </dependency>
 
-        <!-- OPENAPI -->
+        <!-- ========== API DOCUMENTATION ========== -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
 
-        <!-- DATABASE -->
+        <!-- ========== DATABASE ========== -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
 
-        <!-- DEV TOOLS -->
+        <!-- ========== DEVELOPMENT TOOLS ========== -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
 
-        <!-- OPTIONAL WEBFLUX -->
+        <!-- ========== OPTIONAL DEPENDENCIES ========== -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
             <optional>true</optional>
         </dependency>
 
-        <!-- ========= TEST DEPENDENCIES ========= -->
+        <!-- ========== TEST DEPENDENCIES ========== -->
 
-        <!-- Spring Boot Tests -->
+        <!-- Spring Boot Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 
+        <!-- Security Testing -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
 
-        <!-- Reactor tests -->
+        <!-- Reactive Testing -->
         <dependency>
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-test</artifactId>
             <scope>test</scope>
         </dependency>
 
-        <!-- TestContainers -->
+        <!-- Test Containers -->
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -125,7 +148,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- REST-Assured -->
+        <!-- REST API Testing -->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
@@ -138,7 +161,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- JAXB for tests -->
+        <!-- XML Binding for Tests -->
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-xjc</artifactId>
@@ -149,8 +172,7 @@
 
     <build>
         <plugins>
-
-            <!-- SPRING BOOT PLUGIN -->
+            <!-- ========== SPRING BOOT PLUGIN ========== -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -164,7 +186,8 @@
                 </configuration>
             </plugin>
 
-            <!-- UNIT TEST PLUGIN -->
+            <!-- ========== UNIT TEST PLUGIN ========== -->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -174,31 +197,41 @@
                         <include>**/*Tests.java</include>
                         <include>**/*TestCase.java</include>
                         <include>**/unit/**/*Test.java</include>
+                        <include>**/unit/**/*Tests.java</include>
+                        <include>**/unit/**/*TestCase.java</include>
                         <include>**/functional/api/*Test.java</include>
+                        <include>**/functional/api/*Tests.java</include>
+                        <include>**/functional/api/*TestCase.java</include>
                     </includes>
-
+                    <!-- FIX: Remove fork killing issues -->
                     <forkCount>1</forkCount>
                     <reuseForks>true</reuseForks>
-                    <argLine>-Xmx1024m ${argLine}</argLine>
+                    <argLine>-Xmx1024m ${argLine}</argLine> <!-- IMPORTANT: Add ${argLine} for JaCoCo -->
+                    <printSummary>true</printSummary>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <!-- Add these to prevent JVM killing -->
+                    <forkedProcessExitTimeoutInSeconds>120</forkedProcessExitTimeoutInSeconds>
+                    <shutdown>kill</shutdown>
                 </configuration>
             </plugin>
 
-            <!-- INTEGRATION TESTS -->
+            <!-- ========== INTEGRATION TEST PLUGIN ========== -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <includes>
                         <include>**/*IT.java</include>
-                        <include>**/integration/**/*Test.java</include>
                         <include>**/*ITCase.java</include>
+                        <include>**/integration/**/*.java</include>
                     </includes>
-
                     <forkCount>1</forkCount>
                     <reuseForks>true</reuseForks>
-                    <argLine>-Xmx1024m ${argLine}</argLine>
+                    <argLine>-Xmx1024m ${argLine}</argLine> <!-- IMPORTANT: Add ${argLine} for JaCoCo -->
+                    <printSummary>true</printSummary>
                     <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <forkedProcessExitTimeoutInSeconds>120</forkedProcessExitTimeoutInSeconds>
+                    <shutdown>kill</shutdown>
                 </configuration>
                 <executions>
                     <execution>
@@ -210,29 +243,58 @@
                 </executions>
             </plugin>
 
-            <!-- JACOCO CONFIG -->
+            <!-- ========== CUSTOM JACOCO CONFIGURATION ========== -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/dtos/**</exclude>
+                        <exclude>**/config/**</exclude>
+                        <exclude>**/exception/**</exclude>
+                        <exclude>**/models/**</exclude>
+                    </excludes>
+                    <!-- Ensure data file is created -->
+                    <destFile>${project.build.directory}/jacoco.exec</destFile>
+                    <append>true</append>
+                </configuration>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
-                        <goals><goal>prepare-agent</goal></goals>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
                         <configuration>
                             <destFile>${project.build.directory}/jacoco.exec</destFile>
                             <propertyName>argLine</propertyName>
                         </configuration>
                     </execution>
-
                     <execution>
-                        <id>report</id>
+                        <id>unit-report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                            <outputDirectory>${project.build.directory}/jacoco-unit-report</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>integration-report</id>
                         <phase>verify</phase>
-                        <goals><goal>report</goal></goals>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                            <outputDirectory>${project.build.directory}/jacoco-integration-report</outputDirectory>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
 
-            <!-- PITEST CONFIG -->
+            <!-- ========== CUSTOM PITEST CONFIGURATION ========== -->
             <plugin>
                 <groupId>org.pitest</groupId>
                 <artifactId>pitest-maven</artifactId>
@@ -245,6 +307,11 @@
                         <param>com.symptomcheck.appointmentservice.unit.*</param>
                         <param>com.symptomcheck.appointmentservice.functional.api.*</param>
                     </targetTests>
+                    <excludedClasses>
+                        <param>com.symptomcheck.appointmentservice.dtos.*</param>
+                        <param>com.symptomcheck.appointmentservice.config.*</param>
+                        <param>com.symptomcheck.appointmentservice.models.*</param>
+                    </excludedClasses>
                     <mutationThreshold>75</mutationThreshold>
                     <coverageThreshold>70</coverageThreshold>
                 </configuration>

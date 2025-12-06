@@ -34,7 +34,7 @@ class AdminDashboardControllerTest {
 
     private AppointmentStatsDto mockStatsDto;
     private List<AdminAppointmentDto> mockAppointments;
-    private AdminAppointmentDto mockAppointmentDto;
+    private     AdminAppointmentDto mockAppointmentDto;
     private UUID mockDoctorId;
 
     @BeforeEach
