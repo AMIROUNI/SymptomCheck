@@ -131,7 +131,7 @@ sonarqube:
   script:
     - cd SymptomCheck-backend/clinicservice
     - |
-      mvn verify sonar:sonar -DskipTests \
+      mvn verify sonar:sonar  \
         -Dsonar.projectKey=$SONAR_PROJECT_KEY \
         -Dsonar.organization=amirouni162 \
         -Dsonar.host.url=$SONAR_HOST_URL \
