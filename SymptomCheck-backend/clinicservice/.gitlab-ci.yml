@@ -5,12 +5,8 @@ stages:
   - docker
 
 variables:
+  DOCKER_IMAGE: "amir254/clinicservice"
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
-  AWS_ACCOUNT_ID: "767397862703"
-  AWS_DEFAULT_REGION: "us-east-1"
-  ECR_REGISTRY: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
-  ECR_REPOSITORY: "symptomcheck-repository"
-  DOCKER_IMAGE: "${ECR_REGISTRY}/${ECR_REPOSITORY}"
 
 cache:
   key: "$CI_COMMIT_REF_SLUG"
@@ -170,10 +166,6 @@ package-job:
 # -------------------------------
 # BUILD & PUSH DOCKER IMAGE
 # -------------------------------
-
-
-
-
 docker-build-push:
   stage: docker
   image: docker:24-dind
@@ -183,13 +175,12 @@ docker-build-push:
     DOCKER_TLS_CERTDIR: ""
     DOCKER_DRIVER: overlay2
   before_script:
-    - apk add --no-cache aws-cli
-    - aws ecr get-login-password --region "$AWS_DEFAULT_REGION" | docker login --username AWS --password-stdin "$ECR_REGISTRY"
+    - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
   script:
     - cd SymptomCheck-backend/clinicservice
-    - docker build -t "$DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA" -t "$DOCKER_IMAGE:latest" .
-    - docker push "$DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA"
-    - docker push "$DOCKER_IMAGE:latest"
+    - docker build -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA -t $DOCKER_IMAGE:latest .
+    - docker push $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
+    - docker push $DOCKER_IMAGE:latest
     - echo "Docker image pushed successfully!"
     - echo " Image:tag → $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA"
   dependencies:
@@ -198,4 +189,4 @@ docker-build-push:
     - main
     - develop
   after_script:
-    - docker logout "$ECR_REGISTRY"
+    - docker logout
