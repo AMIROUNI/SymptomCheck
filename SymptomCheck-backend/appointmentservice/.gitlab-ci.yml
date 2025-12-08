@@ -29,9 +29,6 @@ build-job:
       - SymptomCheck-backend/appointmentservice/pom.xml
     expire_in: 1 hour
 
-# -------------------------------
-#  PARALLEL TESTS
-# -------------------------------
 
 
 # -------------------------------
