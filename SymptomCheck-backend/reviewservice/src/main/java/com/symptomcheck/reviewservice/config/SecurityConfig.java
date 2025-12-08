@@ -49,6 +49,7 @@ public class SecurityConfig {
                                 "/api/v1/users/public/**",
                                 "/api/v1/auth/**",
                                 "/actuator/health",
+                                "/actuator/health/**",
                                 "/uploads/**").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
 
