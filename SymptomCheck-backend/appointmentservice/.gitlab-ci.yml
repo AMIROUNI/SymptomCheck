@@ -60,7 +60,7 @@ docker-build-push:
     - cd SymptomCheck-backend/appointmentservice
     - docker build -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA -t $DOCKER_IMAGE:latest .
     - docker push $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
-    - docker push $DOCKER_IMAGE:latest
+    - docker push $DOCKER_IMAGE:1.0.0
     - echo "Docker image pushed successfully!"
   dependencies:
     - package-job
