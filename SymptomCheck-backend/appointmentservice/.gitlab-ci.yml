@@ -1,7 +1,6 @@
 stages:
   - build
-  - test
-  - sonarqube
+  - package
   - docker
 
 variables:
@@ -13,27 +12,40 @@ cache:
   paths:
     - SymptomCheck-backend/appointmentservice/.m2/repository
 
-# -------------------------------
-#  BUILD APPOINTMENT SERVICE
-# -------------------------------
+# --------------------------------
+# BUILD
+# --------------------------------
 build-job:
   stage: build
   image: maven:3.9.0-eclipse-temurin-17
   script:
     - cd SymptomCheck-backend/appointmentservice
     - mvn clean compile -DskipTests
-
   artifacts:
     paths:
       - SymptomCheck-backend/appointmentservice/target/classes/
       - SymptomCheck-backend/appointmentservice/pom.xml
     expire_in: 1 hour
 
+# --------------------------------
+# PACKAGE
+# --------------------------------
+package-job:
+  stage: package
+  image: maven:3.9.0-eclipse-temurin-17
+  script:
+    - cd SymptomCheck-backend/appointmentservice
+    - mvn package -DskipTests
+  artifacts:
+    paths:
+      - SymptomCheck-backend/appointmentservice/target/*.jar
+    expire_in: 1 week
+  dependencies:
+    - build-job
 
-
-# -------------------------------
-# BUILD & PUSH DOCKER IMAGE
-# -------------------------------
+# --------------------------------
+# DOCKER BUILD & PUSH
+# --------------------------------
 docker-build-push:
   stage: docker
   image: docker:24-dind
@@ -43,8 +55,6 @@ docker-build-push:
     DOCKER_TLS_CERTDIR: ""
     DOCKER_DRIVER: overlay2
   before_script:
-    - cd SymptomCheck-backend/appointmentservice
-    - mvn package -DskipTests
     - echo "$DOCKERHUB_PASSWORD" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
   script:
     - cd SymptomCheck-backend/appointmentservice
@@ -52,7 +62,8 @@ docker-build-push:
     - docker push $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA
     - docker push $DOCKER_IMAGE:latest
     - echo "Docker image pushed successfully!"
-    - echo " Image:tag → $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA"
+  dependencies:
+    - package-job
   only:
     - main
     - develop
