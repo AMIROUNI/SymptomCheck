@@ -25,7 +25,7 @@ export class CompleteProfileComponent implements OnInit {
     { label: 'Dimanche', value: 'SUNDAY' }
   ];
 
-  private doctorApiUrl = 'http://localhost:8083/api/v1/doctor/profile';
+  private doctorApiUrl = 'http://doctorservice/api/v1/doctor/profile';
 
   constructor(
     private fb: FormBuilder,
@@ -99,7 +99,7 @@ export class CompleteProfileComponent implements OnInit {
 
   toggleDay(index: number, day: string, event: any) {
     const daysArray = this.availabilities.at(index).get('days')!.value as string[];
-    
+
     if (event.target.checked) {
       if (!daysArray.includes(day)) {
         daysArray.push(day);
@@ -110,7 +110,7 @@ export class CompleteProfileComponent implements OnInit {
         daysArray.splice(idx, 1);
       }
     }
-    
+
     this.availabilities.at(index).get('days')!.setValue([...daysArray]);
   }
 

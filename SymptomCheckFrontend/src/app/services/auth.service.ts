@@ -8,7 +8,7 @@ import { KeycloakService } from 'keycloak-angular';
 import { Router } from '@angular/router';
 import { DoctorProfileStatusDTO } from '../models/doctor-profile-status.model';
 
-const apiUrl = 'http://localhost:8082/api/v1/users';
+const apiUrl = 'http://userservice/api/v1/users';
 
 
 @Injectable({
@@ -23,7 +23,7 @@ export class AuthService {
     private http: HttpClient,
     private keycloakService: KeycloakService,
     private router: Router,
-  
+
   ) {
     this.loadCurrentUser();
   }
@@ -48,7 +48,7 @@ export class AuthService {
       });
     }
   }
-  
+
 
   /**
    * Register a new user (this doesn't require Keycloak login)
@@ -81,7 +81,7 @@ export class AuthService {
   async loginWithCredentials(username: string, password: string): Promise<void> {
     try {
       // Call Keycloak token endpoint directly
-      const response = await fetch('http://localhost:8080/realms/symptomcheck-realm/protocol/openid-connect/token', {
+      const response = await fetch('http://keycloak:8080/realms/symptomcheck-realm/protocol/openid-connect/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -106,7 +106,7 @@ export class AuthService {
       // Keycloak service will automatically use these tokens for subsequent requests
       await this.keycloakService.init({
         config: {
-          url: 'http://localhost:8080',
+          url: 'http://keycloack:8080',
           realm: 'symptomcheck-realm',
           clientId: 'angular-client',
         },

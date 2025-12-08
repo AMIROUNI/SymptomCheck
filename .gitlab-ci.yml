@@ -3,7 +3,10 @@ include:
  # - local: 'SymptomCheck-backend/clinicservice/.gitlab-ci.yml'
  # - local: 'SymptomCheck-backend/reviewservice/.gitlab-ci.yml'
  # - local: 'SymptomCheck-backend/doctorservice/.gitlab-ci.yml'
+<<<<<<< HEAD
    - local: 'SymptomCheck-backend/userservice/.gitlab-ci.yml'
+=======
+  - local: 'SymptomCheck-backend/userservice/.gitlab-ci.yml'
+>>>>>>> 0e2ee45d87427729c7683af2c12c42ac3026f7af
  # - local: 'SymptomCheck-backend/appointmentservice/.gitlab-ci.yml'
 
-  
