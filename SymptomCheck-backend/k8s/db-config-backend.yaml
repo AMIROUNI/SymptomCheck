@@ -5,8 +5,16 @@ metadata:
   namespace: symptomcheck-backend
 data:
   SPRING_DATASOURCE_URL: "jdbc:postgresql://symptomcheck-database-1.cjiakyye42a0.us-east-1.rds.amazonaws.com:5432/medical_clinic_service_db"
-  SPRING_DATASOURCE_APPOINTMENT_URL: "jdbc:postgresql://symptomcheck-database-1.cjiakyye42a0.us-east-1.rds.amazonaws.com:5432/medical_clinic_service_db"
+  SPRING_DATASOURCE_APPOINTMENT_URL: "jdbc:postgresql://symptomcheck-database-1.cjiakyye42a0.us-east-1.rds.amazonaws.com:5432/appointment_service_db"
   SPRING_DATASOURCE_USERNAME: "postgres"
+  SPRING_DATASOURCE_USER_URL: "jdbc:postgresql://symptomcheck-database-1.cjiakyye42a0.us-east-1.rds.amazonaws.com:5432/user_service_db"
+
+  SERVER_PORT: "8089"
+  SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "none"           # or "update" / "validate" depending on what you want
+  SPRING_JPA_SHOW_SQL: "false"
+  SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.PostgreSQLDialect"
+  SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
 
   MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "*"
   MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: "always"
