@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-angular-app
+  namespace: symptomcheck-frontend
+  labels:
+    app: my-angular-app
+spec:
+  replicas: 10
+  selector:
+    matchLabels:
+      app: my-angular-app
+  template:
+    metadata:
+      labels:
+        app: my-angular-app
+    spec:
+      containers:
+        - name: my-angular-app
+          image: amir254/my-angular-app:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80

@@ -2,3 +2,10 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: symptomcheck-backend
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: symptomcheck-frontend
