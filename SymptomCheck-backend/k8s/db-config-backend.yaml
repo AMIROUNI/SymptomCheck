@@ -5,6 +5,7 @@ metadata:
   namespace: symptomcheck-backend
 data:
   SPRING_DATASOURCE_URL: "jdbc:postgresql://symptomcheck-database-1.cjiakyye42a0.us-east-1.rds.amazonaws.com:5432/medical_clinic_service_db"
+  SPRING_DATASOURCE_APPOINTMENT_URL: "jdbc:postgresql://symptomcheck-database-1.cjiakyye42a0.us-east-1.rds.amazonaws.com:5432/medical_clinic_service_db"
   SPRING_DATASOURCE_USERNAME: "postgres"
 
   MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "*"

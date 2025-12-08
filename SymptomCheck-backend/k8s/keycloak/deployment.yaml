@@ -69,16 +69,4 @@ spec:
             - name: KC_METRICS_ENABLED
               value: "true"
 
-          readinessProbe:
-            httpGet:
-              path: /realms/master
-              port: 8080
-            initialDelaySeconds: 30
-            periodSeconds: 10
 
-          livenessProbe:
-            httpGet:
-              path: /realms/master
-              port: 8080
-            initialDelaySeconds: 60
-            periodSeconds: 30

@@ -4,20 +4,20 @@ metadata:
   name: appointmentservice
   namespace: symptomcheck-backend
   labels:
-    app: clinicservice
+    app: appointmentservice
 spec:
   replicas: 10
   selector:
     matchLabels:
-      app: clinicservice
+      app: appointmentservice
   template:
     metadata:
       labels:
-        app: clinicservice
+        app: appointmentservice
     spec:
       containers:
-        - name: clinicservice
-          image: amir254/appointmentservice:latest
+        - name: appointmentservice
+          image: amir254/appointmentservice:1.0.0
           imagePullPolicy: IfNotPresent
 
           ports:
