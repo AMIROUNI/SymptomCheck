@@ -8,7 +8,7 @@ import { KeycloakService } from 'keycloak-angular';
 import { Router } from '@angular/router';
 import { DoctorProfileStatusDTO } from '../models/doctor-profile-status.model';
 
-const apiUrl = 'http://localhost:8082/api/v1/users';
+const apiUrl = 'http://userservice/api/v1/users';
 
 
 @Injectable({
@@ -23,7 +23,7 @@ export class AuthService {
     private http: HttpClient,
     private keycloakService: KeycloakService,
     private router: Router,
-  
+
   ) {
     this.loadCurrentUser();
   }
@@ -48,7 +48,7 @@ export class AuthService {
       });
     }
   }
-  
+
 
   /**
    * Register a new user (this doesn't require Keycloak login)

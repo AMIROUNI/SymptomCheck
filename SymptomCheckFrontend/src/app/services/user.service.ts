@@ -55,7 +55,7 @@ export class UserService {
   return this.http.put(`${this.apiUrl}/${userId}`, userDataWithoutId);
 }
 
-  
+
 
   uploadProfilePhoto(userId: string, file: File): Observable<any> {
     const formData = new FormData();

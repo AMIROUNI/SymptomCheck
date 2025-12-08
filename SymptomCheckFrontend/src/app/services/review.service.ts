@@ -8,7 +8,7 @@ import { DoctorReview, DoctorReviewStats } from '@/app/models/doctor-review.mode
   providedIn: 'root'
 })
 export class ReviewService {
-  private apiUrl = 'http://localhost:8078/api/v1/reviews';
+  private apiUrl = 'http://reviewservice/api/v1/reviews';
 
   constructor(private http: HttpClient) {}
 
@@ -34,7 +34,7 @@ export class ReviewService {
 
   // Vérifier si l'utilisateur a déjà reviewé ce docteur
   hasReviewedDoctor(doctorId: string): Observable<boolean> {
-    
+
     return this.http.get<boolean>(`${this.apiUrl}/doctor/${doctorId}/has-reviewed`);
   }
 

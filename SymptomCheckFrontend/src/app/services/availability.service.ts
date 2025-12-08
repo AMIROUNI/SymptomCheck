@@ -15,7 +15,7 @@ export interface DoctorAvailability {
 })
 export class DoctorAvailabilityService {
 
-  private baseUrl = 'http://localhost:8087/api/v1/doctor/availability';
+  private baseUrl = 'http://doctorservice/api/v1/doctor/availability';
 
   constructor(private http: HttpClient) {}
 
