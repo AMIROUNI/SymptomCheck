@@ -81,7 +81,7 @@ export class AuthService {
   async loginWithCredentials(username: string, password: string): Promise<void> {
     try {
       // Call Keycloak token endpoint directly
-      const response = await fetch('http://localhost:8080/realms/symptomcheck-realm/protocol/openid-connect/token', {
+      const response = await fetch('http://keycloak:8080/realms/symptomcheck-realm/protocol/openid-connect/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
@@ -106,7 +106,7 @@ export class AuthService {
       // Keycloak service will automatically use these tokens for subsequent requests
       await this.keycloakService.init({
         config: {
-          url: 'http://localhost:8080',
+          url: 'http://keycloack:8080',
           realm: 'symptomcheck-realm',
           clientId: 'angular-client',
         },

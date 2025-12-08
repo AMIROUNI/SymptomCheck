@@ -19,7 +19,7 @@ export const environment = {
 
   // Configuration Keycloak
   keycloak: {
-    url: 'http://keycloak',
+    url: 'http://keycloak:8080',
     realm: 'symptomcheck-realm',
     clientId: 'your-angular-client'
   },

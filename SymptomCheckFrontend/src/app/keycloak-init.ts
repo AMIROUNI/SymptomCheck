@@ -6,7 +6,7 @@ export function initializeKeycloak(keycloak: KeycloakService, router: Router) {
     keycloak
       .init({
         config: {
-          url: 'http://localhost:8080',
+          url: 'http://keycloak:8080',
           realm: 'symptomcheck-realm',
           clientId: 'angular-client',
         },
@@ -21,7 +21,7 @@ export function initializeKeycloak(keycloak: KeycloakService, router: Router) {
           '/api/v1/users/register',
           '/api/v1/users/public',
           '/api/v1/auth',
-          'http://localhost:8080'
+          'http://keycloack:8080'
         ],
         bearerPrefix: 'Bearer',
       })
