@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: symptomcheck-backend
+  labels:
+    app: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: amir254/keycloak-realm-custom:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            # --- DB config ---
+            - name: KC_DB
+              value: "postgres"
+
+            # Use a dedicated "keycloak" DB on the same RDS instance
+            - name: KC_DB_URL
+              value: "jdbc:postgresql://symptomcheck-database-1.cjiakyye42a0.us-east-1.rds.amazonaws.com:5432/keycloak"
+
+            # Username from ConfigMap (postgres)
+            - name: KC_DB_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: symptomcheck-backend-db-config
+                  key: SPRING_DATASOURCE_USERNAME
+
+            # Password from Secret (same as backend DB password for now)
+            - name: KC_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: symptomcheck-backend-db-secret
+                  key: SPRING_DATASOURCE_PASSWORD
+
+            # --- Keycloak admin user (from Secret) ---
+            - name: KEYCLOAK_ADMIN
+              valueFrom:
+                secretKeyRef:
+                  name: symptomcheck-backend-db-secret
+                  key: KEYCLOAK_ADMIN
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: symptomcheck-backend-db-secret
+                  key: KEYCLOAK_ADMIN_PASSWORD
+
+            # Optional extra config (good defaults for K8s)
+            - name: KC_HTTP_PORT
+              value: "8080"
+            - name: KC_PROXY_HEADERS
+              value: "xforwarded"
+            - name: KC_HOSTNAME_STRICT
+              value: "false"
+            - name: KC_HEALTH_ENABLED
+              value: "true"
+            - name: KC_METRICS_ENABLED
+              value: "true"
+
+          readinessProbe:
+            httpGet:
+              path: /realms/master
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+          livenessProbe:
+            httpGet:
+              path: /realms/master
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 30
