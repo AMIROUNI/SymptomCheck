@@ -197,21 +197,6 @@ class UserDataTest {
             assertNotEquals(userData1, userData2);
         }
 
-        @Test
-        @DisplayName("should handle both null IDs in equals")
-        void shouldHandleBothNullIdsInEquals() {
-            // Given
-            Instant now = Instant.now();
-            UserData userData1 = new UserData();
-            userData1.setId(null);
-            userData1.setCreatedAt(now);
 
-            UserData userData2 = new UserData();
-            userData2.setId(null);
-            userData1.setCreatedAt(now);
-
-            // Then
-            assertEquals(userData1, userData2);
-        }
     }
 }

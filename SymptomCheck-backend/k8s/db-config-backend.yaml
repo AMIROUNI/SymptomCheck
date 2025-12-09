@@ -4,11 +4,42 @@ metadata:
   name: symptomcheck-backend-db-config
   namespace: symptomcheck-backend
 data:
+  # === Datasource URLs ===
   SPRING_DATASOURCE_URL: "jdbc:postgresql://symptomcheck-database-1.cjiakyye42a0.us-east-1.rds.amazonaws.com:5432/medical_clinic_service_db"
-  SPRING_DATASOURCE_APPOINTMENT_URL: "jdbc:postgresql://symptomcheck-database-1.cjiakyye42a0.us-east-1.rds.amazonaws.com:5432/medical_clinic_service_db"
+  SPRING_DATASOURCE_APPOINTMENT_URL: "jdbc:postgresql://symptomcheck-database-1.cjiakyye42a0.us-east-1.rds.amazonaws.com:5432/appointment_service_db"
+  SPRING_DATASOURCE_USER_URL: "jdbc:postgresql://symptomcheck-database-1.cjiakyye42a0.us-east-1.rds.amazonaws.com:5432/user_service_db"
   SPRING_DATASOURCE_USERNAME: "postgres"
 
+  # === JPA / Hibernate common settings ===
+  SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "none"              # override per-service if needed
+  SPRING_JPA_SHOW_SQL: "false"
+  SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.PostgreSQLDialect"
+  SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+
+  # === Multipart / upload (optional overrides) ===
+  APP_UPLOAD_DIR: "uploads"
+  SPRING_SERVLET_MULTIPART_ENABLED: "true"
+  SPRING_SERVLET_MULTIPART_MAX_FILE_SIZE: "10MB"
+  SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE: "10MB"
+
+  # === Monitoring ===
   MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "*"
   MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS: "always"
 
+  # === Security / Keycloak (resource server) ===
   SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: "http://keycloak:8080/realms/symptomcheck-realm"
+
+  # === Logging defaults (optional) ===
+  LOGGING_LEVEL_USERSERVICE: "DEBUG"
+  LOGGING_LEVEL_KEYCLOAK: "INFO"
+  LOGGING_LEVEL_SECURITY: "DEBUG"
+
+  # === Keycloak Admin & App (non-secret parts) ===
+  KEYCLOAK_ADMIN_SERVER_URL: "http://keycloak:8080"
+  KEYCLOAK_ADMIN_REALM: "master"
+  KEYCLOAK_ADMIN_CLIENT_ID: "admin-cli"
+
+  KEYCLOAK_APP_REALM: "symptomcheck-realm"
+  KEYCLOAK_APP_CLIENT_ID: "userservice"
+  KEYCLOAK_APP_ROLES: "USER,ADMIN,DOCTOR,PATIENT"

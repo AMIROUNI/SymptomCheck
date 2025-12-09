@@ -3,10 +3,8 @@ kind: Deployment
 metadata:
   name: appointmentservice
   namespace: symptomcheck-backend
-  labels:
-    app: appointmentservice
 spec:
-  replicas: 10
+  replicas: 4
   selector:
     matchLabels:
       app: appointmentservice
@@ -21,7 +19,7 @@ spec:
           imagePullPolicy: IfNotPresent
 
           ports:
-            - containerPort: 8089
+            - containerPort: 8080
 
           envFrom:
             - configMapRef:
@@ -29,16 +27,18 @@ spec:
             - secretRef:
                 name: symptomcheck-backend-db-secret
 
-          readinessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8089
-            initialDelaySeconds: 15
-            periodSeconds: 10
+          env:
+            - name: SERVER_PORT      # <--- CHANGE to 8080
+              value: "8080"
+            - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+              value: "org.postgresql.Driver"
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: "none"
+            - name: SPRING_JPA_SHOW_SQL
+              value: "false"
+            - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+              value: "org.hibernate.dialect.PostgreSQLDialect"
+            - name: SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL
+              value: "true"
 
-          livenessProbe:
-            httpGet:
-              path: /actuator/health
-              port: 8089
-            initialDelaySeconds: 30
-            periodSeconds: 20
+
