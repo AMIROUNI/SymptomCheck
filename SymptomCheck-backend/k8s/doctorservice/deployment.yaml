@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doctorservice
+  namespace: symptomcheck-backend
+  labels:
+    app: doctorservice
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: doctorservice
+  template:
+    metadata:
+      labels:
+        app: doctorservice
+    spec:
+      containers:
+        - name: doctorservice
+          image: amir254/doctorservice:latest
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 8085
+
+          # Explicit env overrides / additions for this service
+          env:
+            # Set the URL that Spring actually uses
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: symptomcheck-backend-db-config
+                  key: SPRING_DATASOURCE_DOCTOR_URL
+
+            # Optional but nice: make sure app name and port align
+            - name: SPRING_APPLICATION_NAME
+              value: "doctor-service"
+            - name: SERVER_PORT
+              value: "8085"
+
+          # Common/shared config + secrets
+          envFrom:
+            - configMapRef:
+                name: symptomcheck-backend-db-config
+            - secretRef:
+                name: symptomcheck-backend-db-secret
+

@@ -5,14 +5,15 @@ metadata:
   namespace: symptomcheck-backend
 data:
   # === Datasource URLs ===
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://symptomcheck-database-1.cjiakyye42a0.us-east-1.rds.amazonaws.com:5432/medical_clinic_service_db"
-  SPRING_DATASOURCE_APPOINTMENT_URL: "jdbc:postgresql://symptomcheck-database-1.cjiakyye42a0.us-east-1.rds.amazonaws.com:5432/appointment_service_db"
-  SPRING_DATASOURCE_USER_URL: "jdbc:postgresql://symptomcheck-database-1.cjiakyye42a0.us-east-1.rds.amazonaws.com:5432/user_service_db"
+  SPRING_DATASOURCE_URL: "jdbc:postgresql://symptomcheck-database-1.cxesa6ik8o2u.us-east-1.rds.amazonaws.com:5432/medical_clinic_service_db"
+  SPRING_DATASOURCE_APPOINTMENT_URL: "jdbc:postgresql://symptomcheck-database-1.cxesa6ik8o2u.us-east-1.rds.amazonaws.com:5432/appointment_service_db"
+  SPRING_DATASOURCE_USER_URL: "jdbc:postgresql://symptomcheck-database-1.cxesa6ik8o2u.us-east-1.rds.amazonaws.com:5432/user_service_db"
+  SPRING_DATASOURCE_DOCTOR_URL: "jdbc:postgresql://symptomcheck-database-1.cxesa6ik8o2u.us-east-1.rds.amazonaws.com:5432/doctor_service_db"
   SPRING_DATASOURCE_USERNAME: "postgres"
 
   # === JPA / Hibernate common settings ===
   SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
-  SPRING_JPA_HIBERNATE_DDL_AUTO: "none"              # override per-service if needed
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "create"              # override per-service if needed
   SPRING_JPA_SHOW_SQL: "false"
   SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.PostgreSQLDialect"
   SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
@@ -43,3 +44,4 @@ data:
   KEYCLOAK_APP_REALM: "symptomcheck-realm"
   KEYCLOAK_APP_CLIENT_ID: "userservice"
   KEYCLOAK_APP_ROLES: "USER,ADMIN,DOCTOR,PATIENT"
+

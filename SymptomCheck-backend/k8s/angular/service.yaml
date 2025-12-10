@@ -4,10 +4,10 @@ metadata:
   name: my-angular-app
   namespace: symptomcheck-frontend
 spec:
+  type: ClusterIP
   selector:
     app: my-angular-app
   ports:
     - name: http
       port: 80
       targetPort: 80
-  type: ClusterIP

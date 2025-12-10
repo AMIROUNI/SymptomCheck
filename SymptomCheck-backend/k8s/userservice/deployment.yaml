@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userservice
+  namespace: symptomcheck-backend
+  labels:
+    app: userservice
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: userservice
+  template:
+    metadata:
+      labels:
+        app: userservice
+    spec:
+      containers:
+        - name: userservice
+          image: amir254/userservice:latest
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - containerPort: 8082
+
+          # Take all common config & secrets
+          envFrom:
+            - configMapRef:
+                name: symptomcheck-backend-db-config
+            - secretRef:
+                name: symptomcheck-backend-db-secret
+
+          # Service-specific overrides
+          env:
+            # already have:
+            - name: KC_DB
+              value: "postgres"
+            - name: KC_DB_URL
+              value: "jdbc:postgresql://symptomcheck-database-1.cjiakyye42a0.us-east-1.rds.amazonaws.com:5432/keycloak?sslmode=require"
+            - name: KC_DB_USERNAME
+              value: "postgres"
+            - name: KC_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: symptomcheck-backend-db-secret
+                  key: SPRING_DATASOURCE_PASSWORD
+
+            # NEW: pool tuning (example values)
+            - name: KC_DB_POOL_INITIAL_SIZE
+              value: "5"
+            - name: KC_DB_POOL_MIN_SIZE
+              value: "5"
+            - name: KC_DB_POOL_MAX_SIZE
+              value: "20"
+            - name: KC_DB_POOL_ACQUISITION_TIMEOUT
+              value: "30"   # seconds
+
