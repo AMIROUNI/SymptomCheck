@@ -13,7 +13,7 @@ data:
 
   # === JPA / Hibernate common settings ===
   SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
-  SPRING_JPA_HIBERNATE_DDL_AUTO: "create"              # override per-service if needed
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "update"              # override per-service if needed
   SPRING_JPA_SHOW_SQL: "false"
   SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: "org.hibernate.dialect.PostgreSQLDialect"
   SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"

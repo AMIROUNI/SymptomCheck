@@ -15,13 +15,20 @@ spec:
       labels:
         app: userservice
     spec:
+      resources:
+        requests:
+          cpu: "250m"
+          memory: "512Mi"
+        limits:
+          cpu: "500m"
+          memory: "1Gi"
       containers:
         - name: userservice
           image: amir254/userservice:latest
           imagePullPolicy: IfNotPresent
 
           ports:
-            - containerPort: 8082
+              - containerPort: 8082
 
           # Take all common config & secrets
           envFrom:

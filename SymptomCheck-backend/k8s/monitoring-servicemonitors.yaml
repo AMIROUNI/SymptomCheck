@@ -1,0 +1,92 @@
+# monitoring-servicemonitors.yaml
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: appointment-servicemonitor
+  namespace: monitoring
+  labels:
+    release: prom-stack
+spec:
+  namespaceSelector:
+    matchNames: ["symptomcheck-backend"]
+  selector:
+    matchLabels:
+      app: appointmentservice
+  endpoints:
+    - port: metrics
+      path: /actuator/prometheus
+      interval: 15s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: clinicservice-servicemonitor
+  namespace: monitoring
+  labels:
+    release: prom-stack
+spec:
+  namespaceSelector:
+    matchNames: ["symptomcheck-backend"]
+  selector:
+    matchLabels:
+      app: clinicservice
+  endpoints:
+    - port: metrics
+      path: /actuator/prometheus
+      interval: 15s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: doctorservice-servicemonitor
+  namespace: monitoring
+  labels:
+    release: prom-stack
+spec:
+  namespaceSelector:
+    matchNames: ["symptomcheck-backend"]
+  selector:
+    matchLabels:
+      app: doctorservice
+  endpoints:
+    - port: metrics
+      path: /actuator/prometheus
+      interval: 15s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: userservice-servicemonitor
+  namespace: monitoring
+  labels:
+    release: prom-stack
+spec:
+  namespaceSelector:
+    matchNames: ["symptomcheck-backend"]
+  selector:
+    matchLabels:
+      app: userservice
+  endpoints:
+    - port: metrics
+      path: /actuator/prometheus
+      interval: 15s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: keycloak-servicemonitor
+  namespace: monitoring
+  labels:
+    release: prom-stack
+spec:
+  namespaceSelector:
+    matchNames: ["symptomcheck-backend"]
+  selector:
+    matchLabels:
+      app: keycloak
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 15s
+      scheme: http

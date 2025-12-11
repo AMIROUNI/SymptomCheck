@@ -12,52 +12,91 @@ spec:
       app: keycloak
   template:
     metadata:
+      annotations:
+        alb.ingress.kubernetes.io/scheme: internet-facing
+        alb.ingress.kubernetes.io/target-type: ip
+        alb.ingress.kubernetes.io/healthcheck-path: /health/ready
+        alb.ingress.kubernetes.io/healthcheck-port: "9000"
+        alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+        alb.ingress.kubernetes.io/healthy-threshold-count: "2"
+        alb.ingress.kubernetes.io/unhealthy-threshold-count: "2"
+        alb.ingress.kubernetes.io/healthcheck-interval-seconds: "10"
       labels:
         app: keycloak
     spec:
+      initContainers:
+        - name: copy-realm-config
+          image: busybox:1.36
+          command:
+            - /bin/sh
+            - -c
+            - |
+              mkdir -p /opt/keycloak/data/import
+              cp /tmp-src/symptomcheck-realm.json /opt/keycloak/data/import/symptomcheck-realm.json || true
+              chmod 644 /opt/keycloak/data/import/symptomcheck-realm.json || true
+          volumeMounts:
+            - name: import-dir
+              mountPath: /opt/keycloak/data/import
+            - name: realm-config
+              mountPath: /tmp-src
+      volumes:
+        - name: realm-config
+          configMap:
+            name: keycloak-realm-config
+            optional: true
+            items:
+              - key: symptomcheck-realm.json
+                path: symptomcheck-realm.json
+        - name: import-dir
+          emptyDir: {}
       containers:
         - name: keycloak
-          image: quay.io/keycloak/keycloak:24.0.2   # OFFICIAL IMAGE
+          image: quay.io/keycloak/keycloak:24.0.2
           imagePullPolicy: IfNotPresent
           command: ["/opt/keycloak/bin/kc.sh"]
-          args: ["start-dev"]
+          args: ["start", "--http-enabled=true"]
           ports:
             - containerPort: 8080
               name: http
+            - containerPort: 9000
+              name: management
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "1Gi"
+          envFrom:
+            - configMapRef:
+                name: symptomcheck-backend-db-config
+            - secretRef:
+                name: symptomcheck-backend-db-secret
           env:
-            # --- DB config ---
             - name: KC_DB
               value: "postgres"
-
             - name: KC_DB_URL
               value: "jdbc:postgresql://symptomcheck-database-1.cxesa6ik8o2u.us-east-1.rds.amazonaws.com:5432/keycloak?sslmode=require"
-
             - name: KC_DB_USERNAME
               valueFrom:
-                configMapKeyRef:
-                  name: symptomcheck-backend-db-config
+                secretKeyRef:
+                  name: symptomcheck-backend-db-secret
                   key: SPRING_DATASOURCE_USERNAME
-
             - name: KC_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: symptomcheck-backend-db-secret
                   key: SPRING_DATASOURCE_PASSWORD
-
-            # --- Keycloak admin user ---
             - name: KEYCLOAK_ADMIN
               valueFrom:
                 secretKeyRef:
                   name: symptomcheck-backend-db-secret
                   key: KEYCLOAK_ADMIN
-
             - name: KEYCLOAK_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: symptomcheck-backend-db-secret
                   key: KEYCLOAK_ADMIN_PASSWORD
-
-            # --- HTTP + misc ---
             - name: KC_HTTP_PORT
               value: "8080"
             - name: KC_PROXY_HEADERS
@@ -68,22 +107,42 @@ spec:
               value: "true"
             - name: KC_METRICS_ENABLED
               value: "true"
-
-            # --- Realm import from ConfigMap ---
+            - name: KC_HTTP_MANAGEMENT_SCHEME
+              value: "http"
             - name: KC_IMPORT
               value: "/opt/keycloak/data/import/symptomcheck-realm.json"
             - name: KC_IMPORT_STRATEGY
               value: "IGNORE_EXISTING"
-
           volumeMounts:
             - name: realm-config
-              mountPath: /opt/keycloak/data/import
+              mountPath: /tmp-src
               readOnly: true
-
-      volumes:
-        - name: realm-config
-          configMap:
-            name: keycloak-realm-config
-            items:
-              - key: symptomcheck-realm.json
-                path: symptomcheck-realm.json
+            - name: import-dir
+              mountPath: /opt/keycloak/data/import
+              readOnly: false
+          # StartupProbe: wait for management health (9000) — very long timeout to allow DB migration/import
+          startupProbe:
+            httpGet:
+              path: /health/ready
+              port: 9000
+            initialDelaySeconds: 500
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 120
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 9000
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 6
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 9000
+            initialDelaySeconds: 180
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5

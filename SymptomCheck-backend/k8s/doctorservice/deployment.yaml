@@ -15,6 +15,13 @@ spec:
       labels:
         app: doctorservice
     spec:
+      resources:
+        requests:
+          cpu: "250m"
+          memory: "512Mi"
+        limits:
+          cpu: "500m"
+          memory: "1Gi"
       containers:
         - name: doctorservice
           image: amir254/doctorservice:latest
