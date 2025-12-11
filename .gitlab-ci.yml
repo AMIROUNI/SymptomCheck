@@ -1,8 +1,12 @@
 
 include:
- # - local: 'SymptomCheck-backend/clinicservice/.gitlab-ci.yml'
+  - local: 'SymptomCheck-backend/clinicservice/.gitlab-ci.yml'
  # - local: 'SymptomCheck-backend/reviewservice/.gitlab-ci.yml'
+<<<<<<< HEAD
  # - local: 'SymptomCheck-backend/doctorservice/.gitlab-ci.yml'
+=======
+#  - local: 'SymptomCheck-backend/doctorservice/.gitlab-ci.yml'
+>>>>>>> origin2/main
  # - local: 'SymptomCheck-backend/userservice/.gitlab-ci.yml'
   - local: 'SymptomCheck-backend/appointmentservice/.gitlab-ci.yml'
 
